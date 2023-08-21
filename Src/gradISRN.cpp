@@ -127,7 +127,7 @@ int main (int argc, char* argv[])
   outNames[NUM_SPECIES+1] = "xi";
   outNames[NUM_SPECIES+2] = "lambda";
 
-  Vector<std::unique_ptr<MultiFab>> outdata(Nlev);
+  Vector<MultiFab*> outdata(Nlev);
   Vector<Geometry> geoms(Nlev);
   amrex::RealBox real_box({AMREX_D_DECL(amrData.ProbLo()[0],
                                         amrData.ProbLo()[1],
@@ -146,7 +146,7 @@ int main (int argc, char* argv[])
   {
     const BoxArray ba = amrData.boxArray(lev);
     const DistributionMapping dm(ba);
-    outdata[lev].reset(new MultiFab(ba,dm,nCompOut,nGrow));
+    outdata[lev] = new MultiFab(ba,dm,nCompOut,nGrow);
     if ( lev > 0 ) {
        geoms[lev] = amrex::refine(geoms[lev - 1], 2);
     }
@@ -194,8 +194,13 @@ int main (int argc, char* argv[])
 
 
     } // mfi
-    Print() << "Derive finished for level " << lev << std::endl;
+    Print() << "Derived finished for level " << lev << std::endl;
   } // lev
+
+  std::string outfilename(basename(infile) + "_ISRNderived"); 
+  Print() << "Writing ISRN derived data to " << outfilename << std::endl;
+  bool verb = false;
+  WritePlotFile(outdata,amrData,outfilename,verb,outNames);
 
   trans_parms.deallocate();
   amrex::Finalize();

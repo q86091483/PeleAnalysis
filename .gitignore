@@ -3,6 +3,7 @@ nohup.out
 *.ex
 *.ex.dSYM
 *.exe
+*.png
 *.exe.dSYM
 *~
 build/
