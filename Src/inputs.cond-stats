@@ -1,0 +1,59 @@
+# Global settings
+verbose         = 2
+finestLevel     = 0
+infile          = /project/b/bsavard/mavab/Backup_run/DNS_HTC_premixer/chemistry/plt06024
+infile_derived  = /scratch/b/bsavard/zisen347/PeleAnalysis_Zisen/Src/plt06024_derived
+outputDir       = cond_ISRN        
+outputLabel     = Y
+
+# Conditioning variables
+vars            = mixture_fraction  x		      y		      z
+nBins           = 101               4		      1 		    1
+varBounds       = -0.001 0.13       0 3.3E-3 	0 9E-4		0 1.2E-3
+incOutOfBounds  = 1                 1		      1		      1	
+binType         = lin               lin		    lin		    lin
+
+# Averaged variables
+#avgVars        = HeatRelease  temp    Y(H2O)   Y(H2)    Y(H2O2)  Y(HO2)   Y(OH)     mixture_fraction 
+#avgVarWeights  = volume       volume  density  density  density  density  density   volume 
+avgVars         = temp    Y(H2O)    temp_gx
+avgVarWeights   = volume  density   density
+
+# Conditioning variables
+## 1D
+#vars      = mixture_fraction
+#nBins     = 101
+#varBounds = -0.003 0.3
+#outputDir = cond_stats_MF
+
+## 2D
+#vars      = mixture_fraction temp
+#nBins     = 101              91
+#varBounds = -0.003 0.3       600 1200
+
+## 3D
+#vars           = mixture_fraction temp     Y(C12H25O2)
+#nBins          = 101              100      9
+#varBounds      = -0.003 0.3       600 2600 1e-10 1e-1
+#incOutOfBounds = 1                1        1
+#binType        = lin              lin      log
+#outputDir      = cond_stats_MF-T-RO2
+
+## 4D
+#vars           = mixture_fraction temp     Y(C12H25O2) Y(OH)
+#nBins          = 101              10       9           9
+#varBounds      = -0.003 0.3       600 2600 1e-10 1e-1  1e-10 1e-1
+#incOutOfBounds = 1                1        1           1
+#binType        = lin              lin      log         log
+#outputDir      = cond_stats_MF-T-RO2-OH
+
+# 4D
+#vars           = mixture_fraction HeatRelease Y(H2O) Y(OH)
+#nBins          = 101              13          9           9
+#varBounds      = -0.003 0.3       1e1 1e14    1e-10 1e-1  1e-10 1e-1
+#incOutOfBounds = 1                1           1           1
+#binType        = lin              log         log         log
+#outputDir      = cond_stats_MF-HRR-RO2-OH
+
+
+

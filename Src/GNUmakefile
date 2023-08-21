@@ -1,23 +1,30 @@
-AMREX_HOME ?= ../../../amrex
-PELE_PHYSICS_HOME ?= ../../../PelePhysics
+AMREX_HOME          ?= /home/b/bsavard/zisen347/codes/exascale/amrex
+PELE_PHYSICS_HOME   ?= /home/b/bsavard/zisen347/codes/exascale/PelePhysics
+PELE_ANALYSIS_HOME  ?= /scratch/b/bsavard/zisen347/PeleAnalysis
 
 # AMReX
 DEBUG	      = FALSE
-DIM	      = 3
-PRECISION     = DOUBLE
+DIM	        = 3
+PRECISION   = DOUBLE
 
 # Compilation
-COMP          = gnu
+COMP          = intel
 USE_MPI       = TRUE
 USE_OMP       = FALSE
 USE_CUDA      = FALSE
+
+Chemistry_Model = DME_30atm_new
+#Reactions_dir   = Fuego
+Eos_Model       = Fuego
+Transport_Model = Simple
+Reactions_dir := Fuego
 
 # Executable
 # Uncomment the desired exec
 #EBASE         = grad
 #EBASE         = combinePlts
 #EBASE         = isosurface
-EBASE         = flattenAMRFile
+#EBASE         = flattenAMRFile
 #EBASE         = stream
 #EBASE         = partStream
 #EBASE         = blowOut
@@ -37,11 +44,13 @@ EBASE         = flattenAMRFile
 #EBASE         = avgToPlane
 #EBASE          = avgPlotfiles
 #EBASE          = amrToFE
+#EBASE         = conditionalISRN
+EBASE         = gradISRN
 
 NEEDS_f90_SRC = FALSE
 #NEEDS_f90_SRC = TRUE
 
-Pdirs   := Base Boundary AmrCore Extern/amrdata LinearSolvers/MLMG
+Pdirs   := Base Boundary AmrCore Extern/amrdata #LinearSolvers/MLMG
 Ppack   += $(foreach dir, $(Pdirs), $(AMREX_HOME)/Src/$(dir)/Make.package)
 
 PPdirs  := Utility/PltFileManager
@@ -63,6 +72,16 @@ endif
 INCLUDE_LOCATIONS += .
 VPATH_LOCATIONS   += .
 
+ifeq ($(EBASE), conditionalISRN)
+  #INCLUDE_LOCATIONS += $(HDF5_HOME)/include
+  LIBRARIES         += -lhdf5_cpp -lhdf5
+endif
+
+ifeq ($(EBASE), gradISRN)
+  #INCLUDE_LOCATIONS += $(HDF5_HOME)/include
+  LIBRARIES         += -lhdf5_cpp -lhdf5
+endif
+
 include $(Ppack)
 INCLUDE_LOCATIONS += $(Blocs)
 VPATH_LOCATIONS   += $(Blocs)
@@ -81,3 +100,4 @@ vpath %.f   : $(VPATH_LOCATIONS)
 vpath %.f90 : $(VPATH_LOCATIONS)
 
 include $(AMREX_HOME)/Tools/GNUMake/Make.rules
+include $(PELE_ANALYSIS_HOME)/Tools/GNUmake/Make.Analysis
