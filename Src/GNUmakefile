@@ -47,8 +47,8 @@ Reactions_dir := Fuego
 #EBASE         = conditionalISRN
 EBASE         = gradISRN
 
-NEEDS_f90_SRC = FALSE
-#NEEDS_f90_SRC = TRUE
+#NEEDS_f90_SRC = FALSE
+NEEDS_f90_SRC = TRUE
 
 Pdirs   := Base Boundary AmrCore Extern/amrdata #LinearSolvers/MLMG
 Ppack   += $(foreach dir, $(Pdirs), $(AMREX_HOME)/Src/$(dir)/Make.package)
