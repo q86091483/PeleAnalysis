@@ -1,9 +1,9 @@
 # Global settings
 verbose         = 2
 finestLevel     = 0
-infile          = /project/b/bsavard/mavab/Backup_run/DNS_HTC_premixer/chemistry/plt05546
-#infile_derived  = /scratch/b/bsavard/zisen347/PeleAnalysis_Zisen/Src/plt06024_derived
-infile_derived  = /scratch/b/bsavard/zisen347/PeleAnalysis/Src/cond_ISRN/plt05546_derived
+infile          = /scratch/b/bsavard/mavab/Backup_run/DNS_HTC_premixer/chemistry/plt06504/
+infile_derived  = /scratch/b/bsavard/zisen347/PeleAnalysis/Src/cond_ISRN/plt06504_derived
+
 outputDir       = cond_ISRN        
 outputLabel     = Y
 
@@ -15,10 +15,8 @@ incOutOfBounds  = 1                 1		      1		      1
 binType         = lin               lin		    lin		    lin
 
 # Averaged variables
-#avgVars        = HeatRelease  temp    Y(H2O)   Y(H2)    Y(H2O2)  Y(HO2)   Y(OH)     mixture_fraction 
-#avgVarWeights  = volume       volume  density  density  density  density  density   volume 
-avgVars         = temp    Y(H2O)    uY(H2O)
-avgVarWeights   = volume  density   density
+avgVars         = temp    mixture_fraction Y(H2O)    uY(H2O)   rhoD(H2O) rr(H2O)
+avgVarWeights   = density density          density   density   density   density
 
 # Conditioning variables
 ## 1D

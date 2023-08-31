@@ -88,6 +88,7 @@ int main (int argc, char* argv[])
 
   Vector<std::string> spec_names;
   pele::physics::eos::speciesNames<pele::physics::PhysicsType::eos_type>(spec_names);
+  auto eos = pele::physics::PhysicsType::eos();
 
   int idYin = -1; 
   int idTin = -1;
@@ -118,7 +119,8 @@ int main (int argc, char* argv[])
 
   const int idDout   = 0;
   const int idUYout  = idDout   + NUM_SPECIES;
-  const int idMuout  = idUYout  + NUM_SPECIES;
+  const int idRYout  = idUYout  + NUM_SPECIES;
+  const int idMuout  = idRYout  + NUM_SPECIES;
   const int idXiout  = idMuout  + 1;
   const int idLamout = idXiout  + 1;
   const int idZout   = idLamout + 1;
@@ -140,6 +142,7 @@ int main (int argc, char* argv[])
     inNames[i]          =  "Y(" + spec_names[i] + ")";
     outNames[i+idDout]  = "rhoD(" + spec_names[i] + ")";
     outNames[i+idUYout] = "uY(" + spec_names[i] + ")";
+    outNames[i+idRYout] = "rr(" + spec_names[i] + ")";
   }
   destFillComps[idTlocal] = idTlocal;
   destFillComps[idRlocal] = idRlocal;
@@ -186,7 +189,9 @@ int main (int argc, char* argv[])
     MultiFab indata(ba, dm, nCompIn, nGrow);
     MultiFab chi(ba, dm, NUM_SPECIES, nGrow);
     MultiFab grads(ba, dm, BL_SPACEDIM+1, nGrow);
+    MultiFab mflux(ba, dm, 1, nGrow);
 
+    // Loading data at lev.
     Print() << "Reading data (FillVar) for level " << lev << std::endl;
     amrData.FillVar(indata,lev,inNames,destFillComps);
     Print() << "Data has been read for level " << lev << std::endl;
@@ -226,18 +231,76 @@ int main (int argc, char* argv[])
 
       Array4<Real> const& D_a = outdata[lev]->array(mfi,idDout);
       Array4<Real> const& UY_a = outdata[lev]->array(mfi,idUYout);
+      Array4<Real> const& rr_a = outdata[lev]->array(mfi,idRYout);
       Array4<Real> const& mu_a = outdata[lev]->array(mfi,idMuout);
       Array4<Real> const& xi_a = outdata[lev]->array(mfi,idXiout);
       Array4<Real> const& lam_a = outdata[lev]->array(mfi,idLamout);
       Array4<Real> const& Zout_a = outdata[lev]->array(mfi,idZout);
       Array4<Real> const& chi_a = chi.array(mfi); // Zisen - not sure what chi fields means, so only use a temporaray variable to store it
 
+      Array4<Real> const& grads_a = grads.array(mfi);
+      Array4<Real> const& mflux_a = mflux.array(mfi);
+
+      FArrayBox& fab_in = indata[mfi];
+      FArrayBox& fab_grads = grads[mfi];
+      FArrayBox& fab_mflux = mflux[mfi];
+
+      // Calculate transport coefficients
       amrex::launch(bx, [=] AMREX_GPU_DEVICE(amrex::Box const& tbx) {
         auto trans = pele::physics::PhysicsType::transport();
         trans.get_transport_coeffs(
           tbx, Y_a, T_a, rho_a, D_a, chi_a, mu_a, xi_a, lam_a, ltransparm);
       });
 
+      for (int n=0; n<NUM_SPECIES; ++n) {
+        // Scalar dissipation rate
+        gradient(BL_TO_FORTRAN_BOX(bx),
+                BL_TO_FORTRAN_N_ANYD(fab_in,    idYlocal+n),
+                BL_TO_FORTRAN_N_ANYD(fab_grads, 0),
+                &(delta[0]));
+        amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+          D_a(i,j,k,n) = 2 * D_a(i,j,k,n) * (grads_a(i,j,k,0)*grads_a(i,j,k,0)+grads_a(i,j,k,1)*grads_a(i,j,k,1)+grads_a(i,j,k,2)*grads_a(i,j,k,2));
+        });
+
+        // Convection fluxes - uY
+        amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+          mflux_a(i,j,k) = U_a(i,j,k,0) * Y_a(i,j,k,n);
+        });
+        gradient(BL_TO_FORTRAN_BOX(bx),
+                BL_TO_FORTRAN_N_ANYD(fab_mflux, 0),
+                BL_TO_FORTRAN_N_ANYD(fab_grads, 0),
+                &(delta[0]));
+        amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+          UY_a(i,j,k,n) = grads_a(i,j,k,0);
+        });
+
+        // Convection fluxes - vY
+        amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+          mflux_a(i,j,k) = U_a(i,j,k,1) * Y_a(i,j,k,n);
+        });
+        gradient(BL_TO_FORTRAN_BOX(bx),
+                BL_TO_FORTRAN_N_ANYD(fab_mflux, 0),
+                BL_TO_FORTRAN_N_ANYD(fab_grads, 0),
+                &(delta[0]));
+        amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+          UY_a(i,j,k,n) = UY_a(i,j,k,n) + grads_a(i,j,k,1);
+        });
+
+        // Convection fluxes - wY
+        amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+          mflux_a(i,j,k) = U_a(i,j,k,2) * Y_a(i,j,k,n);
+        });
+        gradient(BL_TO_FORTRAN_BOX(bx),
+                BL_TO_FORTRAN_N_ANYD(fab_mflux, 0),
+                BL_TO_FORTRAN_N_ANYD(fab_grads, 0),
+                &(delta[0]));
+        amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+          UY_a(i,j,k,n) = UY_a(i,j,k,n) + grads_a(i,j,k,2);
+        });
+
+      }
+
+      // Cp, rr
       amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
           Real Cpmix = 0.0;
           Real Yloc[NUM_SPECIES] = {0.0};
@@ -247,14 +310,25 @@ int main (int argc, char* argv[])
           Real Tlocal = T_a(i,j,k);
           CKCPBS(T_a(i,j,k), Yloc, Cpmix);
 
-          // convection - <UY|Z>
-          for (int n=0; n<NUM_SPECIES; ++n) {
-              UY_a(i,j,k,n) = U_a(i,j,k) * Y_a(i,j,k,n);
-              UY_a(i,j,k,n) = UY_a(i,j,k,n) + V_a(i,j,k) * Y_a(i,j,k,n);
-              UY_a(i,j,k,n) = UY_a(i,j,k,n) + W_a(i,j,k) * Y_a(i,j,k,n);
+          // Calculate reaction rate
+          amrex::Real rho_loc = rho_a(i,j,k);
+          amrex::Real T_loc = T_a(i,j,k);
+          amrex::Real Y_loc[NUM_SPECIES] = {0.0_rt};
+          amrex::Real wdot[NUM_SPECIES] = {0.0_rt};
+          for (int n = 0; n < NUM_SPECIES; n++) {
+            Y_loc[n] = Y_a(i,j,k,n);
           }
 
-          Zout_a(i,j,k) = Z_a(i,j,k); // Copy mixture fraction.
+          rho_loc = rho_loc * 0.001_rt; // rho MKS -> CGS
+          eos.RTY2WDOT(rho_loc, T_loc, Y_loc, wdot);
+          for (int n = 0; n < NUM_SPECIES; n++) {
+            rr_a(i,j,k,n) = wdot[n] * 1000.0_rt; // rhodot, CGS -> MKS conversion
+          }
+
+          // Copy mixture fraction.
+          Zout_a(i,j,k) = Z_a(i,j,k); 
+
+          // Debug print
           amrex::Print(ioproc) << Z_a(i,j,k) << std::endl;
       });
 

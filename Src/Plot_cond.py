@@ -11,7 +11,7 @@ matplotlib.rcParams['mathtext.bf'] = 'Bitstream Vera Sans:bold'
 matplotlib.rcParams['mathtext.fontset'] = 'stix'
 matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
-fn = "/scratch/b/bsavard/zisen347/PeleAnalysis/Src/cond_ISRN/plt06024_Y.h5"
+fn = "/scratch/b/bsavard/zisen347/PeleAnalysis/Src/cond_ISRN/plt06524_Y.h5"
 f = h5py.File(fn, 'r+')
 
 idx = 3; idy = 0; idz = 0;
@@ -25,7 +25,7 @@ for ipx in range(0, nrows):
     for ipy in range(0, ncols):
       ax = axs[ipx, ipy]
       idx = ipx*2 + ipy
-      phi = f["DATA"]["temp_gx_mean"][:,idx,idy,idz]
+      phi = f["DATA"]["temp_mean"][:,idx,idy,idz]
       ax.plot(zbin, phi, linewidth=linewidth, color='r')
 
       ax2 = ax.twinx() 
