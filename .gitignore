@@ -46,3 +46,8 @@ TAGS
 plt*
 chk*
 
+Backtrace*
+core.*
+slurm*out
+*.i90
+

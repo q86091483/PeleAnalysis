@@ -1,21 +1,21 @@
 # Global settings
 verbose         = 2
 finestLevel     = 0
+
+# infile from bash
 #infile          = /scratch/b/bsavard/mavab/Backup_run/DNS_HTC_premixer/chemistry/plt05991/
 #infile_derived  = /scratch/b/bsavard/zisen347/PeleAnalysis/Src/cond_ISRN/plt05991_derived
-infile          = /scratch/b/bsavard/zisen347/scopingRuns/Burke9_Re6000_2J6_nonreactive/plt_08800/
-infile_derived  = /scratch/b/bsavard/zisen347/scopingRuns/Burke9_Re6000_2J6_nonreactive/plt_08800/ 
 
 
 outputDir       = cond_ISRN        
 outputLabel     = Y
 
 # Conditioning variables
-vars            = mixture_fraction  x		      y		      z
-nBins           = 101               3		      1 		    1
-varBounds       = -0.001 0.13       0 3.3E-3 	0 9E-4		0 1.2E-3
-incOutOfBounds  = 1                 1		      1		      1	
-binType         = lin               lin		    lin		    lin
+vars            = x		      					y		      				z
+nBins           = 112	      					32 		    				48
+varBounds       = -17.5E-4 +122.5E-4 	-2E-3 2E-3				0 6E-3
+incOutOfBounds  = 1                 	1		      				1		      
+binType         = lin               	lin		    				lin		    
 
 # Averaged variables
 avgVars         = temp    mixture_fraction Y(H2O)    uY(H2O)   rhoD(H2O) rr(H2O)

@@ -8,12 +8,12 @@ DIM	        = 3
 PRECISION   = DOUBLE
 
 # Compilation
-COMP          = intel
+COMP          = gnu
 USE_MPI       = TRUE
 USE_OMP       = FALSE
 USE_CUDA      = FALSE
 
-Chemistry_Model = DME_30atm_new
+Chemistry_Model = BurkeH2 #DME_30atm_new
 #Reactions_dir   = Fuego
 Eos_Model       = Fuego
 Transport_Model = Simple
@@ -45,7 +45,10 @@ Reactions_dir := Fuego
 #EBASE          = avgPlotfiles
 #EBASE          = amrToFE
 #EBASE         = conditionalISRN
-EBASE         = gradISRN
+#EBASE         = gradISRN
+#EBASE         = tkeDisspRate
+EBASE         = KolmogorovScale
+
 
 #NEEDS_f90_SRC = FALSE
 NEEDS_f90_SRC = TRUE
@@ -67,10 +70,15 @@ include $(AMREX_HOME)/Tools/GNUMake/Make.defs
 
 CEXE_sources += $(EBASE).cpp
 ifeq ($(NEEDS_f90_SRC),TRUE)
-  f90EXE_sources += $(EBASE)_nd.f90
+  f90EXE_sources += grad_nd.f90
 endif
 INCLUDE_LOCATIONS += .
 VPATH_LOCATIONS   += .
+
+ifeq ($(EBASE), KolmogorovScale)
+  #INCLUDE_LOCATIONS += $(HDF5_HOME)/include
+  LIBRARIES         += -lhdf5_cpp -lhdf5
+endif
 
 ifeq ($(EBASE), conditionalISRN)
   #INCLUDE_LOCATIONS += $(HDF5_HOME)/include
@@ -78,6 +86,11 @@ ifeq ($(EBASE), conditionalISRN)
 endif
 
 ifeq ($(EBASE), gradISRN)
+  #INCLUDE_LOCATIONS += $(HDF5_HOME)/include
+  LIBRARIES         += -lhdf5_cpp -lhdf5
+endif
+
+ifeq ($(EBASE), tkeDisspRate)
   #INCLUDE_LOCATIONS += $(HDF5_HOME)/include
   LIBRARIES         += -lhdf5_cpp -lhdf5
 endif
