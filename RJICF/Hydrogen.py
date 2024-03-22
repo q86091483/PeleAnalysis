@@ -15,7 +15,7 @@ import cantera as ct
 # 0. Initialize parameter ---------------------------------------
 Re_j   = 4913
 njet   = 2
-P      = 8.0 * ct.one_atm
+P      = 12.0 * ct.one_atm
 D_j    = 5.0E-4; A_j = 0.25 * np.pi * D_j * D_j
 intv   = 3.0; 
 Lx     = 26 * D_j;          
@@ -271,7 +271,22 @@ if True:
     max_gradf = np.amax(gradf)
     lf = (f.T[-1]-f.T[0]) / max_gradf
     lfs.append(lf)
+    print("Flame thickness: ", z, lf)
+    print("Flame speed: ", z, f.velocity[0])
+    print("nu:", nu_j)
 
   fig, ax = plt.subplots()
   ax.plot(Zs, lfs)
+# %%
+patm = [6, 7, 8, 9, 10, 11, 12]
+nu = [1.831E-5, 1.569E-5, 1.373E-5, 1.221E-5, 1.099E-5, 9.987E-6, 9.155E-6]
+lf = [5.405E-5, 4.443E-5, 3.757E-5, 3.245E-5, 2.850E-5, 2.535E-5, 2.284E-5]
+sl = [6.985E+0, 6.810E+0, 6.640E+0, 6.481E+0, 6.329E+0, 6.172E+0, 6.031E+0]
+
+labelsize=20
+fig, ax = plt.subplots()
+ax.plot(patm, nu, color="b")
+ax.set_ylabel(r"$\nu_\mathrm{st} \; [m^2/s]$", fontsize=20)
+ax.set_xlabel(r"$P\; [atm]$", fontsize=20)
+
 # %%

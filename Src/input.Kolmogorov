@@ -1,6 +1,6 @@
 # Global settings
 verbose         = 2
-finestLevel     = 0
+finestLevel     = 2
 
 # infile from bash
 #infile          = /scratch/b/bsavard/mavab/Backup_run/DNS_HTC_premixer/chemistry/plt05991/
@@ -14,53 +14,5 @@ outputLabel     = Y
 vars            = x		      					y		      				z
 nBins           = 112	      					32 		    				48
 varBounds       = -17.5E-4 +122.5E-4 	-2E-3 2E-3				0 6E-3
-incOutOfBounds  = 1                 	1		      				1		      
+incOutOfBounds  = 0                 	0		      				0		      
 binType         = lin               	lin		    				lin		    
-
-# Averaged variables
-avgVars         = temp    mixture_fraction Y(H2O)    uY(H2O)   rhoD(H2O) rr(H2O)
-avgVarWeights   = density density          density   density   density   density
-
-# Extract variables
-extract_finest_level 	= 1
-extract_vars		= temp	mixture_fraction Y(H2O)
-extract_output_name 	= T_Z
-
-# Conditioning variables
-## 1D
-#vars      = mixture_fraction
-#nBins     = 101
-#varBounds = -0.003 0.3
-#outputDir = cond_stats_MF
-
-## 2D
-#vars      = mixture_fraction temp
-#nBins     = 101              91
-#varBounds = -0.003 0.3       600 1200
-
-## 3D
-#vars           = mixture_fraction temp     Y(C12H25O2)
-#nBins          = 101              100      9
-#varBounds      = -0.003 0.3       600 2600 1e-10 1e-1
-#incOutOfBounds = 1                1        1
-#binType        = lin              lin      log
-#outputDir      = cond_stats_MF-T-RO2
-
-## 4D
-#vars           = mixture_fraction temp     Y(C12H25O2) Y(OH)
-#nBins          = 101              10       9           9
-#varBounds      = -0.003 0.3       600 2600 1e-10 1e-1  1e-10 1e-1
-#incOutOfBounds = 1                1        1           1
-#binType        = lin              lin      log         log
-#outputDir      = cond_stats_MF-T-RO2-OH
-
-# 4D
-#vars           = mixture_fraction HeatRelease Y(H2O) Y(OH)
-#nBins          = 101              13          9           9
-#varBounds      = -0.003 0.3       1e1 1e14    1e-10 1e-1  1e-10 1e-1
-#incOutOfBounds = 1                1           1           1
-#binType        = lin              log         log         log
-#outputDir      = cond_stats_MF-HRR-RO2-OH
-
-
-
