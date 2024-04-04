@@ -15,7 +15,7 @@ import cantera as ct
 # 0. Initialize parameter ---------------------------------------
 Re_j   = 4913
 njet   = 2
-P      = 10.0 * ct.one_atm
+P      = 6.0 * ct.one_atm
 D_j    = 5.0E-4; A_j = 0.25 * np.pi * D_j * D_j
 intv   = 3.0; 
 Lx     = 26 * D_j;          
@@ -26,7 +26,7 @@ T_j    = 300.;
 T_c    = 750.;
 X_j    = {}; X_j["H2"] = 1.0; X_j["N2"] = 1 - X_j["H2"] 
 X_c    = {}; X_c["O2"] = 0.21; X_c["N2"] = 0.79
-mech   = "Wen30/chem.yaml"; 
+mech   = "BurkeH2/chem.yaml"; 
 freq   = 1000
 
 if (True):
@@ -36,7 +36,7 @@ if (True):
   Lz = nz * d0;
   nx = (int(Lx / d0 / nb) + 1) * nb;
   Lx = nx * d0;
-  U_c   = 17.5
+  U_c   = 29.2
   A_c    = Ly * Lz
   print("nx=",str(nx).rjust(3), " , Lx=", "%10.6E"%Lx, " , Lx/Dj=", Lx/D_j, " , dx=", Lx/nx)
   print("ny=",str(ny).rjust(3), " , Ly=", "%10.6E"%Ly, " , Ly/Dj=", Ly/D_j, " , dy=", Ly/ny)
@@ -106,6 +106,7 @@ nrow = nzbin
 res_pmf = np.zeros((nrow, ncol)) 
 for iz in range(0, nzbin):
   zs = zbins[iz]
+  zs = 0.0
   Ys = zs*gas_j.Y + (1-zs)*gas_c.Y
   Hs = zs*gas_j.enthalpy_mass + (1-zs)*gas_c.enthalpy_mass
   gas_s.HPY = Hs, P, Ys

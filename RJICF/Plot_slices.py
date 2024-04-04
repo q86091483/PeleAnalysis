@@ -16,7 +16,10 @@ matplotlib.rcParams['mathtext.fontset'] = 'stix'
 matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 # Load data
-fn = "/scratch/b/bsavard/zisen347/scopingRuns/Burke9_Re6000_2J6_nonreactive_1/plt_04280"
+fn = "/scratch/b/bsavard/zisen347/scopingRuns/Burke9_Re6000_2J6_nonreactive_1/plt_04370"
+fn = "/scratch/b/bsavard/zisen347/scopingRuns/NUIG_Re4913_2J6_5atm/plt_00220"
+#fn = "/scratch/b/bsavard/zisen347/scopingRuns/MicroMix/plt_00000"
+
 ds = yt.load(fn) # unit_system="cgs")
 zst = 0.0252
 #%%
@@ -40,7 +43,7 @@ res_xy = [res_y, res_x]  # create an image with 1000x1000 pixels
 res_yz = [res_y, res_z]  # create an image with 1000x1000 pixels
 
 coord = None #(-1.5625e-01,-1.9688e+00,1.2188e+00)
-lref = 5E-4
+lref = 5.0E-4
 if coord != None:
   xe = coord[0] * lref
   loc = coord[1]  * lref
@@ -129,7 +132,7 @@ spl.set_zlim('mag_vort', 0, 1e6)
 spl.set_xlabel(r"$x \; \mathrm{[m]}$")
 spl.set_ylabel(r"$z \; \mathrm{[m]}$")
 spl.swap_axes()
-#spl.save()
+spl.save()
 
 #%%
 fn  = "HeatRelease"
@@ -144,7 +147,7 @@ spl.set_zlim(fn, 0, 1e11)
 spl.set_xlabel(r"$x \; \mathrm{[m]}$")
 spl.set_ylabel(r"$z \; \mathrm{[m]}$")
 spl.swap_axes()
-#spl.save()
+spl.save()
 
 #%%
 fn = "HeatRelease"; dir = "y"; vmin = 0; vmax = 1E11
@@ -180,6 +183,7 @@ cax = divider.append_axes('right', size='5%', pad=0.05)
 fig.colorbar(im, cax=cax, orientation='vertical')
 plt.savefig(fn+"_"+dir+".png", dpi=300, bbox_inches="tight")
 
+#%%
 fn = "x_velocity"; dir = "y"; vmin = -120; vmax = 120
 slc = ds.slice(dir, coord=loc, center=(xmin+0.5*Lx, loc, zmin+0.5*Lz), )
 frb = slc.to_frb(width=((Lz, "cm"),(Lx, "cm")), resolution=res_xz)
