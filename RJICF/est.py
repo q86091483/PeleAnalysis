@@ -1,16 +1,19 @@
 #%%
 import numpy as np
 
-finest_level = 0
+finest_level = 1
 r = np.array([np.mean([1.0]), 
-              np.mean([0.83333]), 
+              np.mean([1.0]), 
               np.mean([0.7916]), 
               np.mean([0.4011, 0.4022, 0.4059, 0.4055, 0.4153 ]), 
-              np.mean([0.0225, 0.02255, 0.0226, 0.02269])  ])
-r = np.array([1.0, 0.8, 0.4, 0.1])
-tadv = np.mean([126.396776]) / 3600. # [h]
-nproc = 40 # cores
-dt_finest = np.mean([1.42E-7])
+              np.mean([0.05])  ])
+r = np.array([np.mean([1.0]),
+              np.mean([0.833]),
+              np.mean([0.4]),
+              np.mean([0.05])])
+tadv = np.mean([82.83]) / 3600. # [h]
+nproc = 160 # cores
+dt_finest = np.mean([5.688723736e-08*2])
 
 Lx = 0.014
 Uc = 35.583
@@ -19,7 +22,7 @@ tf = Lx / Uc
 nt_f = tf / dt_finest
 nx0 = 336; ny0 = 96; nz0 = 144;
 n0 = nx0 * ny0 * nz0
-max_level = 4 #r.shape[0]
+max_level = r.shape[0]
 
 def get_n(lev, r):
   n = nx0 * ny0 * nz0 * r * np.power(8, lev)
@@ -36,6 +39,7 @@ for lev in range(0, finest_level+1):
   total_cell_finest = total_cell_finest + nlev[lev]
 
 cost_per_cell_step = nproc * tadv / total_cell_finest
+cost_per_cell_step = 3E-7
 print("cost_per_cell_step", cost_per_cell_step, "\n")
 
 nlast = 0

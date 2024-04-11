@@ -13,20 +13,20 @@ import cantera as ct
 
 #%%
 # 0. Initialize parameter ---------------------------------------
-Re_j   = 4913
+Re_j   = 4000
 njet   = 2
-P      = 6.0 * ct.one_atm
-D_j    = 5.0E-4; A_j = 0.25 * np.pi * D_j * D_j
+P      = 4.0 * ct.one_atm
+D_j    = 4.5E-4; A_j = 0.25 * np.pi * D_j * D_j
 intv   = 3.0; 
-Lx     = 26 * D_j;          
+Lx     = 28.444444444 * D_j;          
 Ly     = (2*intv+2) * D_j; 
-Lz     = 12.8 * D_j; 
+Lz     = 12.444444444444 * D_j; 
 A_c    = Ly * Lz
 T_j    = 300.;
 T_c    = 750.;
 X_j    = {}; X_j["H2"] = 1.0; X_j["N2"] = 1 - X_j["H2"] 
 X_c    = {}; X_c["O2"] = 0.21; X_c["N2"] = 0.79
-mech   = "BurkeH2/chem.yaml"; 
+mech   = "nuig_H2/chem.yaml"; 
 freq   = 1000
 
 if (True):
@@ -36,11 +36,11 @@ if (True):
   Lz = nz * d0;
   nx = (int(Lx / d0 / nb) + 1) * nb;
   Lx = nx * d0;
-  U_c   = 29.2
+  U_c   = 37.5
   A_c    = Ly * Lz
-  print("nx=",str(nx).rjust(3), " , Lx=", "%10.6E"%Lx, " , Lx/Dj=", Lx/D_j, " , dx=", Lx/nx)
-  print("ny=",str(ny).rjust(3), " , Ly=", "%10.6E"%Ly, " , Ly/Dj=", Ly/D_j, " , dy=", Ly/ny)
-  print("nz=",str(nz).rjust(3), " , Lz=", "%10.6E"%Lz, " , Lz/Dj=", Lz/D_j, " , dz=", Lz/nz)
+  #print("nx=",str(nx).rjust(3), " , Lx=", "%10.6E"%Lx, " , Lx/Dj=", Lx/D_j, " , dx=", Lx/nx)
+  #print("ny=",str(ny).rjust(3), " , Ly=", "%10.6E"%Ly, " , Ly/Dj=", Ly/D_j, " , dy=", Ly/ny)
+  #print("nz=",str(nz).rjust(3), " , Lz=", "%10.6E"%Lz, " , Lz/Dj=", Lz/D_j, " , dz=", Lz/nz)
 
 #%%
 gas_j = ct.Solution(mech)
@@ -106,7 +106,6 @@ nrow = nzbin
 res_pmf = np.zeros((nrow, ncol)) 
 for iz in range(0, nzbin):
   zs = zbins[iz]
-  zs = 0.0
   Ys = zs*gas_j.Y + (1-zs)*gas_c.Y
   Hs = zs*gas_j.enthalpy_mass + (1-zs)*gas_c.enthalpy_mass
   gas_s.HPY = Hs, P, Ys
@@ -120,7 +119,7 @@ for iz in range(0, nzbin):
   for isp, spn in enumerate(spn_out):
     igas = gas_s.species_index(spn)
     res_pmf[iz, 4+isp] = gas_s.Y[igas]
-  if True:
+  if False:
     print(iz, np.amin(res_pmf[iz,4:]), np.sum(res_pmf[iz,4:]))
 
 s = 'VARIABLES = "X" "temp" "u" "rho"'

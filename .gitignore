@@ -51,3 +51,7 @@ core.*
 slurm*out
 *.i90
 
+Src/AMReX_buildInfo.cpp
+Src/compile_commands.json
+amrex-kitchen/
+compile_commands.json

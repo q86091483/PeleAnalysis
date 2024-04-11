@@ -13,7 +13,20 @@ import cantera as ct
 import pandas as pd
 
 #%%
-do_things = ["Lz_J"]
+do_things = ["Lz_J", "do_laminar1D"]
+do_things = []
+mech = "nuig_H2"
+
+#if (False):
+#  fig, ax = plt.subplots()
+#  x = [0.813, 0.75, 0.7, 0.619, 0.5935]
+#  y = [7.616, 6.46, 5.55, 4.409, 4.05]
+#  ax.plot(x, y, color="r", marker="o")
+#  ax.set_xlabel(r"$\phi$", fontsize=20)
+#  ax.set_ylabel(r"$J$", fontsize=20)
+#  ax.tick_params(axis='both', which='major', labelsize=18)
+#  ax.tick_params(axis='both', which='minor', labelsize=18)
+#  ax.grid()
 #%%
 # 0. Initialize parameter ---------------------------------------
 def get_param_base():
@@ -22,7 +35,7 @@ def get_param_base():
   param_base["njet"]   = 2
   param_base["P"]      = 10.0 * ct.one_atm 
   param_base["D_j"]    = 5.0E-4
-  param_base["J"]      = 6.6
+  param_base["J"]      = 6.634717274460312
   param_base["equiv"]  = 0.6
   param_base["intv"]   = 3.0
   param_base["T_j"]    = 300.
@@ -31,7 +44,7 @@ def get_param_base():
   X_c = {}; X_c["O2"] = 0.21; X_c["N2"] = 0.79
   param_base["X_j"]    = X_j
   param_base["X_c"]    = X_c
-  param_base["mech"]   = "BurkeH2/chem.yaml"
+  param_base["mech"]   = mech + "/chem.yaml"
   return param_base
 #%%
 
@@ -72,7 +85,7 @@ def get_param_derived(param):
   Ly  = (2*param["intv"]+2) * param["D_j"] 
   Lz = A / Ly
   ufix = (m_j + m_c) / (gas_mix.density * A)
-  print(gas_mix.density, gas_j.density, gas_c.density)
+  #print(gas_mix.density, gas_j.density, gas_c.density)
   res = {}
   for k in param.keys():
     res[k] = param[k]
@@ -89,7 +102,7 @@ def get_param_derived(param):
   res["nu_c"] = nu_c
   res["m_j"] = m_j
   res["m_c"] = m_c
-  res["Lx"] = 28 * param["D_j"]
+  res["Lx"] = 28.4 * param["D_j"]
   res["Ly"] = Ly
   res["Lz"] = Lz
   res["Re_c"] = U_c * Lz / nu_c
@@ -138,7 +151,7 @@ def get_ngrid(lev, nx0, ny0, nz0, r):
   return n
 #%%
 def get_flame_name(Patm, Tj, Tc, z):
-  str1 = "laminar1D_Burke9/P=" + "%i" % Patm
+  str1 = "laminar1D/" + mech + "/P=" + "%i" % Patm
   str1 = str1 + "_Tj=" + "%i" % Tj
   str1 = str1 + "_Tc=" + "%i" % Tc
   str1 = str1 + "_Z=" + "%.4f" % z
@@ -149,7 +162,9 @@ Patms = [3, 4, 5, 6, 8, 10]
 Tjs = [300, 350]
 Tcs = [750]
 Zs = [0.0252]
-do_laminar1D = True
+do_laminar1D = False
+if "do_laminar1D" in do_things:
+  do_laminar1D = True
 if do_laminar1D:
   for iP, Patm in enumerate(Patms):
     for m, Tj in enumerate(Tjs):
@@ -188,12 +203,12 @@ if do_laminar1D:
           f.save(fn, basis="mole", overwrite=True)
           #print(fn)
 #%% Parameters for computation cost
-cost_per_cell_step = 6.5E-8
+cost_per_cell_step = 3.0E-7
 rs = np.array([np.mean([1.0]), 
-              np.mean([0.83333]), 
-              np.mean([0.7916]), 
-              np.mean([0.4011, 0.4022, 0.4059, 0.4055, 0.4153 ]), 
-              np.mean([0.05])  ])
+              np.mean([1.0]), 
+              np.mean([0.8]), 
+              np.mean([0.4]),
+              np.mean([0.2])  ])
 def get_ncell_lev(lev, nx0, ny0, nz0, r):
   n = nx0 * ny0 * nz0 * r * np.power(8, lev)
   return n
@@ -211,9 +226,9 @@ Tj = 300
 Tc = 750
 Z = 0.0252
 Patms = [3, 4, 5, 6, 8, 10]
-Reys = [4000, 4500, 5000]
-D_js = [5E-4, 6E-4]
-ngrid_per_Dj = 6 # grids for 1 jet diameter
+Reys = [4000, 4500, 4750]
+D_js = [4.5E-4, 5E-4]
+ngrid_per_Dj = 5*9/10 # grids for 1 jet diameter
 eta=9E-6
 
 lfs = []
@@ -311,7 +326,7 @@ if do_plot_all:
         U_cs[iR][iD].append(param_derived["U_c"])
         Ma_js[iR][iD].append(param_derived["Ma_j"])
         Ma_cs[iR][iD].append(param_derived["Ma_c"])
-        print(Patm, Re, param_derived["U_j"])
+        #print(Patm, Re, param_derived["U_j"])
         # Base level mesh size 
         dx0 = param_derived["D_j"] / ngrid_per_Dj
         ngs3[iR][iD].append(lf / (dx0/8))
@@ -348,7 +363,7 @@ if do_plot_all:
         neta4[iR][iD].append(eta_Re / (dx0 / 16))
         # Boundary layer
         ufix[iR][iD].append(param_derived["ufix"])
-        print(param_derived["ufix"])
+        #print(param_derived["ufix"])
         delta_nu[iR][iD].append(param_derived["delta_nu"])
         nnu4[iR][iD].append(param_derived["delta_nu"]/(dx0/16))
 #%%
@@ -432,7 +447,7 @@ for ipx in range(0, npx):
         ax.plot(Patms, np.array(costs4[iR][0])/1E6, color=reds[iR], marker='.')
         ax.plot(Patms, np.array(costs4[iR][1])/1E6, color=blues[iR], marker='.')
       ax.set_title(r"$Cost \; in \; CPUh \; \mathrm{[M]}$", fontsize=18)
-      ax.set_ylim([0, 1.5])
+      ax.set_ylim([0, 2.5])
     elif(var_name == "neta"):
       for iR in range(0, len(Reys)):
         ax.plot(Patms, np.array(neta4[iR][0])/1.0, color=reds[iR], marker='.')
