@@ -19,7 +19,7 @@ matplotlib.rcParams['font.family'] = 'STIXGeneral'
 # Where to output the result
 case_folder = "/scratch/b/bsavard/zisen347/PeleAnalysis/Src/cond_FlameStructure_basic/"
 # Where to read h5 files that contain condition smean
-fns = glob.glob(case_folder + "*_Y.h5")
+fns = glob.glob(case_folder + "plt_049*_Y.h5")
 # Domain length of Pele Case
 xmin = -15.75E-4; xmax = 112.25E-4
 ymin = -1.8E-3; ymax = 1.8E-3
@@ -34,6 +34,8 @@ Lz = zmax - zmin
 # Declaration
 wt_sum = np.zeros((nx, ny, nz))
 rho_wtsum = np.zeros((nx, ny, nz))
+T_wtsum = np.zeros((nx, ny, nz))
+HRR_wtsum = np.zeros((nx, ny, nz))
 ts11_wtsum = np.zeros((nx, ny, nz))
 ts22_wtsum = np.zeros((nx, ny, nz))
 ts33_wtsum = np.zeros((nx, ny, nz))
@@ -47,6 +49,8 @@ for ifn, fn in enumerate(fns[1:]):
   f = h5py.File(fn, 'r+')
   wt_sum = wt_sum + np.array(f["DATA"]["volume_mean"])
   rho_wtsum = rho_wtsum + np.array(f["DATA"]["rho_mean"]) 
+  T_wtsum = T_wtsum + np.array(f["DATA"]["temp_mean"]) 
+  HRR_wtsum = HRR_wtsum + np.array(f["DATA"]["HeatRelease_mean"]) 
   ts11_wtsum = ts11_wtsum + np.array(f["DATA"]["ts11_mean"]) 
   ts22_wtsum = ts22_wtsum + np.array(f["DATA"]["ts22_mean"]) 
   ts33_wtsum = ts33_wtsum + np.array(f["DATA"]["ts33_mean"]) 
@@ -57,6 +61,8 @@ for ifn, fn in enumerate(fns[1:]):
   ts_wtsum = ts_wtsum + np.array(f["DATA"]["ts_sum_mean"]) 
 
 rho = rho_wtsum / wt_sum
+T = T_wtsum / wt_sum
+HRR = HRR_wtsum / wt_sum
 ts11 = ts11_wtsum / wt_sum
 ts22 = ts22_wtsum / wt_sum
 ts33 = ts33_wtsum / wt_sum
@@ -71,17 +77,35 @@ eps = ts - sum_of_meanprod
 eps = 2 * eps * mu / rho
 eta = np.power(mu/rho, 3) / eps
 eta = np.power(eta, 0.25)
+
+# T - y
 fig, ax = plt.subplots()
-vmin = 1E-6; vmax = 1E-1
-im = ax.imshow(eta[:,8,:].transpose(), cmap="tab20c", extent=[xmin,xmax,zmin,zmax],
+vmin = 500; vmax = 2800
+im = ax.imshow(T[:,32,:].transpose(), cmap="jet", extent=[xmin,xmax,zmin,zmax],
                origin="lower",
-               norm=LogNorm(vmin, vmax))
+               vmin = vmin, vmax = vmax,)
+#               norm=LogNorm(vmin, vmax))
 divider = make_axes_locatable(ax)
 cax = divider.append_axes('right', size='5%', pad=0.05)
 fig.colorbar(im, cax=cax, orientation='vertical')
-ax.set_title("${\eta_k} \; [\mathrm{m}]$", fontsize=20)
-plt.savefig("eta.png", dpi=300, bbox_inches="tight")
+ax.set_title("$ T \; [\mathrm{K}]$", fontsize=20)
+plt.savefig("T.png", dpi=300, bbox_inches="tight")
 
+# HRR - y
+fig, ax = plt.subplots()
+vmin = 0; vmax = 1E11
+phi = HRR[:,27,:]
+im = ax.imshow(phi.transpose(), cmap="hot", extent=[xmin,xmax,zmin,zmax],
+               origin="lower",
+               vmin = vmin, vmax = vmax,)
+#               norm=LogNorm(vmin, vmax))
+divider = make_axes_locatable(ax)
+cax = divider.append_axes('right', size='5%', pad=0.05)
+fig.colorbar(im, cax=cax, orientation='vertical')
+ax.set_title("$HRR \; [\mathrm{K}]$", fontsize=20)
+plt.savefig("T.png", dpi=300, bbox_inches="tight")
+
+#%%
 fig, ax = plt.subplots()
 vmin = 0; vmax = 5
 im = ax.imshow(rho[:,8,:].transpose(), cmap="jet", extent=[xmin,xmax,zmin,zmax],

@@ -1,6 +1,8 @@
-case_folder="/scratch/b/bsavard/zisen347/scopingRuns/Burke9_Re6000_2J6_nonreactive"
+#case_folder="/scratch/b/bsavard/zisen347/scopingRuns/Burke9_Re6000_2J6_nonreactive"
 #case_folder="/scratch/b/bsavard/zisen347/scopingRuns/Burke9_Re6000_2J6_nonreactive_1"
-plts="plt_10800"
+case_folder="/scratch/b/bsavard/zisen347/scopingRuns/MicroMix"
+
+plts="plt_03050"
 #plts="plt_04300"
 plt_names=$(eval echo "${case_folder}/${plts}")
 for i in ${plt_names}; do

@@ -1,19 +1,18 @@
 # Global settings
 verbose         = 2
-finestLevel     = 2
+finestLevel     = 1
 
 # infile from bash
 #infile          = /scratch/b/bsavard/mavab/Backup_run/DNS_HTC_premixer/chemistry/plt05991/
 #infile_derived  = /scratch/b/bsavard/zisen347/PeleAnalysis/Src/cond_ISRN/plt05991_derived
 
-
-outputDir       = cond_Kolmogorov        
+outputDir       = cond_FlameStructure_basic        
 outputLabel     = Y
 
 # Conditioning variables
 vars            = x		      						y		      				z
-nBins           = 112	      						32 		    				48
-varBounds       = -15.75E-4 +112.25E-4 	-1.8E-3 1.8E-3				0 5.6E-3
+nBins           = 128	      						36 		    				56
+varBounds       = -15.75E-4 +112.25E-4 	-1.8E-3 1.8E-3	  0 5.6E-3
 incOutOfBounds  = 0                 		0		      				0		      
 binType         = lin               		lin		    				lin		    
 

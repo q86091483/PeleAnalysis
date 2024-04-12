@@ -13,7 +13,7 @@ USE_MPI       = TRUE
 USE_OMP       = FALSE
 USE_CUDA      = FALSE
 
-Chemistry_Model = BurkeH2 #DME_30atm_new
+Chemistry_Model = nuig_H2_4atm
 #Reactions_dir   = Fuego
 Eos_Model       = Fuego
 Transport_Model = Simple
@@ -47,8 +47,8 @@ Reactions_dir := Fuego
 #EBASE         = conditionalISRN
 #EBASE         = gradISRN
 #EBASE         = tkeDisspRate
-EBASE         = KolmogorovScale
-
+#EBASE         = KolmogorovScale
+EBASE          = FlameStructure_basic
 
 #NEEDS_f90_SRC = FALSE
 NEEDS_f90_SRC = TRUE
@@ -76,6 +76,11 @@ INCLUDE_LOCATIONS += .
 VPATH_LOCATIONS   += .
 
 ifeq ($(EBASE), KolmogorovScale)
+  #INCLUDE_LOCATIONS += $(HDF5_HOME)/include
+  LIBRARIES         += -lhdf5_cpp -lhdf5
+endif
+
+ifeq ($(EBASE), FlameStructure_basic)
   #INCLUDE_LOCATIONS += $(HDF5_HOME)/include
   LIBRARIES         += -lhdf5_cpp -lhdf5
 endif
