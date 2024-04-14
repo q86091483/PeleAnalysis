@@ -13,7 +13,7 @@ import cantera as ct
 
 #%%
 # 0. Initialize parameter ---------------------------------------
-Re_j   = 4000
+Re_j   = 3600
 njet   = 2
 P      = 4.0 * ct.one_atm
 D_j    = 4.5E-4; A_j = 0.25 * np.pi * D_j * D_j
@@ -36,7 +36,7 @@ if (True):
   Lz = nz * d0;
   nx = (int(Lx / d0 / nb) + 1) * nb;
   Lx = nx * d0;
-  U_c   = 37.5
+  U_c   = 33.8
   A_c    = Ly * Lz
   #print("nx=",str(nx).rjust(3), " , Lx=", "%10.6E"%Lx, " , Lx/Dj=", Lx/D_j, " , dx=", Lx/nx)
   #print("ny=",str(ny).rjust(3), " , Ly=", "%10.6E"%Ly, " , Ly/Dj=", Ly/D_j, " , dy=", Ly/ny)

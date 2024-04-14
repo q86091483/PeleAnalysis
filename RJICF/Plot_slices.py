@@ -16,9 +16,9 @@ matplotlib.rcParams['mathtext.fontset'] = 'stix'
 matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 # Load data
-fn = "/scratch/b/bsavard/zisen347/scopingRuns/Burke9_Re6000_2J6_nonreactive_1/plt_04370"
-fn = "/scratch/b/bsavard/zisen347/scopingRuns/MicroMix/plt_05000"
-#fn = "/scratch/b/bsavard/zisen347/scopingRuns/MicroMix/plt_00000"
+#fn = "/scratch/b/bsavard/zisen347/scopingRuns/Burke9_Re6000_2J6_nonreactive_1/plt_04370"
+fn = "/scratch/b/bsavard/zisen347/scopingRuns/NUIG_Re3600_2J6_4atm/plt_02350"
+fn = "/scratch/b/bsavard/zisen347/scopingRuns/MicroMix/plt_06952"
 
 ds = yt.load(fn) # unit_system="cgs")
 zst = 0.0252
@@ -69,6 +69,23 @@ fig.colorbar(im, cax=cax, orientation='vertical')
 ax.set_title("$T \; [\mathrm{K}]$", fontsize = 18)
 plt.savefig(fn+"_"+dir+".png", dpi=300, bbox_inches="tight")
 
+fn = "HeatRelease"; dir = "y"; vmin = 0; vmax = 1E11
+slc = ds.slice(dir, coord=loc, center=(xmin+0.5*Lx, loc, zmin+0.5*Lz), )
+frb = slc.to_frb(width=((Lz, "cm"),(Lx, "cm")), resolution=res_xz)
+arr_temp = np.array(frb[fn])
+fig, ax = plt.subplots()
+phi = np.log10(np.abs(arr_temp.transpose()))
+phi = arr_temp.transpose()
+im = ax.imshow(phi, vmin=vmin, vmax=vmax, origin="lower", cmap="hot", extent=[xmin, xmax, zmin, zmax])
+#ctr = ax.contour(arr_mf.transpose(), levels=[zst] ,origin='lower', colors=['white'], extent=[xmin, xmax, zmin, zmax])
+divider = make_axes_locatable(ax)
+cax = divider.append_axes('right', size='5%', pad=0.05)
+fig.colorbar(im, cax=cax, orientation='vertical')
+ax.set_title("$\mathrm{HRR}$", fontsize = 18)
+ax.set_xlabel(r"$x \; [\mathrm{m}$]", fontsize=18)
+ax.set_ylabel(r"$y \; [\mathrm{m}$]", fontsize=18)
+plt.savefig(fn+"_"+dir+".png", dpi=300, bbox_inches="tight")
+
 fn = "temp"; dir = "y"; vmin=400; vmax=2600
 slc = ds.slice(dir, coord=loc, center=(xmin+0.5*Lx, loc, zmin+0.5*Lz), )
 frb = slc.to_frb(width=((Lz, "cm"),(Lx, "cm")), resolution=res_xz)
@@ -76,9 +93,9 @@ arr_temp = np.array(frb[fn])
 arr_mf = np.array(frb["mixture_fraction"])
 fig, ax = plt.subplots()
 im = ax.imshow(arr_temp.transpose(), 
-              origin="lower", cmap="viridis", extent=[xmin, xmax, zmin, zmax],
+              origin="lower", cmap="jet", extent=[xmin, xmax, zmin, zmax],
               vmin=vmin, vmax=vmax)
-ctr = ax.contour(arr_mf.transpose(), levels=[zst] ,origin='lower', colors=['white'], extent=[xmin, xmax, zmin, zmax])
+#ctr = ax.contour(arr_mf.transpose(), levels=[zst] ,origin='lower', colors=['white'], extent=[xmin, xmax, zmin, zmax])
 ax.scatter(xe, ze, s=15, color="r")
 divider = make_axes_locatable(ax)
 cax = divider.append_axes('right', size='5%', pad=0.05)
@@ -94,7 +111,7 @@ fig, ax = plt.subplots()
 im = ax.imshow(arr_temp.transpose(), 
               origin="lower", cmap="viridis", extent=[xmin, xmax, zmin, zmax],
               vmin=vmin, vmax=vmax)
-ctr = ax.contour(arr_mf.transpose(), levels=[zst] ,origin='lower', colors=['white'], extent=[xmin, xmax, zmin, zmax])
+#ctr = ax.contour(arr_mf.transpose(), levels=[zst] ,origin='lower', colors=['white'], extent=[xmin, xmax, zmin, zmax])
 ax.scatter(xe, ze, s=15, color="r")
 divider = make_axes_locatable(ax)
 cax = divider.append_axes('right', size='5%', pad=0.05)
@@ -123,11 +140,11 @@ frb = slc.to_frb(width=((Lz, "cm"),(Lx, "cm")), resolution=res_xz)
 arr_temp = np.array(frb[fn])
 fig, ax = plt.subplots()
 im = ax.imshow(arr_temp.transpose(), vmin=vmin, vmax=vmax, origin="lower", cmap="viridis", extent=[xmin, xmax, zmin, zmax])
-ctr = ax.contour(arr_mf.transpose(), levels=[zst] ,origin='lower', colors=['white'], extent=[xmin, xmax, zmin, zmax])
+#ctr = ax.contour(arr_mf.transpose(), levels=[zst] ,origin='lower', colors=['white'], extent=[xmin, xmax, zmin, zmax])
 divider = make_axes_locatable(ax)
 cax = divider.append_axes('right', size='5%', pad=0.05)
 fig.colorbar(im, cax=cax, orientation='vertical')
-ax.set_title(r"$\rho \; [\mathrm{kg/m^3}]$", fontsize = 18)
+ax.set_title(r"$Y_\mathrm{NO}$", fontsize = 18)
 ax.set_xlabel(r"$x \; [\mathrm{m}]$", fontsize=18)
 ax.set_ylabel(r"$y \; [\mathrm{m}]$", fontsize=18)
 plt.savefig(fn+"_"+dir+".png", dpi=300, bbox_inches="tight")
@@ -166,22 +183,6 @@ spl.set_ylabel(r"$z \; \mathrm{[m]}$")
 spl.swap_axes()
 spl.save()
 
-fn = "HeatRelease"; dir = "y"; vmin = 0; vmax = 1E11
-slc = ds.slice(dir, coord=loc, center=(xmin+0.5*Lx, loc, zmin+0.5*Lz), )
-frb = slc.to_frb(width=((Lz, "cm"),(Lx, "cm")), resolution=res_xz)
-arr_temp = np.array(frb[fn])
-fig, ax = plt.subplots()
-phi = np.log10(np.abs(arr_temp.transpose()))
-phi = arr_temp.transpose()
-im = ax.imshow(phi, vmin=vmin, vmax=vmax, origin="lower", cmap="hot", extent=[xmin, xmax, zmin, zmax])
-ctr = ax.contour(arr_mf.transpose(), levels=[zst] ,origin='lower', colors=['white'], extent=[xmin, xmax, zmin, zmax])
-divider = make_axes_locatable(ax)
-cax = divider.append_axes('right', size='5%', pad=0.05)
-fig.colorbar(im, cax=cax, orientation='vertical')
-ax.set_title("$\mathrm{HRR}$", fontsize = 18)
-ax.set_xlabel(r"$x \; [\mathrm{m}$]", fontsize=18)
-ax.set_ylabel(r"$y \; [\mathrm{m}$]", fontsize=18)
-plt.savefig(fn+"_"+dir+".png", dpi=300, bbox_inches="tight")
 #%%
 
 fn = "mag_vort"; dir = "y"; vmin = 0; vmax = 1E6
@@ -192,7 +193,7 @@ fig, ax = plt.subplots()
 phi = np.log10(np.abs(arr_temp.transpose()))
 phi = arr_temp.transpose()
 im = ax.imshow(phi, vmin=vmin, vmax=vmax, origin="lower", cmap="binary", extent=[xmin, xmax, zmin, zmax])
-ctr = ax.contour(zctr, levels=[zst] ,origin='lower', colors=['white'], extent=[xmin, xmax, zmin, zmax],
+ctr = ax.contour(arr_mf, levels=[zst] ,origin='lower', colors=['white'], extent=[xmin, xmax, zmin, zmax],
                  linestyle = "--")
 divider = make_axes_locatable(ax)
 cax = divider.append_axes('right', size='5%', pad=0.05)

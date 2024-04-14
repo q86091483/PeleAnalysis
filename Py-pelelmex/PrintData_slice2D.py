@@ -17,7 +17,7 @@ plt_pattern = "plt_0[4,5,6]*"
 # Planes to be extracted
 plane_x = []
 plane_y = [-9E-4, 9E-4]
-plane_z = [2E-3]
+plane_z = [2E-3, 3E-3]
 # Prefix
 str_prefix = "HRR_T"
 # Fields to be extracted
@@ -51,7 +51,7 @@ for iy, pos in enumerate(plane_y):
   if not os.path.exists(folder_name):   
     os.mkdir(folder_name)
   
-  for ifn, fn in enumerate(fns_sorted[0:3]):
+  for ifn, fn in enumerate(fns_sorted):
     out_name = re.split("/", fn)[-1]
     time = HeaderData(fn).time
     out_name = out_name + "_t=" + "%.3E"%time
@@ -69,9 +69,29 @@ for iy, pos in enumerate(plane_y):
                uselog=1,
                )
 
+for iz, pos in enumerate(plane_z):
+  normal = 1
 
+  folder_name = str_prefix + "_z=" + "%.3E" % pos
+  folder_name = os.path.join(output_case_slice_dir, folder_name)
+  if not os.path.exists(folder_name):   
+    os.mkdir(folder_name)
+  
+  for ifn, fn in enumerate(fns_sorted):
+    out_name = re.split("/", fn)[-1]
+    time = HeaderData(fn).time
+    out_name = out_name + "_t=" + "%.3E"%time
+    out_name = os.path.join(folder_name, out_name)
 
-
-
-
+    mand = Mandoline(fn, 
+                     fields=field_names, 
+                     limit_level=max_level,
+                     serial=True,
+                     verbose=1)
+    mand.slice(normal=normal, 
+               pos=pos,
+               outfile=out_name,
+               fformat="array",
+               uselog=1,
+               )
 #%%

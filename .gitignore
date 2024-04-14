@@ -55,4 +55,4 @@ Src/AMReX_buildInfo.cpp
 Src/compile_commands.json
 amrex-kitchen/
 compile_commands.json
-*dat
+*.dat

@@ -235,13 +235,13 @@ int main (int argc, char* argv[])
   }
 
   int verbose = 0;
-    pp.query("verbose", verbose);
-    if (verbose > 2) {
-        AmrData::SetVerbose(true);
-    }
-    if (! isioproc) {
-        verbose = 0;
-    }
+  pp.query("verbose", verbose);
+  if (verbose > 2) {
+      AmrData::SetVerbose(true);
+  }
+  if (! isioproc) {
+      verbose = 0;
+  }
 
   // Number of files to read
   const int nPlotFiles = pp.countval("infile");
@@ -373,11 +373,13 @@ int main (int argc, char* argv[])
   fn = "z";
   midNames.emplace_back(fn); nCompMid = midNames.size(); mi[fn] = nCompMid + nCompIn - 1; 
 
-  // Output index and names
+  // Output index and names (Y of <Y|X>)
   amrex::Vector<std::string> outNames;
   int nCompOut;
   std::map<std::string, int> mo;
   fn = "rho";
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
+  fn = "mixture_fraction";
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "temp";
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
@@ -400,7 +402,7 @@ int main (int argc, char* argv[])
   fn = "mu";
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
 
-  // Variable to be conditioned upon
+  // Conditional variables (X of <Y|X>)
   const int nVars(pp.countval("vars"));
   if (nVars < 1) {
     Error("Needs to specify at least one conditioning variable.");
@@ -454,7 +456,7 @@ int main (int argc, char* argv[])
     nBinsTot *= nBins[i];
   }
 
-  // Variables to be averaged
+  // Variables to be averaged (Y of <Y|X>)
   amrex::Vector<std::string> avgVarNames;
   amrex::Vector<weight_t> avgVarWeights;
   int nAvgVars = nCompOut;
@@ -602,6 +604,7 @@ int main (int argc, char* argv[])
 
         const Box& bx = mfi.tilebox();
 
+        // Reference FArraybox
         FArrayBox& fab_in = mf_in[mfi];
         FArrayBox& fab_out = mfv_out[lev][mfi];
         FArrayBox& fab_covered = mf_covered[mfi];
@@ -613,23 +616,25 @@ int main (int argc, char* argv[])
         FArrayBox& fab_su    = mf_su[mfi];
         FArrayBox& fab_tau   = mf_tau[mfi];
 
+        // Reference Array4
+        Array4<Real> const& rho_a   = mf_in.array(mfi, mi["density"]);
+        Array4<Real> const& mixfrac_a  = mf_in.array(mfi, mi["mixture_fraction"]);
         Array4<Real> const& Y_a     = mf_in.array(mfi, mi[spec_names[0]]);
         Array4<Real> const& T_a     = mf_in.array(mfi, mi["temp"]);
         Array4<Real> const& HRR_a   = mf_in.array(mfi, mi["HeatRelease"]);
         Array4<Real> const& U_a     = mf_in.array(mfi, mi["x_velocity"]);
         Array4<Real> const& V_a     = mf_in.array(mfi, mi["y_velocity"]);
         Array4<Real> const& W_a     = mf_in.array(mfi, mi["z_velocity"]);
-        Array4<Real> const& rho_a   = mf_in.array(mfi, mi["density"]);
         Array4<Real> const& x_a     = mf_xyz.array(mfi, 0);
         Array4<Real> const& y_a     = mf_xyz.array(mfi, 1);
-        Array4<Real> const& z_a     = mf_xyz.array(mfi, 2);
-     
+        Array4<Real> const& z_a     = mf_xyz.array(mfi, 2);  
+        Array4<Real> const& covered_a = mf_covered.array(mfi);
+
         Array4<Real> const& D_a     = mf_D.array(mfi);
         Array4<Real> const& mu_a    = mf_mu.array(mfi);
         Array4<Real> const& lam_a   = mf_lam.array(mfi);
         Array4<Real> const& chi_a   = mf_chi.array(mfi);
         Array4<Real> const& xi_a    = mf_xi.array(mfi);
-        Array4<Real> const& covered_a = mf_covered.array(mfi);
         Array4<Real> const& su_a    = mf_su.array(mfi);
         Array4<Real> const& tau_a   = mf_tau.array(mfi);
         Array4<Real> const& gradu_a = mf_gradu.array(mfi);
@@ -637,6 +642,7 @@ int main (int argc, char* argv[])
         Array4<Real> const& gradw_a = mf_gradw.array(mfi);
 
         Array4<Real> const& rho_out_a = mfv_out[lev].array(mfi, mo["rho"]);
+        Array4<Real> const& mixfrac_out_a = mfv_out[lev].array(mfi, mo["mixture_fraction"]);
         Array4<Real> const& T_out_a = mfv_out[lev].array(mfi, mo["temp"]);
         Array4<Real> const& HRR_out_a = mfv_out[lev].array(mfi, mo["HeatRelease"]);
         Array4<Real> const& mu_out_a = mfv_out[lev].array(mfi, mo["mu"]);
@@ -678,6 +684,7 @@ int main (int argc, char* argv[])
 
         amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
           rho_out_a(i,j,k) = rho_a(i,j,k);
+          mixfrac_out_a(i,j,k) = mixfrac_a(i,j,k);
           T_out_a(i,j,k) = T_a(i,j,k);
           HRR_out_a(i,j,k) = HRR_a(i,j,k);
           mu_out_a(i,j,k) = mu_a(i,j,k);
@@ -768,7 +775,7 @@ int main (int argc, char* argv[])
             varMinVal[i][bin] += std::min(varMinVal[i][bin], dataY[i]);
             varMaxVal[i][bin] += std::min(varMaxVal[i][bin], dataY[i]);
           }
-        } // iv - mfi
+        } // iv of mfi to collect statistics
       } // mfi - set variables && collect stats
 
       // Cell volume for each level
