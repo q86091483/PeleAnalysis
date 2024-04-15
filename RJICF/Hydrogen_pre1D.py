@@ -53,6 +53,12 @@ gas_j = ct.Solution(param["mech"])
 gas_c = ct.Solution(param["mech"])
 
 Ns     = len(gas_j.species_names)
+i_N2   = gas_j.species_index("N2") 
+i_NO   = gas_j.species_index("NO") 
+i_NO2  = gas_j.species_index("NO2") 
+i_N2O  = gas_j.species_index("N2O") 
+i_NNH  = gas_j.species_index("NNH") 
+
 X_j    = {}; X_j["H2"] = 1.0; X_j["N2"] = 1 - X_j["H2"] 
 X_c    = {}; X_c["O2"] = 0.21; X_c["N2"] = 0.79
 
@@ -96,14 +102,33 @@ for iz, z in enumerate(Zs):
   states = ct.SolutionArray(gas_mix)
   T_s = T_f[i_Tmax]
   Y_s = {}
-  for spn in gas_mix.species_names:
+  for isp, spn in enumerate(gas_mix.species_names):
     Y_s[spn] = Y_f[isp][i_Tmax]
   P_s = gas_mix.P
   states.append(T=T_s,
                 P=P_s,
                 Y=Y_s)
   rates = states.net_rates_of_progress
-  
+
+  tran_matrix = np.genfromtxt("./nuig_H2_4atm/n-N-sp1-sp2_nuig_H2_32sp_4atm.csv", delimiter=",")
+  graph = np.zeros((Ns, Ns))
+  reactions_of_species = {}
+  for iline in range(0, tran_matrix.shape[0]):
+    ir    = int(tran_matrix[iline, 0])
+    isp0  = int(tran_matrix[iline, 1])
+    isp1  = int(tran_matrix[iline, 2])
+    nN    = int(tran_matrix[iline, 3])
+
+    graph[isp0, isp1] = graph[isp0, isp1] + rates[0][ir] * nN
+  sum = np.sum(graph[i_N2,:])
+
+  ratio = np.zeros((Ns))
+  for isp, spn in enumerate(gas_mix.species_names):
+    ratio[isp] = graph[i_N2, isp] - graph[isp, i_N2]
+    if ratio[isp] < 0:
+      ratio[isp] = 0.0
+  for isp, spn in enumerate(gas_mix.species_names):
+    print("N2 -> " + spn, ratio[isp]/np.sum(ratio))
 
   vmin=700; vmax=2500
   axz.plot(x_f, T_f, label="T", linestyle="--", color="r")
