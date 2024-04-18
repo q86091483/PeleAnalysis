@@ -294,6 +294,10 @@ int main (int argc, char* argv[])
   pp.query("finestLevel", finestLevel_in);
   int Nlev_in = finestLevel_in + 1;
 
+  // If write Derived field
+  int writeDerivedField = 0;
+  pp.query("writeDerivedField", writeDerivedField);
+
   // Get species names
   Vector<std::string> spec_names;
   pele::physics::eos::speciesNames<pele::physics::PhysicsType::eos_type>(spec_names);
@@ -974,7 +978,7 @@ int main (int argc, char* argv[])
     } // statistics
 
     // Write output fields
-    if (true) {
+    if (writeDerivedField) {
       std::string outfilename(outDir + "/" + basename(plotFileNames[iPlot]) + "_derived"); 
       Print() << "Writing ISRN derived data to " << outfilename << std::endl;
       //bool verb = false;

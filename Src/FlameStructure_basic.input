@@ -1,13 +1,15 @@
 # Global settings
 verbose         = 2
-finestLevel     = 1
+finestLevel     = 2
 
 # infile from bash
 #infile          = /scratch/b/bsavard/mavab/Backup_run/DNS_HTC_premixer/chemistry/plt05991/
 #infile_derived  = /scratch/b/bsavard/zisen347/PeleAnalysis/Src/cond_ISRN/plt05991_derived
 
-outputDir       = cond_FlameStructure_basic        
+outputDir       = res_FlameStructure_basic        
 outputLabel     = Y
+
+writeDerivedField = 0  # If write derived field (output field)
 
 # Conditioning variables
 vars            = x		      						y		      				z
