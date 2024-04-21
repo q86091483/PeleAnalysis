@@ -735,11 +735,11 @@ int main (int argc, char* argv[])
           //for (int i = 0; i < nVars; i++) {
           //  dataX[i] = mf_in.array(mfi, mi[varNames[i]])(iv[0],iv[1],iv[2]);
           //}
-          //dataX[0] = mf_x.array(mfi)(iv[0], iv[1], iv[2]);
-          //dataX[1] = mf_y.array(mfi)(iv[0], iv[1], iv[2]);
-          //dataX[2] = mf_z.array(mfi)(iv[0], iv[1], iv[2]);
+          dataX[0] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 0);
+          dataX[1] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 1);
+          dataX[2] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 2);
 
-          fab_xyz.getVal(dataX.dataPtr(), iv);
+          //fab_xyz.getVal(dataX.dataPtr(), iv);
           fab_out.getVal(dataY.dataPtr(), iv);
           //Skip points overlapping with a finer levels
           skip = false;

@@ -57,3 +57,10 @@ amrex-kitchen/
 compile_commands.json
 *.dat
 *.gif
+mpi*.txt
+*tmp*
+*.pdf
+*.gv
+
+RJICF/Data/*
+RJICF/laminar1D*/*
