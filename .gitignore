@@ -64,3 +64,4 @@ mpi*.txt
 
 RJICF/Data/*
 RJICF/laminar1D*/*
+RJICF/initeq.dat
