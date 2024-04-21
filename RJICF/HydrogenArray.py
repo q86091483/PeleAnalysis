@@ -151,7 +151,7 @@ def get_ngrid(lev, nx0, ny0, nz0, r):
   return n
 #%%
 def get_flame_name(Patm, Tj, Tc, z):
-  str1 = "laminar1D/" + mech + "/P=" + "%i" % Patm
+  str1 = "laminar1D_HydrogenArray/" + mech + "/P=" + "%i" % Patm
   str1 = str1 + "_Tj=" + "%i" % Tj
   str1 = str1 + "_Tc=" + "%i" % Tc
   str1 = str1 + "_Z=" + "%.4f" % z

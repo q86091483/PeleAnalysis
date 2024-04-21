@@ -56,3 +56,4 @@ Src/compile_commands.json
 amrex-kitchen/
 compile_commands.json
 *.dat
+*.gif

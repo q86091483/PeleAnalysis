@@ -17,7 +17,7 @@ matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 # Input
 # Where to output the result
-case_folder = "/scratch/b/bsavard/zisen347/PeleAnalysis/Src/cond_FlameStructure_basic/"
+case_folder = "/scratch/b/bsavard/zisen347/PeleAnalysis/Src/res_FlameStructure_basic/"
 # Where to read h5 files that contain condition smean
 fns = glob.glob(case_folder + "*_Y.h5")
 # Domain length of Pele Case

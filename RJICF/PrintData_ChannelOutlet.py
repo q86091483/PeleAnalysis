@@ -26,8 +26,8 @@ case_name     = "NUIG_Re4000_2J6_4atm"
 # Case path to input.3d, turbin of Pele
 case_path     = os.path.join(case_folder, case_name)
 # The time range t0 to t1 should cover the Pele run
-t0            = 2.0E-4
-t1            = 6.0E-4
+t0            = 5.5E-4    # 2.0E-4
+t1            = 1.0E-3    # 6.0E-4
 # The NGA output, data_(t_nga_froz), is first periodically fed 
 t_nga_froz    = 1.000E-2;
 # Time when the channel input of Pele change from frozen flow 

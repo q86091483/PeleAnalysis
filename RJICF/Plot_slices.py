@@ -17,8 +17,8 @@ matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 # Load data
 #fn = "/scratch/b/bsavard/zisen347/scopingRuns/Burke9_Re6000_2J6_nonreactive_1/plt_04370"
-fn = "/scratch/b/bsavard/zisen347/scopingRuns/NUIG_Re3600_2J6_4atm/plt_02350"
-fn = "/scratch/b/bsavard/zisen347/scopingRuns/MicroMix/plt_06952"
+#fn = "/scratch/b/bsavard/zisen347/scopingRuns/NUIG_Re3600_2J6_4atm/plt_02300"
+fn = "/scratch/b/bsavard/zisen347/scopingRuns/MicroMix/plt_09620"
 
 ds = yt.load(fn) # unit_system="cgs")
 zst = 0.0252
@@ -50,7 +50,7 @@ if coord != None:
   ze = coord[2] * lref
 else:
   xe = 2.0 * lref
-  loc = 2.0 * lref
+  loc = -2.0 * lref
   ze = 2.0 * lref
 
 fn = "mixture_fraction"; dir = "y"; vmin=0.0; vmax=1.0
