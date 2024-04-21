@@ -299,11 +299,52 @@ int main (int argc, char* argv[])
   pp.query("writeDerivedField", writeDerivedField);
 
   // Get species names
+  auto eos = pele::physics::PhysicsType::eos();
   Vector<std::string> spec_names;
   pele::physics::eos::speciesNames<pele::physics::PhysicsType::eos_type>(spec_names);
+  amrex::Real atwCHON[4] = {0.0};
+  pele::physics::eos::atomic_weightsCHON<pele::physics::PhysicsType::eos_type>(
+    atwCHON);
+  for (int i = 0; i < 4; i++) {
+    amrex::Print() << atwCHON[i] << std::endl;
+  }
+  int ecompCHON[NUM_SPECIES * 4];
+  pele::physics::eos::element_compositionCHON<
+    pele::physics::PhysicsType::eos_type>(ecompCHON);
+  amrex::Print() << "Number of atm (C,H,O,N) in species (molecular weight):" << std::endl;
+  amrex::Real mwt[NUM_SPECIES];
+  eos.molecular_weight(mwt);
+  for (int i = 0; i < NUM_SPECIES; ++i) {
+    for (int k = 0; k < 4; k++) {
+      amrex::Print() << ecompCHON[i*4+k] << ", ";
+    }
+    amrex::Print() << mwt[i];
+    amrex::Print() << std::endl;
+  }
+
+  amrex::Real Beta_mix[4] = {0.0};
+  Beta_mix[0] = (atwCHON[0] != 0.0) ? 2.0 / atwCHON[0] : 0.0;
+  Beta_mix[1] = (atwCHON[1] != 0.0) ? 1.0 / (2.0 * atwCHON[1]) : 0.0;
+  Beta_mix[2] = (atwCHON[2] != 0.0) ? -1.0 / atwCHON[2] : 0.0;
+  Beta_mix[3] = 0.0;
+
+  amrex::Real spec_Bilger_fact[NUM_SPECIES] = {0.0};
+  amrex::Real YF[NUM_SPECIES] = {0.0}; YF[H2_ID] = 1.0;
+  amrex::Real YO[NUM_SPECIES] = {0.0}; YO[O2_ID] = 0.232; YO[N2_ID] = 1-YO[O2_ID];
+  amrex::Real Zfu = 0.0;
+  amrex::Real Zox = 0.0;
+  for (int i = 0; i < NUM_SPECIES; ++i) {
+    spec_Bilger_fact[i] = 0.0;
+    for (int k = 0; k < 4; k++) {
+      spec_Bilger_fact[i] +=
+        Beta_mix[k] * (ecompCHON[i * 4 + k] * atwCHON[k] / mwt[i]);
+    }
+    Zfu += spec_Bilger_fact[i] * YF[i];
+    Zox += spec_Bilger_fact[i] * YO[i];
+  }
+  amrex::Print() << "Zfu: " << Zfu << ", Zox: " << Zox << std::endl;
 
   // Initialize transport data
-  auto eos = pele::physics::PhysicsType::eos();
   pele::physics::transport::TransportParams<
       pele::physics::PhysicsType::transport_type>
       trans_parms;
@@ -311,6 +352,7 @@ int main (int argc, char* argv[])
 
   // Get the transport data pointer
   auto const* ltransparm = trans_parms.device_trans_parm();
+  amrex::Real atw[4] = {0.0};
 
   // Initialize dataServicePtrVec & amrDataPtrVec
   amrex::Print() << "Initializing dataServicePtrVec: " << std::endl;
@@ -331,9 +373,8 @@ int main (int argc, char* argv[])
   }
   amrex::Print() << "   Done." << std::endl;
 
-  std::string fn;
-
   // Input index and names
+  std::string fn;
   amrex::Vector<std::string> inNames;
   std::map<std::string,int> mi;
   int nCompIn = 0;
@@ -365,18 +406,7 @@ int main (int argc, char* argv[])
   for (int i=0; i<inNames.size(); ++i) {
     amrex::Print() << "   " << inNames[i] << " -> " << destFillComps[i] << std::endl;
   }
-
-  // Intermediate fields (middle) index and names
-  amrex::Vector<std::string> midNames;
-  std::map<std::string, int> mm;
-  int nCompMid = 0;
-  fn = "x";
-  midNames.emplace_back(fn); nCompMid = midNames.size(); mi[fn] = nCompMid + nCompIn - 1; 
-  fn = "y";
-  midNames.emplace_back(fn); nCompMid = midNames.size(); mi[fn] = nCompMid + nCompIn - 1;
-  fn = "z";
-  midNames.emplace_back(fn); nCompMid = midNames.size(); mi[fn] = nCompMid + nCompIn - 1; 
-
+ 
   // Output index and names (Y of <Y|X>)
   amrex::Vector<std::string> outNames;
   int nCompOut;
@@ -389,21 +419,7 @@ int main (int argc, char* argv[])
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "HeatRelease";
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
-  fn = "ts11";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
-  fn = "ts22";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
-  fn = "ts33";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
-  fn = "ts12";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
-  fn = "ts13";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
-  fn = "ts23";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
-  fn = "ts_sum";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
-  fn = "mu";
+  fn = "Y(H2)";
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
 
   // Conditional variables (X of <Y|X>)
@@ -471,6 +487,16 @@ int main (int argc, char* argv[])
 
   Vector<Real> dataX(nVars);
   Vector<Real> dataY(nAvgVars);
+
+  // Conditional variable fields index and names
+  amrex::Vector<std::string> midNames;
+  std::map<std::string, int> mm;
+  int nCompMid = 0;
+  for (int i=0; i<nVars; i++) {
+    fn = varNames[i];
+    midNames.emplace_back(fn); nCompMid = midNames.size(); mm[fn] = nCompMid - 1; 
+  }
+  amrex::Print() << "midNames size: " << midNames.size() << std::endl;
 
   // Iterate over input plot files
   for (int iPlot; iPlot < nPlotFiles; ++iPlot) {
@@ -553,9 +579,11 @@ int main (int argc, char* argv[])
       mfv_out[lev] = MultiFab(ba,dm,nCompOut,nGrow);
       //MultiFab mf_out(mfv_out[lev], amrex::make_alias, 0, nCompOut);
 
-      // Intermediate fields MultiFabs
+      // Mid MultiFabs - conditional variables except x, y, z
+      MultiFab mf_mid(ba, dm, nCompMid, nGrow);
       MultiFab mf_xyz(ba, dm, 3, nGrow);
 
+      // Intermediate fields MultiFabs
       MultiFab mf_D(ba, dm, NUM_SPECIES, nGrow);
       MultiFab mf_lam(ba, dm, 1, nGrow);
       MultiFab mf_chi(ba, dm, 1, nGrow);
@@ -564,11 +592,11 @@ int main (int argc, char* argv[])
       MultiFab mf_gradu(ba, dm, BL_SPACEDIM+1, nGrow);
       MultiFab mf_gradv(ba, dm, BL_SPACEDIM+1, nGrow);
       MultiFab mf_gradw(ba, dm, BL_SPACEDIM+1, nGrow);
-		  MultiFab mf_su(ba, dm, 6, nGrow); // symmetric velocity tensor 0.5(du_i/dx_j+du_j/dx_i)
-		  MultiFab mf_tau(ba, dm, 6, nGrow); // viscous force tensor
-      const int L11=0, L22=1, L33=2, L12=3, L13=4, L23=5;
-      const int                      L21=3, L31=4, L32=5;
-      const int LSUM = 6;
+		  //MultiFab mf_su(ba, dm, 6, nGrow); // symmetric velocity tensor 0.5(du_i/dx_j+du_j/dx_i)
+		  //MultiFab mf_tau(ba, dm, 6, nGrow); // viscous force tensor
+      //const int L11=0, L22=1, L33=2, L12=3, L13=4, L23=5;
+      //const int                      L21=3, L31=4, L32=5;
+      //const int LSUM = 6;
 
       // Mask if covered by finer level - mf_covered
       MultiFab mf_covered(ba,dm,1,nGrow); 
@@ -608,19 +636,25 @@ int main (int argc, char* argv[])
 
         const Box& bx = mfi.tilebox();
 
-        // Reference FArraybox
+        // FArraybox reference to mf_in
         FArrayBox& fab_in = mf_in[mfi];
-        FArrayBox& fab_out = mfv_out[lev][mfi];
-        FArrayBox& fab_covered = mf_covered[mfi];
-        FArrayBox& fab_xyz = mf_xyz[mfi];
 
+        // FArraybox reference mfv_out
+        FArrayBox& fab_out = mfv_out[lev][mfi];
+
+        // FArraybox reference mfv_out
+        FArrayBox& fab_mid = mf_mid[mfi];
+
+        // FArraybox reference to intermediate
+        FArrayBox& fab_xyz = mf_xyz[mfi];
+        FArrayBox& fab_covered = mf_covered[mfi];
         FArrayBox& fab_gradu = mf_gradu[mfi];
         FArrayBox& fab_gradv = mf_gradv[mfi];
         FArrayBox& fab_gradw = mf_gradw[mfi];
-        FArrayBox& fab_su    = mf_su[mfi];
-        FArrayBox& fab_tau   = mf_tau[mfi];
+        //FArrayBox& fab_su    = mf_su[mfi];
+        //FArrayBox& fab_tau   = mf_tau[mfi];
 
-        // Reference Array4
+        // Array4 reference to mf_in
         Array4<Real> const& rho_a   = mf_in.array(mfi, mi["density"]);
         Array4<Real> const& mixfrac_a  = mf_in.array(mfi, mi["mixture_fraction"]);
         Array4<Real> const& Y_a     = mf_in.array(mfi, mi[spec_names[0]]);
@@ -629,28 +663,35 @@ int main (int argc, char* argv[])
         Array4<Real> const& U_a     = mf_in.array(mfi, mi["x_velocity"]);
         Array4<Real> const& V_a     = mf_in.array(mfi, mi["y_velocity"]);
         Array4<Real> const& W_a     = mf_in.array(mfi, mi["z_velocity"]);
+
+        // Array reference to mfv_out
+        Array4<Real> const& rho_out_a = mfv_out[lev].array(mfi, mo["rho"]);
+        Array4<Real> const& mixfrac_out_a = mfv_out[lev].array(mfi, mo["mixture_fraction"]);
+        Array4<Real> const& Y_H2_a = mfv_out[lev].array(mfi, mo["Y(H2)"]);
+        Array4<Real> const& T_out_a = mfv_out[lev].array(mfi, mo["temp"]);
+        Array4<Real> const& HRR_out_a = mfv_out[lev].array(mfi, mo["HeatRelease"]);
+
+        //Array4<Real> const& mu_out_a = mfv_out[lev].array(mfi, mo["mu"]);
+        //Array4<Real> const& ts_a      = mfv_out[lev].array(mfi, mo["ts11"]);
+
+        // Array reference to mf_mid
+        Array4<Real> const& mixfrac_mid_a = mf_mid.array(mfi, mm["mixture_fraction"]);
+
+        // Array reference intermediate
         Array4<Real> const& x_a     = mf_xyz.array(mfi, 0);
         Array4<Real> const& y_a     = mf_xyz.array(mfi, 1);
         Array4<Real> const& z_a     = mf_xyz.array(mfi, 2);  
-        Array4<Real> const& covered_a = mf_covered.array(mfi);
-
+        Array4<Real> const& covered_a = mf_covered.array(mfi); 
         Array4<Real> const& D_a     = mf_D.array(mfi);
-        Array4<Real> const& mu_a    = mf_mu.array(mfi);
         Array4<Real> const& lam_a   = mf_lam.array(mfi);
         Array4<Real> const& chi_a   = mf_chi.array(mfi);
         Array4<Real> const& xi_a    = mf_xi.array(mfi);
-        Array4<Real> const& su_a    = mf_su.array(mfi);
-        Array4<Real> const& tau_a   = mf_tau.array(mfi);
+        Array4<Real> const& mu_a    = mf_mu.array(mfi);
+        //Array4<Real> const& su_a    = mf_su.array(mfi);
+        //Array4<Real> const& tau_a   = mf_tau.array(mfi);
         Array4<Real> const& gradu_a = mf_gradu.array(mfi);
         Array4<Real> const& gradv_a = mf_gradv.array(mfi);
         Array4<Real> const& gradw_a = mf_gradw.array(mfi);
-
-        Array4<Real> const& rho_out_a = mfv_out[lev].array(mfi, mo["rho"]);
-        Array4<Real> const& mixfrac_out_a = mfv_out[lev].array(mfi, mo["mixture_fraction"]);
-        Array4<Real> const& T_out_a = mfv_out[lev].array(mfi, mo["temp"]);
-        Array4<Real> const& HRR_out_a = mfv_out[lev].array(mfi, mo["HeatRelease"]);
-        Array4<Real> const& mu_out_a = mfv_out[lev].array(mfi, mo["mu"]);
-        Array4<Real> const& ts_a      = mfv_out[lev].array(mfi, mo["ts11"]);
 
         // Calculate coordiante
         const auto lo = lbound(bx);
@@ -687,57 +728,78 @@ int main (int argc, char* argv[])
                 &(dx[0]));
 
         amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+
+
           rho_out_a(i,j,k) = rho_a(i,j,k);
-          mixfrac_out_a(i,j,k) = mixfrac_a(i,j,k);
           T_out_a(i,j,k) = T_a(i,j,k);
           HRR_out_a(i,j,k) = HRR_a(i,j,k);
-          mu_out_a(i,j,k) = mu_a(i,j,k);
+          Y_H2_a(i,j,k) = Y_a(i,j,k,H2_ID);
 
-          su_a(i,j,k,L11) = gradu_a(i,j,k,0);
-          su_a(i,j,k,L22) = gradv_a(i,j,k,1);
-          su_a(i,j,k,L33) = gradw_a(i,j,k,2);
-          su_a(i,j,k,L12) = 0.5 * (gradu_a(i,j,k,1) + gradv_a(i,j,k,0));
-          su_a(i,j,k,L13) = 0.5 * (gradu_a(i,j,k,2) + gradw_a(i,j,k,0));
-          su_a(i,j,k,L23) = 0.5 * (gradv_a(i,j,k,2) + gradw_a(i,j,k,1));
+          amrex::Real Zlocal = 0.0;
+          for (int isp = 0; isp < NUM_SPECIES; ++isp) {
+            Zlocal += spec_Bilger_fact[isp] * Y_a(i,j,k,isp);
+          }
+          mixfrac_out_a(i,j,k) = (Zlocal-Zox) / (Zfu-Zox);
+          mixfrac_mid_a(i,j,k) = mixfrac_out_a(i,j,k);
 
-          Real skk = (1/3.) * (gradu_a(i,j,k,0)+gradv_a(i,j,k,1)+gradw_a(i,j,k,2));
-          tau_a(i,j,k,L11) = 2. * mu_a(i,j,k) * (su_a(i,j,k,L11) - skk);
-          tau_a(i,j,k,L22) = 2. * mu_a(i,j,k) * (su_a(i,j,k,L22) - skk);
-          tau_a(i,j,k,L33) = 2. * mu_a(i,j,k) * (su_a(i,j,k,L33) - skk);
-          tau_a(i,j,k,L12) = 2 * mu_a(i,j,k) * su_a(i,j,k,L12);
-          tau_a(i,j,k,L13) = 2 * mu_a(i,j,k) * su_a(i,j,k,L13); 
-          tau_a(i,j,k,L23) = 2 * mu_a(i,j,k) * su_a(i,j,k,L23); 
+          //mu_out_a(i,j,k) = mu_a(i,j,k);
 
-          Real coeff = 2 * mu_a(i,j,k) / rho_a(i,j,k);
-          ts_a(i,j,k,L11) = su_a(i,j,k,L11);
-          ts_a(i,j,k,L22) = su_a(i,j,k,L22);
-          ts_a(i,j,k,L33) = su_a(i,j,k,L33);
-          ts_a(i,j,k,L12) = su_a(i,j,k,L12);
-          ts_a(i,j,k,L13) = su_a(i,j,k,L13);
-          ts_a(i,j,k,L23) = su_a(i,k,k,L23);
+          //su_a(i,j,k,L11) = gradu_a(i,j,k,0);
+          //su_a(i,j,k,L22) = gradv_a(i,j,k,1);
+          //su_a(i,j,k,L33) = gradw_a(i,j,k,2);
+          //su_a(i,j,k,L12) = 0.5 * (gradu_a(i,j,k,1) + gradv_a(i,j,k,0));
+          //su_a(i,j,k,L13) = 0.5 * (gradu_a(i,j,k,2) + gradw_a(i,j,k,0));
+          //su_a(i,j,k,L23) = 0.5 * (gradv_a(i,j,k,2) + gradw_a(i,j,k,1));
 
-          ts_a(i,j,k,LSUM) = ts_a(i,j,k,L11) * ts_a(i,j,k,L11) + 
-                             ts_a(i,j,k,L12) * ts_a(i,j,k,L12) + 
-                             ts_a(i,j,k,L13) * ts_a(i,j,k,L13) +
-                             ts_a(i,j,k,L21) * ts_a(i,j,k,L21) + 
-                             ts_a(i,j,k,L22) * ts_a(i,j,k,L22) +
-                             ts_a(i,j,k,L23) * ts_a(i,j,k,L23) +
-                             ts_a(i,j,k,L31) * ts_a(i,j,k,L31) +
-                             ts_a(i,j,k,L32) * ts_a(i,j,k,L32) + 
-                             ts_a(i,j,k,L33) * ts_a(i,j,k,L33);
+          //Real skk = (1/3.) * (gradu_a(i,j,k,0)+gradv_a(i,j,k,1)+gradw_a(i,j,k,2));
+          //tau_a(i,j,k,L11) = 2. * mu_a(i,j,k) * (su_a(i,j,k,L11) - skk);
+          //tau_a(i,j,k,L22) = 2. * mu_a(i,j,k) * (su_a(i,j,k,L22) - skk);
+          //tau_a(i,j,k,L33) = 2. * mu_a(i,j,k) * (su_a(i,j,k,L33) - skk);
+          //tau_a(i,j,k,L12) = 2 * mu_a(i,j,k) * su_a(i,j,k,L12);
+          //tau_a(i,j,k,L13) = 2 * mu_a(i,j,k) * su_a(i,j,k,L13); 
+          //tau_a(i,j,k,L23) = 2 * mu_a(i,j,k) * su_a(i,j,k,L23); 
 
+          //Real coeff = 2 * mu_a(i,j,k) / rho_a(i,j,k);
+          //ts_a(i,j,k,L11) = su_a(i,j,k,L11);
+          //ts_a(i,j,k,L22) = su_a(i,j,k,L22);
+          //ts_a(i,j,k,L33) = su_a(i,j,k,L33);
+          //ts_a(i,j,k,L12) = su_a(i,j,k,L12);
+          //ts_a(i,j,k,L13) = su_a(i,j,k,L13);
+          //ts_a(i,j,k,L23) = su_a(i,k,k,L23);
+
+          //ts_a(i,j,k,LSUM) = ts_a(i,j,k,L11) * ts_a(i,j,k,L11) + 
+          //                   ts_a(i,j,k,L12) * ts_a(i,j,k,L12) + 
+          //                   ts_a(i,j,k,L13) * ts_a(i,j,k,L13) +
+          //                   ts_a(i,j,k,L21) * ts_a(i,j,k,L21) + 
+          //                   ts_a(i,j,k,L22) * ts_a(i,j,k,L22) +
+          //                   ts_a(i,j,k,L23) * ts_a(i,j,k,L23) +
+          //                   ts_a(i,j,k,L31) * ts_a(i,j,k,L31) +
+          //                   ts_a(i,j,k,L32) * ts_a(i,j,k,L32) + 
+          //                   ts_a(i,j,k,L33) * ts_a(i,j,k,L33);
 
         });
 
         // Collect statistics for mfi
         countLvl[lev] += bx.volume();
         for (IntVect iv = bx.smallEnd(); iv <= bx.bigEnd(); bx.next(iv)) {
-          //for (int i = 0; i < nVars; i++) {
-          //  dataX[i] = mf_in.array(mfi, mi[varNames[i]])(iv[0],iv[1],iv[2]);
-          //}
-          dataX[0] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 0);
-          dataX[1] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 1);
-          dataX[2] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 2);
+          // Get vector of conditional variables
+          // x, y, z in mf_xyz
+          // other variables in mf_mid
+          for (int i = 0; i < nVars; i++) {
+            std::string vn = varNames[i]; 
+            if (vn == "x") {
+              dataX[i] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 0);
+            } else if (vn == "y") {
+              dataX[i] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 1);
+            } else if (vn == "z") {
+              dataX[i] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 2); 
+            } else {
+              dataX[i] = mf_mid.array(mfi)(iv[0], iv[1], iv[2], mm[vn]);
+            } 
+          }
+          //dataX[0] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 0);
+          //dataX[1] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 1);
+          //dataX[2] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 2);
 
           //fab_xyz.getVal(dataX.dataPtr(), iv);
           fab_out.getVal(dataY.dataPtr(), iv);
