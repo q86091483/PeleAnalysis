@@ -10,29 +10,25 @@ import numpy as np
 
 # Input
 # Where plt files are stored
-plt_folder = "/scratch/b/bsavard/zisen347/scopingRuns/NUIG_Re4000_2J6_4atm/Level_3"
+plt_folder = "/scratch/b/bsavard/zisen347/PeleAnalysis/Src/res_MicroMix/"
 # Case name
 case_name = "Micromix"
 # Patterns of plotfiles to be processed
-plt_pattern = "plt_11040"
+plt_pattern = "plt_07000_derived"
 # Planes to be extracted
 Djet = 4.5E-4
-plane_x = np.array([-3.5, -2.5, -1.5, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0]) * Djet
-plane_y = np.array([]) * Djet
+plane_x = np.array([]) * Djet
+plane_y = np.array([2.0]) * Djet
 plane_z = np.array([]) * Djet
 # Prefix
-str_prefix = "HRR_T"
+str_prefix = "Derived"
 # Fields to be extracted
 # Max level
-max_level = 3
-#field_names = ["HeatRelease", "temp", "mixture_fraction", "mag_vort", 
-#               "x_velocity", "y_velocity", "z_velocity",
-#               "Y(NO)", "Y(N2O)", "Y(NO2)", "Y(NNH)", "Y(N)",
-#               "Y(H2O2)", "Y(OH)", "Y(HO2)",]
-field_names = ["x_velocity", "y_velocity", "z_velocity", "density"]
+max_level = 0
+field_names = ["HeatRelease", "mixture_fraction", "temp", "Y(H2)", "pv"]
 #field_names = ["x_velocity", "y_velocity", "z_velocity"]
 # Output data folder
-output_dir = "../Data"
+output_dir = "/scratch/b/bsavard/zisen347/PeleAnalysis/Py-pelelmex/Data"
 if not os.path.exists(output_dir):
   os.mkdir(output_dir)
 output_slice_dir = os.path.join(output_dir, "Slice2D")
@@ -46,14 +42,15 @@ if not os.path.exists(output_case_slice_dir):
 fns_unsorted = glob.glob(os.path.join(plt_folder, plt_pattern))
 
 def get_key(s):
-  ss = re.split("plt_", s)[-1]
+  ss = re.split("_derived", s)[0]
+  ss = re.split("plt_", ss)[-1]
   return int(ss)
 fns_sorted = sorted(fns_unsorted, key=get_key)
-print(fns_sorted)
-#%%
+
+for fn in fns_sorted:
+  print(fn)
 for ix, pos in enumerate(plane_x):
   normal = 0
-  print("Processing ix =", ix, ", pos=", pos)
 
   folder_name = str_prefix + "_x=" + "%.3E" % pos
   folder_name = os.path.join(output_case_slice_dir, folder_name)
@@ -61,6 +58,8 @@ for ix, pos in enumerate(plane_x):
     os.mkdir(folder_name)
   
   for ifn, fn in enumerate(fns_sorted):
+    print("Processing ix =", ix, ", pos=", pos)
+
     out_name = re.split("/", fn)[-1]
     time = HeaderData(fn).time
     out_name = out_name + "_t=" + "%.3E"%time
@@ -80,7 +79,6 @@ for ix, pos in enumerate(plane_x):
 #%%
 for iy, pos in enumerate(plane_y):
   normal = 1
-  print("Processing iy =", iy, ", pos=", pos)
 
   folder_name = str_prefix + "_y=" + "%.3E" % pos
   folder_name = os.path.join(output_case_slice_dir, folder_name)
@@ -88,6 +86,8 @@ for iy, pos in enumerate(plane_y):
     os.mkdir(folder_name)
   
   for ifn, fn in enumerate(fns_sorted):
+    print("Processing iy =", iy, ", pos=", pos)
+
     normal = 1
     out_name = re.split("/", fn)[-1]
     time = HeaderData(fn).time
@@ -109,7 +109,6 @@ for iy, pos in enumerate(plane_y):
 #%%
 for iz, pos in enumerate(plane_z):
   normal = 2
-  print("Processing iz =", iz, ", pos=", pos)
 
   folder_name = str_prefix + "_z=" + "%.3E" % pos
   folder_name = os.path.join(output_case_slice_dir, folder_name)
@@ -117,6 +116,8 @@ for iz, pos in enumerate(plane_z):
     os.mkdir(folder_name)
   
   for ifn, fn in enumerate(fns_sorted):
+    print("Processing iz =", iz, ", pos=", pos)
+
     out_name = re.split("/", fn)[-1]
     time = HeaderData(fn).time
     out_name = out_name + "_t=" + "%.3E"%time

@@ -18,7 +18,9 @@ matplotlib.rcParams['font.family'] = 'STIXGeneral'
 # Load data
 #fn = "/scratch/b/bsavard/zisen347/scopingRuns/Burke9_Re6000_2J6_nonreactive_1/plt_04370"
 #fn = "/scratch/b/bsavard/zisen347/scopingRuns/NUIG_Re3600_2J6_4atm/plt_02300"
-fn = "/scratch/b/bsavard/zisen347/scopingRuns/MicroMix/plt_09620"
+fn = "/scratch/b/bsavard/zisen347/scopingRuns/NUIG_Re4000_2J6_4atm/Level_3/plt_11000"
+#fn = "/scratch/b/bsavard/zisen347/scopingRuns/Debug_cases/MicroMix_cfl/plt_11000"
+
 
 ds = yt.load(fn) # unit_system="cgs")
 zst = 0.0252
@@ -50,7 +52,7 @@ if coord != None:
   ze = coord[2] * lref
 else:
   xe = 2.0 * lref
-  loc = -2.0 * lref
+  loc = 2.0 * lref
   ze = 2.0 * lref
 
 fn = "mixture_fraction"; dir = "y"; vmin=0.0; vmax=1.0
@@ -178,6 +180,21 @@ spl.set_log((fn), False)
 spl.annotate_grids(cmap='brg_r')
 spl.set_cmap(fn, 'binary')
 spl.set_zlim(fn, 0, 1e11)
+spl.set_xlabel(r"$x \; \mathrm{[m]}$")
+spl.set_ylabel(r"$z \; \mathrm{[m]}$")
+spl.swap_axes()
+spl.save()
+
+#%%
+fn  = "z_velocity"
+spl = yt.SlicePlot(ds, "y", 
+             [(fn)], 
+             origin='native',
+             center=(xmin+0.5*Lx, loc,zmin+0.5*Lz), width=((Lz, "cm"),(Lx, "cm")), )
+spl.set_log((fn), False)
+spl.annotate_grids(cmap='brg_r')
+spl.set_cmap(fn, 'jet')
+spl.set_zlim(fn, 0, 231)
 spl.set_xlabel(r"$x \; \mathrm{[m]}$")
 spl.set_ylabel(r"$z \; \mathrm{[m]}$")
 spl.swap_axes()

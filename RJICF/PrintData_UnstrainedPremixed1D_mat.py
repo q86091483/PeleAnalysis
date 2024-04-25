@@ -14,7 +14,6 @@ import re
 import glob
 
 import cantera as ct; ct.suppress_thermo_warnings()
-import graphviz
 
 #%% Read input
 # What tasks to do
@@ -93,28 +92,29 @@ gas_c.TPX = param["T_c"], param["P"], param["X_c"]
 
 #%% Progress variable
 coeff_pv = {}
-for isp, spn in enumerate(species_names):
-  if ("N" in spn or spn=="H2" or spn=="O2" or spn=="N2" or spn=="OHV"):
-    coeff_pv[spn] = 0.0
-  else:
-    coeff_pv[spn] = 1.0
-  #if (spn=="H2O"):
-  #  coeff_pv[spn] = 1.0
-  #elif (spn=="H2"):
-  #  coeff_pv[spn] = -1.0
-  #elif (spn=="O2"):
-  #  coeff_pv[spn] = -1.0
-  #else:
-  #  coeff_pv[spn] = 0.0
-
-  print(spn)
+idef = 1
+if idef == 0:
+  for isp, spn in enumerate(gas_mix.species_names):
+    if ("N" in spn or spn=="H2" or spn=="O2" or spn=="N2"):
+      coeff_pv[spn] = 0.0
+    else:
+      coeff_pv[spn] = 1.0
+elif idef == 1:
+  for isp, spn in enumerate(gas_mix.species_names):
+    if (spn == "H2O"):
+      coeff_pv[spn] = 1.0
+    elif (spn == "H2"):
+      coeff_pv[spn] = -1.0
+    elif (spn == "O2"):
+      coeff_pv[spn] = -1.0
+    else:
+      coeff_pv[spn] = 0.0
  
-def get_pveq(zs):
+def get_states(zs, equilibrate = True):
   gas_f = ct.Solution(param["mech"])
   gas_o = ct.Solution(param["mech"])
   gas_m = ct.Solution(param["mech"])
-  states = ct.SolutionArray(gas_m)
-  print(zs)
+  states = ct.SolutionArray(gas_m) 
   for iz, z in enumerate(zs):
     # Fuel and oxidizer stream
     X_f    = {}; X_f["H2"] = 1.0; X_f["N2"] = 1 - X_f["H2"] 
@@ -129,7 +129,43 @@ def get_pveq(zs):
     states.append(T = gas_m.T,
                   P = gas_m.P,
                   Y = gas_m.Y)
-  states.equilibrate("HP")
+    if equilibrate == True:
+      states.equilibrate("HP")
+  return states
+
+#%% Reference state based on equilibrium state of Z
+zout = np.linspace(0, 1.0, 51)
+states0 = get_states(zout, equilibrate = False) 
+states1 = get_states(zout, equilibrate = True) 
+pv_eq_min = np.zeros_like(zout)
+pv_eq_max = np.zeros_like(zout)
+for isp, spn in enumerate(species_names):
+  pv_eq_min = pv_eq_min + coeff_pv[spn] * states0.Y[:,isp]
+  pv_eq_max = pv_eq_max + coeff_pv[spn] * states1.Y[:,isp]
+
+#%%
+def get_pveq(zs, equilibrate):
+  gas_f = ct.Solution(param["mech"])
+  gas_o = ct.Solution(param["mech"])
+  gas_m = ct.Solution(param["mech"])
+  states = ct.SolutionArray(gas_m)
+  print("Input zs for get_pveq: ", zs)
+  for iz, z in enumerate(zs):
+    # Fuel and oxidizer stream
+    X_f    = {}; X_f["H2"] = 1.0; X_f["N2"] = 1 - X_f["H2"] 
+    X_o    = {}; X_o["O2"] = 0.21; X_o["N2"] = 0.79
+    gas_f.TPX = 300, 405300, X_f
+    gas_o.TPX = 750, 405300, X_o
+    # Mixture with z
+    Ym = z*gas_f.Y + (1-z)*gas_o.Y
+    Hm = z*gas_f.enthalpy_mass + (1-z)*gas_o.enthalpy_mass
+    Pm = gas_f.P
+    gas_m.HPY = Hm, Pm, Ym
+    states.append(T = gas_m.T,
+                  P = gas_m.P,
+                  Y = gas_m.Y)
+  if equilibrate == True:
+    states.equilibrate("HP")
 
   pveq = np.zeros_like(states.T)
   for isp, spn in enumerate(gas_f.species_names):
@@ -137,8 +173,8 @@ def get_pveq(zs):
   return pveq
 
 #%% Plot selected flames
-
-pveqs = get_pveq(Zs)
+pveqs0 = get_pveq(Zs, equilibrate = False)
+pveqs = get_pveq(Zs, equilibrate = True)
 #%%
 fig, ax = plt.subplots()
 fig, axc = plt.subplots()
@@ -158,15 +194,24 @@ if "do_matrix" in do_things:
       Y_f.append(fstate.Y[:,isp])
 
     pv = np.zeros_like(T_f)
-    for isp, spn in enumerate(species_names):
-      pv = pv + coeff_pv[spn] * fstate.Y[:,isp]
-    pv_min = np.amin(pv)
-    pv_max = np.amax(pv)
-    pv = (pv-pv_min) / (pv_max - pv_min)
-    #for isp, spn in enumerate(gas_mix.species_names):
-    #  pv = pv + coeff_pv[spn] * Y_f[isp] 
-    #pv = pv / pveqs[ifn]
 
+    #for isp, spn in enumerate(species_names):
+    #  pv = pv + coeff_pv[spn] * fstate.Y[:,isp]
+    #pv0 = 0
+    #pv1 = 0
+    #if False:
+    #  for isp, spn in enumerate(species_names):
+    #    pv0 = pv0 + coeff_pv[spn] * fstate.Y[0,isp]
+    #    pv1 = pv1 + coeff_pv[spn] * fstate.Y[-1,isp]
+    #else:
+      #iz = np.argmax((zout > z))
+      #pv0 = pv_eq_min[iz] 
+      #pv1 = pv_eq_max[iz]
+    #pv = (pv-pv0) / (pv1 - pv0)
+
+    for isp, spn in enumerate(gas_mix.species_names):
+      pv = pv + coeff_pv[spn] * Y_f[isp] 
+    pv = (pv - pveqs0[ifn]) / (pveqs[ifn] - pveqs0[ifn])
     grad_T = np.gradient(T_f, x_f)
     i_Tmax = np.argmax(grad_T) 
     delta_T = (T_f[-1]-T_f[0])/grad_T[i_Tmax]
@@ -182,7 +227,7 @@ if "do_matrix" in do_things:
     ax.legend(fontsize=14)
 
     ax2 = ax.twinx()
-    ax2.plot(x_f, hrr/np.amax(hrr), label =r"$\mathrm{HRR}$")
+    ax2.plot(x_f, hrr, label =r"$\mathrm{HRR}$")
     ax2.plot(x_f, pv, label =r"$C$")
 
     # Plot - C space
@@ -190,4 +235,10 @@ if "do_matrix" in do_things:
     phi = hrr 
     axc.plot(pv, phi/np.amax(phi))
 
+#%%
+
+#data = np.vstack((np.array(Zs), pv_min, pv_max)).T
+zout = np.linspace(0, 1.0, 51)
+pveqs0 = get_pveq(Zs, equilibrate = False)
+pveqs = get_pveq(Zs, equilibrate = True)
 # %%

@@ -13,7 +13,7 @@ USE_MPI       = TRUE
 USE_OMP       = FALSE
 USE_CUDA      = FALSE
 
-Chemistry_Model = nuig_H2_4atm
+Chemistry_Model = nuig_H2_4atm_CHNO
 #Reactions_dir   = Fuego
 Eos_Model       = Fuego
 Transport_Model = Simple

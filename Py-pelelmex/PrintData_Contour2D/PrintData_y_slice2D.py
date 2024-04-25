@@ -8,6 +8,9 @@ from amr_kitchen import HeaderData
 import glob
 import numpy as np
 
+import cantera as ct
+gas_mix = ct.Solution("/scratch/b/bsavard/zisen347/PeleAnalysis/Py-pelelmex/Input/nuig_H2_4atm/chem.yaml")
+#%%
 # Input
 # Where plt files are stored
 plt_folder = "/scratch/b/bsavard/zisen347/scopingRuns/NUIG_Re4000_2J6_4atm/Level_3"
@@ -24,17 +27,18 @@ plane_z = np.array([]) * Djet
 str_prefix = "HRR_T"
 # Fields to be extracted
 # Max level
-max_level = 2
-field_names = ["HeatRelease", "temp", "mixture_fraction", "mag_vort", 
-               "x_velocity", "y_velocity", "z_velocity",
-               "Y(NO)", "Y(N2O)", "Y(NO2)", "Y(NNH)", "Y(N)",
-               "Y(H2O2)", "Y(OH)", "Y(HO2)",]
-#field_names = ["x_velocity", "y_velocity", "z_velocity"]
+max_level = 3
+field_names = ["density", "HeatRelease", "temp", "mixture_fraction", "mag_vort", 
+               "x_velocity", "y_velocity", "z_velocity",]
+for isp, spn in enumerate(gas_mix.species_names):
+  field_names.append("Y("+spn+")")
+#%%
+
 # Output data folder
 output_dir = "../Data"
 if not os.path.exists(output_dir):
   os.mkdir(output_dir)
-output_slice_dir = os.path.join(output_dir, "Slice2D")
+output_slice_dir = os.path.join(output_dir, "Slice2D_plt")
 if not os.path.exists(output_slice_dir):
   os.mkdir(output_slice_dir)
 output_case_slice_dir = os.path.join(output_slice_dir, case_name)

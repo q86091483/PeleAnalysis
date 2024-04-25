@@ -17,9 +17,10 @@ import graphviz
 #%% Read input
 # What tasks to do
 #do_things = ["do_plot", "do_laminar1D"]
-do_things = ["do_plot"]
+do_things = ["do_laminar1D"]
 # Which mixture to calculate
-Zs = np.linspace(0, 0.3, 30)
+Zs = np.linspace(0, 0.3, 61)
+#Zs = np.array([0.0252])
 # Which mixture to plot
 plot_Zs = np.array([2.483E-01])
 # Which mechanism to use
@@ -91,11 +92,12 @@ if "do_laminar1D" in do_things:
       f.set_max_grid_points(domain=f.domains[1], npmax=10000)
       f.set_refine_criteria(ratio=3.0, slope=0.1, curve=0.1)
       f.transport_model = 'mixture-averaged'
-      f.solve(loglevel)  # don't use 'auto' on subsequent solves
+      f.solve(loglevel)  
       f.set_refine_criteria(ratio=2.0, slope=0.05, curve=0.05)
+      f.solve(loglevel)  
       fn = get_flame_name(z)
       f.save(fn, basis="mass", overwrite=True)
-      print("FreeFlame.solve() successed at Z = ", Z)
+      print("FreeFlame.solve() successed at Z = ", z)
     except:
       print("FreeFlame.solve() failed at Z =", z)
 
@@ -118,12 +120,23 @@ if "do_plot" in do_things:
 
     # Definition of progress variable
     coeff_pv = {}
-    for isp, spn in enumerate(gas_mix.species_names):
-      if ("N" in spn or spn=="H2" or spn=="O2" or spn=="N2"):
-        coeff_pv[spn] = 0.0
-      else:
-        coeff_pv[spn] = 1.0
-      print(spn)
+    idef = 0
+    if idef == 0:
+      for isp, spn in enumerate(gas_mix.species_names):
+        if ("N" in spn or spn=="H2" or spn=="O2" or spn=="N2"):
+          coeff_pv[spn] = 0.0
+        else:
+          coeff_pv[spn] = 1.0
+    elif idef == 1:
+      for isp, spn in enumerate(gas_mix.species_names):
+        if (spn == "H2O"):
+          coeff_pv[spn] = 1.0
+        elif (spn == "H2"):
+          coeff_pv[spn] = -1.0
+        elif (spn == "O2"):
+          coeff_pv[spn] = -1.0
+        else:
+          coeff_pv[spn] = 0.0
 
     # Plot
     fig, ax = plt.subplots()
