@@ -421,6 +421,15 @@ int main (int argc, char* argv[])
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "Y(H2)";
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
+  fn = "pv";
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
+  fn = "rhorr(NO)";
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
+  fn = "rhorr(N2O)";
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
+  fn = "rhorr(NNH)";
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
+
 
   // Conditional variables (X of <Y|X>)
   const int nVars(pp.countval("vars"));
@@ -497,6 +506,42 @@ int main (int argc, char* argv[])
     midNames.emplace_back(fn); nCompMid = midNames.size(); mm[fn] = nCompMid - 1; 
   }
   amrex::Print() << "midNames size: " << midNames.size() << std::endl;
+
+  // Progress variable  
+  Vector<Real> pv_min = {-0.23290922, -0.24825103, -0.26359285, -0.27893466, -0.29427648,
+       -0.3096183 , -0.32496011, -0.34030193, -0.35564374, -0.37098556,
+       -0.38632737, -0.40166919, -0.41701101, -0.43235282, -0.44769464,
+       -0.46303645, -0.47837827, -0.49372008, -0.5090619 , -0.52440372,
+       -0.53974553, -0.55508735, -0.57042916, -0.58577098, -0.60111279,
+       -0.61645461, -0.63179642, -0.64713824, -0.66248006, -0.67782187,
+       -0.69316369, -0.7085055 , -0.72384732, -0.73918913, -0.75453095,
+       -0.76987277, -0.78521458, -0.8005564 , -0.81589821, -0.83124003,
+       -0.84658184, -0.86192366, -0.87726547, -0.89260729, -0.90794911,
+       -0.92329092, -0.93863274, -0.95397455, -0.96931637, -0.98465818,
+       -1.};
+  Vector<Real> pv_max = {-0.23290756,  0.11198707,  0.23760585,  0.21397159,  0.18827926,
+        0.16245364,  0.13662336,  0.11079683,  0.08497476,  0.05915878,
+        0.03335191,  0.00755889, -0.01821313, -0.04395368, -0.06964796,
+       -0.09527449, -0.12080348, -0.14619516, -0.1713993 , -0.19635705,
+       -0.22100643, -0.24529162, -0.26917403, -0.29264112, -0.31570967,
+       -0.33842297, -0.36084441, -0.38305109, -0.40512986, -0.42717719,
+       -0.44930301, -0.47163929, -0.494354  , -0.51766916, -0.54187145,
+       -0.56726962, -0.59402377, -0.62193754, -0.65056081, -0.67951156,
+       -0.70858909, -0.73771137, -0.76684866, -0.7959908 , -0.82513446,
+       -0.85427858, -0.88342283, -0.91256711, -0.94171141, -0.9708557 ,
+       -1.};
+  amrex::Real ztab_min = 0.0;
+  amrex::Real ztab_max = 1.0;
+  int nztab = pv_max.size();
+  amrex::Real dz_tab = (ztab_max - ztab_min) / amrex::Real(nztab - 1);
+  Vector<Real> ztab(nztab, 0.0);
+  for (int iz = 0; iz < nztab; iz++) {
+    ztab[iz] = ztab_min + Real(iz) * dz_tab;
+    amrex::Print() << "iz: " << iz << ", ztabl[" << iz << "] = " << ztab[iz] << std::endl;
+  }
+  amrex::Print() << "nztab = " << nztab << ", dz_tab = " << dz_tab << std::endl;
+
+  // Temporary data that can be repetitively used
 
   // Iterate over input plot files
   for (int iPlot; iPlot < nPlotFiles; ++iPlot) {
@@ -670,12 +715,19 @@ int main (int argc, char* argv[])
         Array4<Real> const& Y_H2_a = mfv_out[lev].array(mfi, mo["Y(H2)"]);
         Array4<Real> const& T_out_a = mfv_out[lev].array(mfi, mo["temp"]);
         Array4<Real> const& HRR_out_a = mfv_out[lev].array(mfi, mo["HeatRelease"]);
+        Array4<Real> const& pv_out_a = mfv_out[lev].array(mfi, mo["pv"]);
+        Array4<Real> const& rhorr_NO_out_a = mfv_out[lev].array(mfi, mo["rhorr(NO)"]);
+        Array4<Real> const& rhorr_N2O_out_a = mfv_out[lev].array(mfi, mo["rhorr(N2O)"]);
+        Array4<Real> const& rhorr_NNH_out_a = mfv_out[lev].array(mfi, mo["rhorr(NNH)"]);
 
         //Array4<Real> const& mu_out_a = mfv_out[lev].array(mfi, mo["mu"]);
         //Array4<Real> const& ts_a      = mfv_out[lev].array(mfi, mo["ts11"]);
 
         // Array reference to mf_mid
         Array4<Real> const& mixfrac_mid_a = mf_mid.array(mfi, mm["mixture_fraction"]);
+        Array4<Real> const& pv_mid_a = mf_mid.array(mfi, mm["pv"]);
+        Array4<Real> const& rhowdot_mid_a = mf_mid.array(mfi, mm["pv"]);
+
 
         // Array reference intermediate
         Array4<Real> const& x_a     = mf_xyz.array(mfi, 0);
@@ -728,19 +780,58 @@ int main (int argc, char* argv[])
                 &(dx[0]));
 
         amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+          // var_loc(i,j,k)
+          amrex::Real wdot_loc[NUM_SPECIES] = {0.0_rt};
+          amrex::Real Y_loc[NUM_SPECIES] = {0.0_rt};
+          amrex::Real rho_loc = 0.0_rt;
+          amrex::Real rho_cgs = 0.0_rt;
+          amrex::Real T_loc = 0.0_rt;
 
+          rho_loc = rho_a(i,j,k);
+          T_loc = T_a(i,j,k);
+          for (int isp = 0; isp < NUM_SPECIES; isp++) {
+            Y_loc[isp] = Y_a(i,j,k,isp);
+          }
 
+          // mf_out
           rho_out_a(i,j,k) = rho_a(i,j,k);
           T_out_a(i,j,k) = T_a(i,j,k);
           HRR_out_a(i,j,k) = HRR_a(i,j,k);
           Y_H2_a(i,j,k) = Y_a(i,j,k,H2_ID);
-
+          // mf_out - mixture fraction
           amrex::Real Zlocal = 0.0;
           for (int isp = 0; isp < NUM_SPECIES; ++isp) {
             Zlocal += spec_Bilger_fact[isp] * Y_a(i,j,k,isp);
           }
-          mixfrac_out_a(i,j,k) = (Zlocal-Zox) / (Zfu-Zox);
+          Zlocal = (Zlocal-Zox) / (Zfu-Zox);
+          mixfrac_out_a(i,j,k) = Zlocal;
+          // mf_out - progress variable
+          amrex::Real pv0, pv1;
+          int iztab0 = 0;
+          iztab0 = floor((Zlocal-ztab_min)/(ztab_max-ztab_min)*nztab);
+          iztab0 = std::max(std::min(iztab0, nztab - 1), 0);
+          if (iztab0 >= (nztab-1)) iztab0 = iztab0 - 1;
+          amrex::Real r0 = 1 - (Zlocal - ztab[iztab0]) / dz_tab;
+          pv0 = pv_min[iztab0]*r0 + pv_min[iztab0+1]*(1-r0); 
+          pv1 = pv_max[iztab0]*r0 + pv_max[iztab0+1]*(1-r0); 
+          pv_out_a(i,j,k) = -1.0 * Y_a(i,j,k,H2_ID) + 
+                            -1.0 * Y_a(i,j,k,O2_ID) +
+                            +1.0 * Y_a(i,j,k,H2O_ID); 
+          pv_out_a(i,j,k) = (pv_out_a(i,j,k)-pv0)/(pv1-pv0);
+          if (Zlocal < 1E-6) pv_out_a(i,j,k) = 0.0;
+          // mf_out - wdot
+          rho_cgs = rho_loc * 0.001_rt;
+          eos.RTY2WDOT(rho_cgs, T_loc, Y_loc, wdot_loc);
+          //for (int n = 0; n < NUM_SPECIES; n++) {
+          //  rr_a(i,j,k,n) = wdot[n] * 1000.0_rt; // rhodot, CGS -> MKS conversion
+          //}
+          rhorr_NO_out_a(i,j,k) = wdot_loc[NO_ID] * 1000.0_rt;
+          rhorr_N2O_out_a(i,j,k) = wdot_loc[N2O_ID] * 1000.0_rt;
+          rhorr_NNH_out_a(i,j,k) = wdot_loc[NNH_ID] * 1000.0_rt;
+
+          // mf_mid
           mixfrac_mid_a(i,j,k) = mixfrac_out_a(i,j,k);
+          pv_mid_a(i,j,k) = pv_out_a(i,j,k);
 
           //mu_out_a(i,j,k) = mu_a(i,j,k);
 

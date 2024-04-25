@@ -12,10 +12,9 @@ outputLabel     = Y
 writeDerivedField = 1  # If write derived field (output field)
 
 # Conditioning variables
-vars            = x		      						y		      				z					mixture_fraction
-#nBins           = 128	      						36 		    				56				100
-nBins           = 4  	      						1 		    				1  				100
-varBounds       = -15.75E-4 +112.25E-4 	-1.8E-3 1.8E-3	  0 5.6E-3	0 1.0
-incOutOfBounds  = 0                 		0		      				0		    	1
-binType         = lin               		lin		    				lin		    lin
+vars            = x		      						y		      				z					mixture_fraction	pv
+nBins           = 4  	      						1 		    				1  				50                50
+varBounds       = -15.75E-4 +112.25E-4 	-1.8E-3 1.8E-3	  0 5.6E-3	0 1.0             0 1.0
+incOutOfBounds  = 0                 		0		      				0		    	1                 1
+binType         = lin               		lin		    				lin		    lin               lin
 
