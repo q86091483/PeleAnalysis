@@ -373,7 +373,7 @@ int main (int argc, char* argv[])
   }
   amrex::Print() << "   Done." << std::endl;
 
-  // Input index and names
+  // List of input fields
   std::string fn;
   amrex::Vector<std::string> inNames;
   std::map<std::string,int> mi;
@@ -407,7 +407,7 @@ int main (int argc, char* argv[])
     amrex::Print() << "   " << inNames[i] << " -> " << destFillComps[i] << std::endl;
   }
  
-  // Output index and names (Y of <Y|X>)
+  // List of output fields
   amrex::Vector<std::string> outNames;
   int nCompOut;
   std::map<std::string, int> mo;
@@ -430,8 +430,7 @@ int main (int argc, char* argv[])
   fn = "rhorr(NNH)";
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
 
-
-  // Conditional variables (X of <Y|X>)
+  // List of fields to be conditioned upon (X of <Y|X>)
   const int nVars(pp.countval("vars"));
   if (nVars < 1) {
     Error("Needs to specify at least one conditioning variable.");
@@ -485,13 +484,38 @@ int main (int argc, char* argv[])
     nBinsTot *= nBins[i];
   }
 
-  // Variables to be averaged (Y of <Y|X>)
+  // List of variables to be conditionally averaged (Y of <Y|X>)
   amrex::Vector<std::string> avgVarNames;
   amrex::Vector<weight_t> avgVarWeights;
-  int nAvgVars = nCompOut;
+  std::map<std::string, int> mav;
+  int nAvgVars = 0;
+  //int nAvgVars = nCompOut;
+  //for (int i = 0; i < nAvgVars; i++) {
+  //  avgVarNames.push_back(outNames[i]);
+  //  avgVarWeights.push_back(w_volume); 
+  //}
+  fn = "rho"; 
+  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
+  fn = "mixture_fraction"; 
+  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
+  fn = "temp"; 
+  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
+  fn = "HeatRelease"; 
+  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
+  fn = "Y(H2)"; 
+  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
+  fn = "pv"; 
+  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
+  fn = "rhorr(NO)"; 
+  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
+  fn = "rhorr(N2O)"; 
+  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
+  fn = "rhorr(NNH)"; 
+  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
+
+  nAvgVars = avgVarNames.size();
   for (int i = 0; i < nAvgVars; i++) {
-    avgVarNames.push_back(outNames[i]);
-    avgVarWeights.push_back(w_volume); 
+    avgVarWeights.emplace_back(w_volume);
   }
 
   Vector<Real> dataX(nVars);
@@ -680,6 +704,7 @@ int main (int argc, char* argv[])
       for (amrex::MFIter mfi(mf_in, amrex::TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
         const Box& bx = mfi.tilebox();
+        countLvl[lev] += bx.volume();
 
         // FArraybox reference to mf_in
         FArrayBox& fab_in = mf_in[mfi];
@@ -825,53 +850,18 @@ int main (int argc, char* argv[])
           //for (int n = 0; n < NUM_SPECIES; n++) {
           //  rr_a(i,j,k,n) = wdot[n] * 1000.0_rt; // rhodot, CGS -> MKS conversion
           //}
-          rhorr_NO_out_a(i,j,k) = wdot_loc[NO_ID] * 1000.0_rt;
-          rhorr_N2O_out_a(i,j,k) = wdot_loc[N2O_ID] * 1000.0_rt;
-          rhorr_NNH_out_a(i,j,k) = wdot_loc[NNH_ID] * 1000.0_rt;
+          rhorr_NO_out_a(i,j,k) = wdot_loc[NO_ID] * 1000.0_rt / rho_loc;
+          rhorr_N2O_out_a(i,j,k) = wdot_loc[N2O_ID] * 1000.0_rt / rho_loc;
+          rhorr_NNH_out_a(i,j,k) = wdot_loc[NNH_ID] * 1000.0_rt / rho_loc;
 
           // mf_mid
           mixfrac_mid_a(i,j,k) = mixfrac_out_a(i,j,k);
           pv_mid_a(i,j,k) = pv_out_a(i,j,k);
 
-          //mu_out_a(i,j,k) = mu_a(i,j,k);
-
-          //su_a(i,j,k,L11) = gradu_a(i,j,k,0);
-          //su_a(i,j,k,L22) = gradv_a(i,j,k,1);
-          //su_a(i,j,k,L33) = gradw_a(i,j,k,2);
-          //su_a(i,j,k,L12) = 0.5 * (gradu_a(i,j,k,1) + gradv_a(i,j,k,0));
-          //su_a(i,j,k,L13) = 0.5 * (gradu_a(i,j,k,2) + gradw_a(i,j,k,0));
-          //su_a(i,j,k,L23) = 0.5 * (gradv_a(i,j,k,2) + gradw_a(i,j,k,1));
-
-          //Real skk = (1/3.) * (gradu_a(i,j,k,0)+gradv_a(i,j,k,1)+gradw_a(i,j,k,2));
-          //tau_a(i,j,k,L11) = 2. * mu_a(i,j,k) * (su_a(i,j,k,L11) - skk);
-          //tau_a(i,j,k,L22) = 2. * mu_a(i,j,k) * (su_a(i,j,k,L22) - skk);
-          //tau_a(i,j,k,L33) = 2. * mu_a(i,j,k) * (su_a(i,j,k,L33) - skk);
-          //tau_a(i,j,k,L12) = 2 * mu_a(i,j,k) * su_a(i,j,k,L12);
-          //tau_a(i,j,k,L13) = 2 * mu_a(i,j,k) * su_a(i,j,k,L13); 
-          //tau_a(i,j,k,L23) = 2 * mu_a(i,j,k) * su_a(i,j,k,L23); 
-
-          //Real coeff = 2 * mu_a(i,j,k) / rho_a(i,j,k);
-          //ts_a(i,j,k,L11) = su_a(i,j,k,L11);
-          //ts_a(i,j,k,L22) = su_a(i,j,k,L22);
-          //ts_a(i,j,k,L33) = su_a(i,j,k,L33);
-          //ts_a(i,j,k,L12) = su_a(i,j,k,L12);
-          //ts_a(i,j,k,L13) = su_a(i,j,k,L13);
-          //ts_a(i,j,k,L23) = su_a(i,k,k,L23);
-
-          //ts_a(i,j,k,LSUM) = ts_a(i,j,k,L11) * ts_a(i,j,k,L11) + 
-          //                   ts_a(i,j,k,L12) * ts_a(i,j,k,L12) + 
-          //                   ts_a(i,j,k,L13) * ts_a(i,j,k,L13) +
-          //                   ts_a(i,j,k,L21) * ts_a(i,j,k,L21) + 
-          //                   ts_a(i,j,k,L22) * ts_a(i,j,k,L22) +
-          //                   ts_a(i,j,k,L23) * ts_a(i,j,k,L23) +
-          //                   ts_a(i,j,k,L31) * ts_a(i,j,k,L31) +
-          //                   ts_a(i,j,k,L32) * ts_a(i,j,k,L32) + 
-          //                   ts_a(i,j,k,L33) * ts_a(i,j,k,L33);
-
+          // Collect statistics
         });
 
         // Collect statistics for mfi
-        countLvl[lev] += bx.volume();
         for (IntVect iv = bx.smallEnd(); iv <= bx.bigEnd(); bx.next(iv)) {
           // Get vector of conditional variables
           // x, y, z in mf_xyz
