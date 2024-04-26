@@ -843,7 +843,8 @@ int main (int argc, char* argv[])
                             -1.0 * Y_a(i,j,k,O2_ID) +
                             +1.0 * Y_a(i,j,k,H2O_ID); 
           pv_out_a(i,j,k) = (pv_out_a(i,j,k)-pv0)/(pv1-pv0);
-          if (Zlocal < 1E-6) pv_out_a(i,j,k) = 0.0;
+          if (Zlocal < 1E-4) pv_out_a(i,j,k) = 0.0;
+
           // mf_out - wdot
           rho_cgs = rho_loc * 0.001_rt;
           eos.RTY2WDOT(rho_cgs, T_loc, Y_loc, wdot_loc);
@@ -858,51 +859,66 @@ int main (int argc, char* argv[])
           mixfrac_mid_a(i,j,k) = mixfrac_out_a(i,j,k);
           pv_mid_a(i,j,k) = pv_out_a(i,j,k);
 
-          // Collect statistics
         });
 
         // Collect statistics for mfi
+        amrex::Real wdot_loc[NUM_SPECIES] = {0.0_rt};
+        amrex::Real Y_loc[NUM_SPECIES] = {0.0_rt};
+        amrex::Real rho_loc = 0.0_rt;
+        amrex::Real rho_cgs = 0.0_rt;
+        amrex::Real T_loc = 0.0_rt;
         for (IntVect iv = bx.smallEnd(); iv <= bx.bigEnd(); bx.next(iv)) {
-          // Get vector of conditional variables
-          // x, y, z in mf_xyz
-          // other variables in mf_mid
-          for (int i = 0; i < nVars; i++) {
-            std::string vn = varNames[i]; 
+          int i = iv[0];
+          int j = iv[1];
+          int k = iv[2];
+          // Get dataX such as x, y, z and variables in mf_mid
+          for (int ivar = 0; ivar < nVars; ivar++) {
+            std::string vn = varNames[ivar]; 
             if (vn == "x") {
-              dataX[i] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 0);
+              dataX[ivar] = mf_xyz.array(mfi)(i, j, k, 0);
             } else if (vn == "y") {
-              dataX[i] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 1);
+              dataX[ivar] = mf_xyz.array(mfi)(i, j, k, 1);
             } else if (vn == "z") {
-              dataX[i] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 2); 
+              dataX[ivar] = mf_xyz.array(mfi)(i, j, k, 2); 
             } else {
-              dataX[i] = mf_mid.array(mfi)(iv[0], iv[1], iv[2], mm[vn]);
+              dataX[ivar] = mf_mid.array(mfi)(i, j, k, mm[vn]);
             } 
           }
           //dataX[0] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 0);
           //dataX[1] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 1);
           //dataX[2] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 2);
 
-          //fab_xyz.getVal(dataX.dataPtr(), iv);
-          fab_out.getVal(dataY.dataPtr(), iv);
+          // Get dataY
+          fab_out.getVal(dataY.dataPtr(), iv); // original way
+          //dataY[mav["rho"]] = rho_a(i,j,k);
+          //dataY[mav["mixture_fraction"]] = rho_a(i,j,k);
+          //dataY[mav["temp"]] = rho_a(i,j,k);
+          //dataY[mav["HeatRelease"]] = rho_a(i,j,k);
+          //dataY[mav["Y(H2)"]] = rho_a(i,j,k);
+          //dataY[mav["pv"]] = rho_a(i,j,k);
+          //dataY[mav["rhorr(NO)"]] = rho_a(i,j,k);
+          //dataY[mav["rhorr(N2O)"]] = rho_a(i,j,k);
+          //dataY[mav["rhorr(NNH)"]] = rho_a(i,j,k);
+
           //Skip points overlapping with a finer levels
           skip = false;
-          if (covered_a(iv[0],iv[1],iv[2]) > 0.0) skip = true;
-          for (int i=0; i<nVars; i++) {
-            if ((incOutOfBounds[i] == 0) &&
-                ((dataX[i] < varBounds[i][0]) ||
-                 (dataX[i] >= varBounds[i][1]))) {
+          if (covered_a(i, j, k) > 0.0) skip = true;
+          for (int ivar=0; ivar<nVars; ivar++) {
+            if ((incOutOfBounds[ivar] == 0) &&
+                ((dataX[ivar] < varBounds[ivar][0]) ||
+                 (dataX[ivar] >= varBounds[ivar][1]))) {
               skip = true;
             }
           }
           if (skip) continue;
           // Compute the bin
-          for (int i=0; i<nVars; i++) {
-            bins[i] = computeBin(dataX[i], varBounds[i][0], varBounds[i][1], nBins[i], binType[i]);
+          for (int ivar=0; ivar<nVars; ivar++) {
+            bins[ivar] = computeBin(dataX[ivar], varBounds[ivar][0], varBounds[ivar][1], nBins[ivar], binType[ivar]);
           }
           bin = 0;
-          for (int i=0; i<nVars-1; i++) {
-            bin += bins[i];
-            bin *= nBins[i+1];
+          for (int ivar=0; ivar<nVars-1; ivar++) {
+            bin += bins[ivar];
+            bin *= nBins[ivar+1];
           }
           bin += bins[nVars-1];
 
@@ -916,11 +932,11 @@ int main (int argc, char* argv[])
           rhoStd[bin] += rho * rho;
           massMean[bin] += m;
           massStd[bin] += m * m;
-          for (int i=0; i<nCompOut; i++) {
-            varMeanVal[i][bin] += dataY[i] * vol;
-            varStdVal[i][bin] += dataY[i] * dataY[i] * vol;
-            varMinVal[i][bin] += std::min(varMinVal[i][bin], dataY[i]);
-            varMaxVal[i][bin] += std::min(varMaxVal[i][bin], dataY[i]);
+          for (int ivar=0; ivar<nCompOut; ivar++) {
+            varMeanVal[ivar][bin] += dataY[ivar] * vol;
+            varStdVal[ivar][bin] += dataY[ivar] * dataY[ivar] * vol;
+            varMinVal[ivar][bin] += std::min(varMinVal[ivar][bin], dataY[ivar]);
+            varMaxVal[ivar][bin] += std::min(varMaxVal[ivar][bin], dataY[ivar]);
           }
         } // iv of mfi to collect statistics
       } // mfi - set variables && collect stats
