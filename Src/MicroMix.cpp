@@ -429,6 +429,8 @@ int main (int argc, char* argv[])
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "rhorr(NNH)";
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
+  fn = "FI";
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
 
   // List of fields to be conditioned upon (X of <Y|X>)
   const int nVars(pp.countval("vars"));
@@ -502,10 +504,12 @@ int main (int argc, char* argv[])
   avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
   fn = "HeatRelease"; 
   avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
-  fn = "Y(H2)"; 
-  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
   fn = "pv"; 
   avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
+  for (int isp = 0; isp < NUM_SPECIES; isp++) {
+    fn = "rhoY(" + spec_names[isp] + ")";
+    avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1;
+  }
   fn = "rhorr(NO)"; 
   avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
   fn = "rhorr(N2O)"; 
@@ -517,7 +521,6 @@ int main (int argc, char* argv[])
   for (int i = 0; i < nAvgVars; i++) {
     avgVarWeights.emplace_back(w_volume);
   }
-
   Vector<Real> dataX(nVars);
   Vector<Real> dataY(nAvgVars);
 
@@ -661,6 +664,8 @@ int main (int argc, char* argv[])
       MultiFab mf_gradu(ba, dm, BL_SPACEDIM+1, nGrow);
       MultiFab mf_gradv(ba, dm, BL_SPACEDIM+1, nGrow);
       MultiFab mf_gradw(ba, dm, BL_SPACEDIM+1, nGrow);
+      MultiFab mf_gradYfu(ba, dm, BL_SPACEDIM+1, nGrow);
+      MultiFab mf_gradYox(ba, dm, BL_SPACEDIM+1, nGrow);
 		  //MultiFab mf_su(ba, dm, 6, nGrow); // symmetric velocity tensor 0.5(du_i/dx_j+du_j/dx_i)
 		  //MultiFab mf_tau(ba, dm, 6, nGrow); // viscous force tensor
       //const int L11=0, L22=1, L33=2, L12=3, L13=4, L23=5;
@@ -721,6 +726,9 @@ int main (int argc, char* argv[])
         FArrayBox& fab_gradu = mf_gradu[mfi];
         FArrayBox& fab_gradv = mf_gradv[mfi];
         FArrayBox& fab_gradw = mf_gradw[mfi];
+        FArrayBox& fab_gradYfu = mf_gradYfu[mfi];
+        FArrayBox& fab_gradYox = mf_gradYox[mfi];
+
         //FArrayBox& fab_su    = mf_su[mfi];
         //FArrayBox& fab_tau   = mf_tau[mfi];
 
@@ -744,7 +752,7 @@ int main (int argc, char* argv[])
         Array4<Real> const& rhorr_NO_out_a = mfv_out[lev].array(mfi, mo["rhorr(NO)"]);
         Array4<Real> const& rhorr_N2O_out_a = mfv_out[lev].array(mfi, mo["rhorr(N2O)"]);
         Array4<Real> const& rhorr_NNH_out_a = mfv_out[lev].array(mfi, mo["rhorr(NNH)"]);
-
+        Array4<Real> const& FI_out_a = mfv_out[lev].array(mfi, mo["FI"]);
         //Array4<Real> const& mu_out_a = mfv_out[lev].array(mfi, mo["mu"]);
         //Array4<Real> const& ts_a      = mfv_out[lev].array(mfi, mo["ts11"]);
 
@@ -769,6 +777,8 @@ int main (int argc, char* argv[])
         Array4<Real> const& gradu_a = mf_gradu.array(mfi);
         Array4<Real> const& gradv_a = mf_gradv.array(mfi);
         Array4<Real> const& gradw_a = mf_gradw.array(mfi);
+        Array4<Real> const& gradYfu_a = mf_gradYfu.array(mfi);
+        Array4<Real> const& gradYox_a = mf_gradYox.array(mfi);
 
         // Calculate coordiante
         const auto lo = lbound(bx);
@@ -803,6 +813,14 @@ int main (int argc, char* argv[])
                 BL_TO_FORTRAN_N_ANYD(fab_in,    mi["z_velocity"]),
                 BL_TO_FORTRAN_N_ANYD(fab_gradw, 0),
                 &(dx[0]));
+        gradient(BL_TO_FORTRAN_BOX(bx),
+                BL_TO_FORTRAN_N_ANYD(fab_in,    mi["Y(H2)"]),
+                BL_TO_FORTRAN_N_ANYD(fab_gradYfu, 0),
+                &(dx[0]));
+        gradient(BL_TO_FORTRAN_BOX(bx),
+                BL_TO_FORTRAN_N_ANYD(fab_in,    mi["Y(O2)"]),
+                BL_TO_FORTRAN_N_ANYD(fab_gradYox, 0),
+                &(dx[0]));
 
         amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
           // var_loc(i,j,k)
@@ -818,19 +836,18 @@ int main (int argc, char* argv[])
             Y_loc[isp] = Y_a(i,j,k,isp);
           }
 
-          // mf_out
+          // mfv_out
           rho_out_a(i,j,k) = rho_a(i,j,k);
           T_out_a(i,j,k) = T_a(i,j,k);
-          HRR_out_a(i,j,k) = HRR_a(i,j,k);
           Y_H2_a(i,j,k) = Y_a(i,j,k,H2_ID);
-          // mf_out - mixture fraction
+          // mfv_out - mixture fraction
           amrex::Real Zlocal = 0.0;
           for (int isp = 0; isp < NUM_SPECIES; ++isp) {
             Zlocal += spec_Bilger_fact[isp] * Y_a(i,j,k,isp);
           }
           Zlocal = (Zlocal-Zox) / (Zfu-Zox);
           mixfrac_out_a(i,j,k) = Zlocal;
-          // mf_out - progress variable
+          // mfv_out - progress variable
           amrex::Real pv0, pv1;
           int iztab0 = 0;
           iztab0 = floor((Zlocal-ztab_min)/(ztab_max-ztab_min)*nztab);
@@ -844,8 +861,7 @@ int main (int argc, char* argv[])
                             +1.0 * Y_a(i,j,k,H2O_ID); 
           pv_out_a(i,j,k) = (pv_out_a(i,j,k)-pv0)/(pv1-pv0);
           if (Zlocal < 1E-4) pv_out_a(i,j,k) = 0.0;
-
-          // mf_out - wdot
+          // mfv_out - wdot
           rho_cgs = rho_loc * 0.001_rt;
           eos.RTY2WDOT(rho_cgs, T_loc, Y_loc, wdot_loc);
           //for (int n = 0; n < NUM_SPECIES; n++) {
@@ -854,6 +870,20 @@ int main (int argc, char* argv[])
           rhorr_NO_out_a(i,j,k) = wdot_loc[NO_ID] * 1000.0_rt / rho_loc;
           rhorr_N2O_out_a(i,j,k) = wdot_loc[N2O_ID] * 1000.0_rt / rho_loc;
           rhorr_NNH_out_a(i,j,k) = wdot_loc[NNH_ID] * 1000.0_rt / rho_loc;
+          // mfv_out - FI 
+          FI_out_a(i,j,k) = 0.0;
+          FI_out_a(i,j,k) = gradYfu_a(i,j,k,0) * gradYox_a(i,j,k,0) +
+                            gradYfu_a(i,j,k,1) * gradYox_a(i,j,k,1) +
+                            gradYfu_a(i,j,k,2) * gradYox_a(i,j,k,2);
+          FI_out_a(i,j,k) = FI_out_a(i,j,k) / std::fabs(FI_out_a(i,j,k));
+          //if (HRR_a(i,j,k) < 1E3) {
+          //  FI_out_a(i,j,k) = 0.0;
+          //}
+          if (FI_out_a(i,j,k) > 0.0) {
+            HRR_out_a(i,j,k) = HRR_a(i,j,k);
+          } else if (FI_out_a(i,j,k) < 0.0) {
+            HRR_out_a(i,j,k) = -HRR_a(i,j,k);
+          }
 
           // mf_mid
           mixfrac_mid_a(i,j,k) = mixfrac_out_a(i,j,k);
@@ -889,16 +919,19 @@ int main (int argc, char* argv[])
           //dataX[2] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 2);
 
           // Get dataY
-          fab_out.getVal(dataY.dataPtr(), iv); // original way
-          //dataY[mav["rho"]] = rho_a(i,j,k);
-          //dataY[mav["mixture_fraction"]] = rho_a(i,j,k);
-          //dataY[mav["temp"]] = rho_a(i,j,k);
-          //dataY[mav["HeatRelease"]] = rho_a(i,j,k);
-          //dataY[mav["Y(H2)"]] = rho_a(i,j,k);
-          //dataY[mav["pv"]] = rho_a(i,j,k);
-          //dataY[mav["rhorr(NO)"]] = rho_a(i,j,k);
-          //dataY[mav["rhorr(N2O)"]] = rho_a(i,j,k);
-          //dataY[mav["rhorr(NNH)"]] = rho_a(i,j,k);
+          //fab_out.getVal(dataY.dataPtr(), iv); // original way
+          dataY[mav["rho"]] = rho_a(i,j,k);
+          dataY[mav["mixture_fraction"]] = mixfrac_out_a(i,j,k);
+          dataY[mav["temp"]] = T_a(i,j,k);
+          dataY[mav["HeatRelease"]] = HRR_a(i,j,k);
+          for (int isp = 0; isp < NUM_SPECIES; isp++) {
+            fn = "rhoY(" + spec_names[isp] + ")";
+            dataY[mav[fn]] = rho_a(i,j,k) * Y_a(i,j,k,isp);
+          }
+          dataY[mav["pv"]] = pv_out_a(i,j,k);
+          dataY[mav["rhorr(NO)"]] = rhorr_NO_out_a(i,j,k);
+          dataY[mav["rhorr(N2O)"]] = rhorr_N2O_out_a(i,j,k);
+          dataY[mav["rhorr(NNH)"]] = rhorr_NNH_out_a(i,j,k);
 
           //Skip points overlapping with a finer levels
           skip = false;
@@ -911,7 +944,8 @@ int main (int argc, char* argv[])
             }
           }
           if (skip) continue;
-          // Compute the bin
+
+          // Compute the bin in X space (<Y|X>)
           for (int ivar=0; ivar<nVars; ivar++) {
             bins[ivar] = computeBin(dataX[ivar], varBounds[ivar][0], varBounds[ivar][1], nBins[ivar], binType[ivar]);
           }
@@ -923,7 +957,7 @@ int main (int argc, char* argv[])
           bin += bins[nVars-1];
 
           // Gather statistics
-          rho = dataY[mo["density"]];
+          rho = dataY[mav["density"]];
           m = rho * vol;
           count[bin] += 1;
           volMean[bin] += vol;
@@ -932,7 +966,7 @@ int main (int argc, char* argv[])
           rhoStd[bin] += rho * rho;
           massMean[bin] += m;
           massStd[bin] += m * m;
-          for (int ivar=0; ivar<nCompOut; ivar++) {
+          for (int ivar=0; ivar<nAvgVars; ivar++) {
             varMeanVal[ivar][bin] += dataY[ivar] * vol;
             varStdVal[ivar][bin] += dataY[ivar] * dataY[ivar] * vol;
             varMinVal[ivar][bin] += std::min(varMinVal[ivar][bin], dataY[ivar]);
@@ -1149,7 +1183,7 @@ int main (int argc, char* argv[])
         ref_ratio.emplace_back(iv);
       }
 	    WriteMultiLevelPlotfile(outfilename, Nlev, 
-          GetVecOfConstPtrs(mfv_out), outNames, geoms, 0.0, istep, ref_ratio);
+          GetVecOfConstPtrs(mfv_out), outNames, geoms, amrData.Time(), istep, ref_ratio);
     }
   } // iPlot
 } // end of main
