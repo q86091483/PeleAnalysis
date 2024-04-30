@@ -435,6 +435,8 @@ int main (int argc, char* argv[])
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "R10";
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
+  fn = "zone";
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
 
   // List of fields to be conditioned upon (X of <Y|X>)
   const int nVars(pp.countval("vars"));
@@ -611,6 +613,9 @@ int main (int argc, char* argv[])
 
     Vector<Real> probLo = amrData.ProbLo();
     Vector<Real> probHi = amrData.ProbHi();
+    amrex::Real Lx = probHi[0] - probLo[0]; 
+    amrex::Real Ly = probHi[1] - probLo[1]; 
+    amrex::Real Lz = probHi[2] - probLo[2]; 
 
     int finestLevel = amrData.FinestLevel();
     if (finestLevel > finestLevel_in) finestLevel = finestLevel_in;
@@ -736,6 +741,16 @@ int main (int argc, char* argv[])
                   << std::endl;
       }
 
+      // Jet trajectory
+      const amrex::Real coeff_A = 0.55;
+      const amrex::Real coeff_B = 0.2;
+      const amrex::Real coeff_J = 6.6;
+      const amrex::Real Djet = 4.5E-4;
+      const amrex::Real slope_zone = 1.5; 
+      const amrex::Real ZONE_LEEWARD = 1.5;
+      const amrex::Real ZONE_WINDWARD = 2.5;
+      const amrex::Real ZONE_INTERACTION = 3.5;
+
       //FArrayBox alias_fab(orig_fab, amrex::make_alias, 1, 2);
       // Calculate result variables & collect their statistics
 
@@ -796,6 +811,8 @@ int main (int argc, char* argv[])
         // Array reference to mf_mid
         Array4<Real> const& mixfrac_mid_a = mf_mid.array(mfi, mm["mixture_fraction"]);
         Array4<Real> const& pv_mid_a = mf_mid.array(mfi, mm["pv"]);
+        Array4<Real> const& zone_mid_a = mf_mid.array(mfi, mm["zone"]);
+
         Array4<Real> const& rhowdot_mid_a = mf_mid.array(mfi, mm["pv"]);
 
         // Array reference intermediate
@@ -930,10 +947,38 @@ int main (int argc, char* argv[])
           } else if (FI_out_a(i,j,k) < 0.0) {
             HRRFI_out_a(i,j,k) = -HRR_a(i,j,k);
           }
+          // zone
+          //ys = J * Djet * A * np.power(xs / (J*Djet), B)
+          amrex::Real yp = 0.0_rt; 
+          amrex::Real hj = coeff_J * Djet * coeff_A * std::pow(x_a(i,j,k)/(coeff_J*Djet), coeff_B); 
+          amrex::Real bl0, bl1, br0, br1, zl0, zl1, zr0, zr1, zp;
+          // Use periodicity along y direction
+          yp = probLo[1] + std::fmod(y_a(i,j,k)-probLo[1], Ly/2.);
+          bl0 = hj - (-slope_zone) * (-2.0*Djet); // Lean towards left or right
+          bl1 = hj - (-slope_zone) * (+2.0*Djet);
+          br0 = hj - (+slope_zone) * (-2.0*Djet);
+          br1 = hj - (+slope_zone) * (+2.0*Djet);
+          zl0 = (-slope_zone) * yp + bl0;
+          zl1 = (-slope_zone) * yp + bl1;
+          zr0 = (+slope_zone) * yp + br0;
+          zr1 = (+slope_zone) * yp + br1;
+          zp = z_a(i,j,k); 
+          zone_out_a(i,j,k) = -1.0;
+          if ((zp>zr0) and (zp>zl0)) {
+            zone_out_a(i,j,k) = ZONE_WINDWARD;
+          } else if ((zp<zl0) and (zp<zr0)) {
+            zone_out_a(i,j,k) = ZONE_LEEWARD;
+          } else {
+            zone_out_a(i,j,k) = ZONE_INTERACTION;
+          }
+          if (x_a(i,j,k) < 0.0) {
+            zone_out_a(i,j,k) = -1.0; // Disregard inlet regions
+          }
 
           // mf_mid
           mixfrac_mid_a(i,j,k) = mixfrac_out_a(i,j,k);
           pv_mid_a(i,j,k) = pv_out_a(i,j,k);
+          zone_mid_a(i,j,k) = zone_out_a(i,j,k);
 
         });
 
