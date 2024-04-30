@@ -419,6 +419,8 @@ int main (int argc, char* argv[])
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "HeatRelease";
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
+  fn = "HeatReleaseFI";  
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "Y(H2)";
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "pv";
@@ -430,6 +432,8 @@ int main (int argc, char* argv[])
   fn = "rhorr(NNH)";
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "FI";
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
+  fn = "R10";
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
 
   // List of fields to be conditioned upon (X of <Y|X>)
@@ -496,20 +500,49 @@ int main (int argc, char* argv[])
   //  avgVarNames.push_back(outNames[i]);
   //  avgVarWeights.push_back(w_volume); 
   //}
-  fn = "rho"; 
-  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
-  fn = "mixture_fraction"; 
-  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
-  fn = "temp"; 
-  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
-  fn = "HeatRelease"; 
-  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
-  fn = "pv"; 
-  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
+  // rho
+  fn = "rho"; avgVarNames.emplace_back(fn);
+  int ID_rho = avgVarNames.size()-1; mav[fn] = avgVarNames.size()-1; 
+  // Z
+  fn = "mixture_fraction"; avgVarNames.emplace_back(fn);
+  int ID_Z = avgVarNames.size()-1; mav[fn] = avgVarNames.size()-1; 
+  // rhoT
+  fn = "rhoT"; avgVarNames.emplace_back(fn);
+  int ID_rhoT = avgVarNames.size()-1; mav[fn] = avgVarNames.size()-1; 
+  fn = "rhoT2"; avgVarNames.emplace_back(fn);
+  int ID_rhoT2 = avgVarNames.size()-1; mav[fn] = avgVarNames.size()-1; 
+  // HRR
+  fn = "HeatRelease"; avgVarNames.emplace_back(fn); 
+  int ID_HRR = avgVarNames.size()-1; mav[fn] = avgVarNames.size()-1; 
+  // pv
+  fn = "pv"; avgVarNames.emplace_back(fn); 
+  int ID_pv = avgVarNames.size()-1; mav[fn] = avgVarNames.size()-1; 
+  // rhoY
+  int ID_rhoY = ID_pv + 1;
   for (int isp = 0; isp < NUM_SPECIES; isp++) {
-    fn = "rhoY(" + spec_names[isp] + ")";
-    avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1;
+    fn = "rhoY(" + spec_names[isp] + ")"; avgVarNames.emplace_back(fn); 
+    mav[fn] = avgVarNames.size() - 1;
   }
+  // rhoY2
+  int ID_rhoY2 = ID_rhoY + NUM_SPECIES;
+  for (int isp = 0; isp < NUM_SPECIES; isp++) {
+    fn = "rhoY2(" + spec_names[isp] + ")"; avgVarNames.emplace_back(fn); 
+    mav[fn] = avgVarNames.size() - 1;
+  }
+  // wdot
+  int ID_wdot = ID_rhoY2 + NUM_SPECIES;
+  for (int isp = 0; isp < NUM_SPECIES; isp++) {
+    fn = "wdot(" + spec_names[isp] + ")"; avgVarNames.emplace_back(fn); 
+    mav[fn] = avgVarNames.size() - 1;
+  }
+  // wdot2
+  int ID_wdot2 = ID_wdot + NUM_SPECIES;
+  for (int isp = 0; isp < NUM_SPECIES; isp++) {
+    fn = "wdot2(" + spec_names[isp] + ")"; avgVarNames.emplace_back(fn); 
+    mav[fn] = avgVarNames.size() - 1;
+  }
+
+
   fn = "rhorr(NO)"; 
   avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
   fn = "rhorr(N2O)"; 
@@ -748,11 +781,15 @@ int main (int argc, char* argv[])
         Array4<Real> const& Y_H2_a = mfv_out[lev].array(mfi, mo["Y(H2)"]);
         Array4<Real> const& T_out_a = mfv_out[lev].array(mfi, mo["temp"]);
         Array4<Real> const& HRR_out_a = mfv_out[lev].array(mfi, mo["HeatRelease"]);
+        Array4<Real> const& HRRFI_out_a = mfv_out[lev].array(mfi, mo["HeatReleaseFI"]);
         Array4<Real> const& pv_out_a = mfv_out[lev].array(mfi, mo["pv"]);
         Array4<Real> const& rhorr_NO_out_a = mfv_out[lev].array(mfi, mo["rhorr(NO)"]);
         Array4<Real> const& rhorr_N2O_out_a = mfv_out[lev].array(mfi, mo["rhorr(N2O)"]);
         Array4<Real> const& rhorr_NNH_out_a = mfv_out[lev].array(mfi, mo["rhorr(NNH)"]);
         Array4<Real> const& FI_out_a = mfv_out[lev].array(mfi, mo["FI"]);
+        Array4<Real> const& R10_out_a = mfv_out[lev].array(mfi, mo["R10"]);
+        Array4<Real> const& zone_out_a = mfv_out[lev].array(mfi, mo["zone"]);
+
         //Array4<Real> const& mu_out_a = mfv_out[lev].array(mfi, mo["mu"]);
         //Array4<Real> const& ts_a      = mfv_out[lev].array(mfi, mo["ts11"]);
 
@@ -760,7 +797,6 @@ int main (int argc, char* argv[])
         Array4<Real> const& mixfrac_mid_a = mf_mid.array(mfi, mm["mixture_fraction"]);
         Array4<Real> const& pv_mid_a = mf_mid.array(mfi, mm["pv"]);
         Array4<Real> const& rhowdot_mid_a = mf_mid.array(mfi, mm["pv"]);
-
 
         // Array reference intermediate
         Array4<Real> const& x_a     = mf_xyz.array(mfi, 0);
@@ -826,11 +862,16 @@ int main (int argc, char* argv[])
           // var_loc(i,j,k)
           amrex::Real wdot_loc[NUM_SPECIES] = {0.0_rt};
           amrex::Real Y_loc[NUM_SPECIES] = {0.0_rt};
-          amrex::Real rho_loc = 0.0_rt;
-          amrex::Real rho_cgs = 0.0_rt;
-          amrex::Real T_loc = 0.0_rt;
+          amrex::Real X_loc[NUM_SPECIES] = {0.0_rt};
+          amrex::Real Qf[NUM_REACTIONS] = {0.0_rt};
+          amrex::Real Qr[NUM_REACTIONS] = {0.0_rt};
+          amrex::Real rho_loc     = 0.0_rt;
+          amrex::Real rho_cgs     = 0.0_rt;
+          amrex::Real Pcgs        = 0.0_rt;
+          amrex::Real T_loc       = 0.0_rt;
 
           rho_loc = rho_a(i,j,k);
+          rho_cgs = rho_loc * 0.001_rt; // kg/m3 to g/cm3
           T_loc = T_a(i,j,k);
           for (int isp = 0; isp < NUM_SPECIES; isp++) {
             Y_loc[isp] = Y_a(i,j,k,isp);
@@ -862,14 +903,18 @@ int main (int argc, char* argv[])
           pv_out_a(i,j,k) = (pv_out_a(i,j,k)-pv0)/(pv1-pv0);
           if (Zlocal < 1E-4) pv_out_a(i,j,k) = 0.0;
           // mfv_out - wdot
-          rho_cgs = rho_loc * 0.001_rt;
-          eos.RTY2WDOT(rho_cgs, T_loc, Y_loc, wdot_loc);
+          eos.RTY2WDOT(rho_cgs, T_loc, Y_loc, wdot_loc);  // g/cm3
           //for (int n = 0; n < NUM_SPECIES; n++) {
           //  rr_a(i,j,k,n) = wdot[n] * 1000.0_rt; // rhodot, CGS -> MKS conversion
           //}
-          rhorr_NO_out_a(i,j,k) = wdot_loc[NO_ID] * 1000.0_rt / rho_loc;
-          rhorr_N2O_out_a(i,j,k) = wdot_loc[N2O_ID] * 1000.0_rt / rho_loc;
-          rhorr_NNH_out_a(i,j,k) = wdot_loc[NNH_ID] * 1000.0_rt / rho_loc;
+          rhorr_NO_out_a(i,j,k) = wdot_loc[NO_ID] * 1000.0_rt; // kg/m3
+          rhorr_N2O_out_a(i,j,k) = wdot_loc[N2O_ID] * 1000.0_rt;
+          rhorr_NNH_out_a(i,j,k) = wdot_loc[NNH_ID] * 1000.0_rt;
+          // net rate of reaction progress
+          eos.Y2X(Y_loc, X_loc);
+          CKPX(rho_cgs, T_a(i,j,k), X_loc, Pcgs);        
+          CKKFKR(101325*4*10.0, T_a(i,j,k), X_loc, Qf, Qr);
+          R10_out_a(i,j,k) = (Qf[1] - Qr[1]) * 1.0E6; // - Qr[9];
           // mfv_out - FI 
           FI_out_a(i,j,k) = 0.0;
           FI_out_a(i,j,k) = gradYfu_a(i,j,k,0) * gradYox_a(i,j,k,0) +
@@ -879,10 +924,11 @@ int main (int argc, char* argv[])
           //if (HRR_a(i,j,k) < 1E3) {
           //  FI_out_a(i,j,k) = 0.0;
           //}
+          HRR_out_a(i,j,k) = HRR_a(i,j,k);
           if (FI_out_a(i,j,k) > 0.0) {
-            HRR_out_a(i,j,k) = HRR_a(i,j,k);
+            HRRFI_out_a(i,j,k) = HRR_a(i,j,k);
           } else if (FI_out_a(i,j,k) < 0.0) {
-            HRR_out_a(i,j,k) = -HRR_a(i,j,k);
+            HRRFI_out_a(i,j,k) = -HRR_a(i,j,k);
           }
 
           // mf_mid
@@ -892,15 +938,30 @@ int main (int argc, char* argv[])
         });
 
         // Collect statistics for mfi
-        amrex::Real wdot_loc[NUM_SPECIES] = {0.0_rt};
-        amrex::Real Y_loc[NUM_SPECIES] = {0.0_rt};
         amrex::Real rho_loc = 0.0_rt;
         amrex::Real rho_cgs = 0.0_rt;
         amrex::Real T_loc = 0.0_rt;
+        amrex::Real Y_loc[NUM_SPECIES] = {0.0_rt};
+        amrex::Real wdot_loc[NUM_SPECIES] = {0.0_rt};
         for (IntVect iv = bx.smallEnd(); iv <= bx.bigEnd(); bx.next(iv)) {
+          // Index
           int i = iv[0];
           int j = iv[1];
           int k = iv[2];
+          // rho, T, Y
+          rho_loc = rho_a(i,j,k);
+          rho_cgs = rho_loc * 0.001_rt; // kg/m3 to g/cm3
+          T_loc   = T_a(i,j,k);
+          for (int isp = 0; isp < NUM_SPECIES; isp++) {
+            Y_loc[isp] = Y_a(i,j,k,isp);
+            wdot_loc[isp] = 0.0;
+          }
+          // wdot
+          eos.RTY2WDOT(rho_cgs, T_loc, Y_loc, wdot_loc);  // g/cm3
+          for (int isp = 0; isp < NUM_SPECIES; isp++) {
+            wdot_loc[isp] = wdot_loc[isp] * 1000.0_rt; // kg/m3
+          }
+          
           // Get dataX such as x, y, z and variables in mf_mid
           for (int ivar = 0; ivar < nVars; ivar++) {
             std::string vn = varNames[ivar]; 
@@ -918,21 +979,6 @@ int main (int argc, char* argv[])
           //dataX[1] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 1);
           //dataX[2] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 2);
 
-          // Get dataY
-          //fab_out.getVal(dataY.dataPtr(), iv); // original way
-          dataY[mav["rho"]] = rho_a(i,j,k);
-          dataY[mav["mixture_fraction"]] = mixfrac_out_a(i,j,k);
-          dataY[mav["temp"]] = T_a(i,j,k);
-          dataY[mav["HeatRelease"]] = HRR_a(i,j,k);
-          for (int isp = 0; isp < NUM_SPECIES; isp++) {
-            fn = "rhoY(" + spec_names[isp] + ")";
-            dataY[mav[fn]] = rho_a(i,j,k) * Y_a(i,j,k,isp);
-          }
-          dataY[mav["pv"]] = pv_out_a(i,j,k);
-          dataY[mav["rhorr(NO)"]] = rhorr_NO_out_a(i,j,k);
-          dataY[mav["rhorr(N2O)"]] = rhorr_N2O_out_a(i,j,k);
-          dataY[mav["rhorr(NNH)"]] = rhorr_NNH_out_a(i,j,k);
-
           //Skip points overlapping with a finer levels
           skip = false;
           if (covered_a(i, j, k) > 0.0) skip = true;
@@ -944,6 +990,25 @@ int main (int argc, char* argv[])
             }
           }
           if (skip) continue;
+
+          // Get dataY
+          //fab_out.getVal(dataY.dataPtr(), iv); // original way
+          dataY[ID_rho]   = rho_a(i,j,k);
+          dataY[ID_Z]     = mixfrac_out_a(i,j,k);
+          dataY[ID_rhoT]  = rho_a(i,j,k) * T_a(i,j,k); 
+          dataY[ID_rhoT2] = rho_a(i,j,k) * T_a(i,j,k) * T_a(i,j,k);
+          dataY[ID_HRR]   = HRR_a(i,j,k);
+          for (int isp = 0; isp < NUM_SPECIES; isp++) {
+            dataY[ID_rhoY + isp] = rho_a(i,j,k) * Y_a(i,j,k,isp);
+            dataY[ID_rhoY2 + isp] = rho_a(i,j,k) * Y_a(i,j,k,isp) * Y_a(i,j,k,isp);
+            dataY[ID_wdot + isp] = rho_a(i,j,k) * wdot_loc[isp];
+            dataY[ID_wdot2 + isp] = rho_a(i,j,k) * wdot_loc[isp] * wdot_loc[isp];
+          }
+          dataY[ID_pv] = pv_out_a(i,j,k);
+
+          dataY[mav["rhorr(NO)"]] = rhorr_NO_out_a(i,j,k);
+          dataY[mav["rhorr(N2O)"]] = rhorr_N2O_out_a(i,j,k);
+          dataY[mav["rhorr(NNH)"]] = rhorr_NNH_out_a(i,j,k);
 
           // Compute the bin in X space (<Y|X>)
           for (int ivar=0; ivar<nVars; ivar++) {
