@@ -732,7 +732,7 @@ int main (int argc, char* argv[])
       // Normalise cell volume for numerical accuracy
       if (lev == 0)
         vol0 = vol;
-      vol /= vol0;
+      //vol /= vol0; // Commented out Apr 30 2024
       if (verbose > 1) {
         std::cout << "   - collecting statistics" << std::endl;
         std::cout << "      - dx, dy, dz [m] =  " << dx[0] << ", " << dx[1] << ", " << dx[2] << "\n"
@@ -812,6 +812,7 @@ int main (int argc, char* argv[])
         Array4<Real> const& mixfrac_mid_a = mf_mid.array(mfi, mm["mixture_fraction"]);
         Array4<Real> const& pv_mid_a = mf_mid.array(mfi, mm["pv"]);
         Array4<Real> const& zone_mid_a = mf_mid.array(mfi, mm["zone"]);
+        Array4<Real> const& FI_mid_a = mf_mid.array(mfi, mm["FI"]);
 
         Array4<Real> const& rhowdot_mid_a = mf_mid.array(mfi, mm["pv"]);
 
@@ -878,6 +879,8 @@ int main (int argc, char* argv[])
         amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
           // var_loc(i,j,k)
           amrex::Real wdot_loc[NUM_SPECIES] = {0.0_rt};
+          amrex::Real Ci_MKS[NUM_SPECIES] = {0.0_rt};
+          amrex::Real Ci_CGS[NUM_SPECIES] = {0.0_rt};
           amrex::Real Y_loc[NUM_SPECIES] = {0.0_rt};
           amrex::Real X_loc[NUM_SPECIES] = {0.0_rt};
           amrex::Real Qf[NUM_REACTIONS] = {0.0_rt};
@@ -886,6 +889,8 @@ int main (int argc, char* argv[])
           amrex::Real rho_cgs     = 0.0_rt;
           amrex::Real Pcgs        = 0.0_rt;
           amrex::Real T_loc       = 0.0_rt;
+          int reaction_map[NUM_REACTIONS];
+          GET_RMAP(reaction_map);
 
           rho_loc = rho_a(i,j,k);
           rho_cgs = rho_loc * 0.001_rt; // kg/m3 to g/cm3
@@ -930,8 +935,13 @@ int main (int argc, char* argv[])
           // net rate of reaction progress
           eos.Y2X(Y_loc, X_loc);
           CKPX(rho_cgs, T_a(i,j,k), X_loc, Pcgs);        
-          CKKFKR(101325*4*10.0, T_a(i,j,k), X_loc, Qf, Qr);
-          R10_out_a(i,j,k) = (Qf[1] - Qr[1]) * 1.0E6; // - Qr[9];
+          CKYTCR(rho_cgs, T_a(i,j,k), Y_loc, Ci_CGS);
+          for (int isp = 0; isp < NUM_SPECIES; isp++) {
+            Ci_MKS[isp] = Ci_CGS[isp]*1.0e6_rt;                             // CGS -> MKS conversion
+          }
+          //CKKFKR(Pcgs, T_a(i,j,k), X_loc, Qf, Qr);
+          progressRateFR(Qf, Qr, Ci_MKS, T_a(i,j,k));
+          R10_out_a(i,j,k) = Qf[0]; //(Qf[reaction_map[10]] - Qr[reaction_map[10]]) * 1.0E6; // - Qr[9];
           // mfv_out - FI 
           FI_out_a(i,j,k) = 0.0;
           FI_out_a(i,j,k) = gradYfu_a(i,j,k,0) * gradYox_a(i,j,k,0) +
@@ -979,6 +989,7 @@ int main (int argc, char* argv[])
           mixfrac_mid_a(i,j,k) = mixfrac_out_a(i,j,k);
           pv_mid_a(i,j,k) = pv_out_a(i,j,k);
           zone_mid_a(i,j,k) = zone_out_a(i,j,k);
+          FI_mid_a(i,j,k) = FI_out_a(i,j,k);
 
         });
 
