@@ -545,7 +545,13 @@ int main (int argc, char* argv[])
     fn = "wdot2(" + spec_names[isp] + ")"; avgVarNames.emplace_back(fn); 
     mav[fn] = avgVarNames.size() - 1;
   }
-
+  // progress rate of reaction
+  int ID_PRR = ID_wdot2 + NUM_SPECIES;
+  for (int ir = 0; ir < NUM_REACTIONS; ir++) {
+    std::string s = std::to_string(ir);
+    fn = "R(" + std::string(s) + ")"; avgVarNames.emplace_back(fn); 
+    mav[fn] = avgVarNames.size() - 1;
+  }
 
   fn = "rhorr(NO)"; 
   avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1; 
@@ -606,6 +612,8 @@ int main (int argc, char* argv[])
   amrex::Print() << "nztab = " << nztab << ", dz_tab = " << dz_tab << std::endl;
 
   // Temporary data that can be repetitively used
+  int reaction_map[NUM_REACTIONS];
+  GET_RMAP(reaction_map);
 
   // Iterate over input plot files
   for (int iPlot; iPlot < nPlotFiles; ++iPlot) {
@@ -934,16 +942,6 @@ int main (int argc, char* argv[])
           rhorr_NO_out_a(i,j,k) = wdot_loc[NO_ID] * 1000.0_rt; // kg/m3
           rhorr_N2O_out_a(i,j,k) = wdot_loc[N2O_ID] * 1000.0_rt;
           rhorr_NNH_out_a(i,j,k) = wdot_loc[NNH_ID] * 1000.0_rt;
-          // net rate of reaction progress
-          eos.Y2X(Y_loc, X_loc);
-          CKPX(rho_cgs, T_a(i,j,k), X_loc, Pcgs);        
-          CKYTCR(rho_cgs, T_a(i,j,k), Y_loc, Ci_CGS);
-          for (int isp = 0; isp < NUM_SPECIES; isp++) {
-            Ci_MKS[isp] = Ci_CGS[isp]*1.0e6_rt;                             // CGS -> MKS conversion
-          }
-          //CKKFKR(Pcgs, T_a(i,j,k), X_loc, Qf, Qr);
-          progressRateFR(Qf, Qr, Ci_MKS, T_a(i,j,k));
-          R10_out_a(i,j,k) = Qf[0]; //(Qf[reaction_map[10]] - Qr[reaction_map[10]]) * 1.0E6; // - Qr[9];
           // mfv_out - FI 
           FI_out_a(i,j,k) = 0.0;
           FI_out_a(i,j,k) = gradYfu_a(i,j,k,0) * gradYox_a(i,j,k,0) +
@@ -987,6 +985,16 @@ int main (int argc, char* argv[])
             zone_out_a(i,j,k) = -1.0; // Disregard inlet regions
           }
 
+          // net rate of reaction progress
+          eos.Y2X(Y_loc, X_loc);
+          CKPX(rho_cgs, T_a(i,j,k), X_loc, Pcgs);        
+          CKYTCR(rho_cgs, T_a(i,j,k), Y_loc, Ci_CGS);
+          for (int isp = 0; isp < NUM_SPECIES; isp++) {
+            Ci_MKS[isp] = Ci_CGS[isp]*1.0e6_rt;                             // CGS -> MKS conversion
+          }
+          progressRateFR(Qf, Qr, Ci_MKS, T_a(i,j,k));
+          R10_out_a(i,j,k) = Qf[1] - Qr[1]; 
+
           // mf_mid
           mixfrac_mid_a(i,j,k) = mixfrac_out_a(i,j,k);
           pv_mid_a(i,j,k) = pv_out_a(i,j,k);
@@ -998,15 +1006,21 @@ int main (int argc, char* argv[])
         // Collect statistics for mfi
         amrex::Real rho_loc = 0.0_rt;
         amrex::Real rho_cgs = 0.0_rt;
+        amrex::Real Pcgs = 0.0_rt;
         amrex::Real T_loc = 0.0_rt;
         amrex::Real Y_loc[NUM_SPECIES] = {0.0_rt};
+        amrex::Real X_loc[NUM_SPECIES] = {0.0_rt};
         amrex::Real wdot_loc[NUM_SPECIES] = {0.0_rt};
+        amrex::Real Ci_MKS[NUM_SPECIES] = {0.0_rt};
+        amrex::Real Ci_CGS[NUM_SPECIES] = {0.0_rt};
+        amrex::Real Qf[NUM_REACTIONS] = {0.0_rt};
+        amrex::Real Qr[NUM_REACTIONS] = {0.0_rt};
         for (IntVect iv = bx.smallEnd(); iv <= bx.bigEnd(); bx.next(iv)) {
           // Index
           int i = iv[0];
           int j = iv[1];
           int k = iv[2];
-          // rho, T, Y
+          // rho, T, Y, X
           rho_loc = rho_a(i,j,k);
           rho_cgs = rho_loc * 0.001_rt; // kg/m3 to g/cm3
           T_loc   = T_a(i,j,k);
@@ -1014,12 +1028,21 @@ int main (int argc, char* argv[])
             Y_loc[isp] = Y_a(i,j,k,isp);
             wdot_loc[isp] = 0.0;
           }
+          eos.Y2X(Y_loc, X_loc);
           // wdot
           eos.RTY2WDOT(rho_cgs, T_loc, Y_loc, wdot_loc);  // g/cm3
           for (int isp = 0; isp < NUM_SPECIES; isp++) {
             wdot_loc[isp] = wdot_loc[isp] * 1000.0_rt; // kg/m3
           }
-          
+          // progress rate of reactions 
+          CKPX(rho_cgs, T_a(i,j,k), X_loc, Pcgs);        
+          CKYTCR(rho_cgs, T_a(i,j,k), Y_loc, Ci_CGS);
+          for (int isp = 0; isp < NUM_SPECIES; isp++) {
+            Ci_MKS[isp] = Ci_CGS[isp]*1.0e6_rt;   // CGS -> MKS conversion
+          }
+          //CKKFKR(Pcgs, T_a(i,j,k), X_loc, Qf, Qr);
+          progressRateFR(Qf, Qr, Ci_MKS, T_a(i,j,k));
+
           // Get dataX such as x, y, z and variables in mf_mid
           for (int ivar = 0; ivar < nVars; ivar++) {
             std::string vn = varNames[ivar]; 
@@ -1062,6 +1085,9 @@ int main (int argc, char* argv[])
             dataY[ID_rhoY2 + isp] = rho_a(i,j,k) * Y_a(i,j,k,isp) * Y_a(i,j,k,isp);
             dataY[ID_wdot + isp] = rho_a(i,j,k) * wdot_loc[isp];
             dataY[ID_wdot2 + isp] = rho_a(i,j,k) * wdot_loc[isp] * wdot_loc[isp];
+          }
+          for (int ir = 0; ir < NUM_REACTIONS; ir++) {
+            dataY[ID_PRR + reaction_map[ir]] = Qf[ir] - Qr[ir];
           }
           dataY[ID_pv] = pv_out_a(i,j,k);
 
