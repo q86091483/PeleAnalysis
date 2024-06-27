@@ -66,7 +66,7 @@ void writeIntData
     const int total,
     const weight_t weight = w_notdefined,
     const int cmpr_lvl = 0
-)
+) 
 {
     // Modify dataset creation property to enable chunking and compression
     H5::DSetCreatPropList plist;
@@ -191,7 +191,7 @@ inline int computeBin
 } // computeBin
 
 
-static void
+static void 
 print_usage (int,
              char* argv[])
 {
@@ -247,12 +247,12 @@ int main (int argc, char* argv[])
   const int nPlotFiles = pp.countval("infile");
   amrex::Print() << nPlotFiles << std::endl;
   if (nPlotFiles < 1) {
-    Print(ioproc) << "Bad nPlotFiles, exiting ..." << std::endl;
+    Print(ioproc) << "Bad nPlotFiles, exiting ..." << std::endl; 
     DataServices::Dispatch(DataServices::ExitRequest, NULL);
-  }
+  } 
   const int nPlotFilesDerived = pp.countval("infile_derived");
   if (nPlotFilesDerived < 1) {
-    Print(ioproc) << "No derived field is needed." << std::endl;
+    Print(ioproc) << "No derived field is needed." << std::endl; 
   }
   if (verbose > 0) {
     Print(ioproc) << "Processing " << nPlotFiles << " + " << nPlotFilesDerived << " plotfiles ..." << std::endl;
@@ -358,22 +358,22 @@ int main (int argc, char* argv[])
   amrex::Print() << "Initializing dataServicePtrVec: " << std::endl;
   DataServices::SetBatchMode();
   Amrvis::FileType fileType(Amrvis::NEWPLT);
-  amrex::Vector<DataServices*>  dataServicePtrVec(nPlotFiles);
+  amrex::Vector<DataServices*>  dataServicePtrVec(nPlotFiles);                                         
   amrex::Vector<AmrData*>           amrDataPtrVec(nPlotFiles);
   amrex::Vector<Real>                        time(nPlotFiles);
   for (int iPlot=0; iPlot<nPlotFiles; iPlot++) {
     dataServicePtrVec[iPlot] = new DataServices(plotFileNames[iPlot], fileType);
-    if( ! dataServicePtrVec[iPlot]->AmrDataOk()) {
-      amrex::Print() << "   " << "Initialize dataServicePtrVec failed for "
-                     << plotFileNames[iPlot] << std::endl;
-	    DataServices::Dispatch(DataServices::ExitRequest, NULL);
+    if( ! dataServicePtrVec[iPlot]->AmrDataOk()) {                        
+      amrex::Print() << "   " << "Initialize dataServicePtrVec failed for " 
+                     << plotFileNames[iPlot] << std::endl; 
+	    DataServices::Dispatch(DataServices::ExitRequest, NULL); 
     }
     amrDataPtrVec[iPlot] = &(dataServicePtrVec[iPlot]->AmrDataRef());
     time[iPlot] = amrDataPtrVec[iPlot]->Time();
   }
   amrex::Print() << "   Done." << std::endl;
 
-  // List of input fields
+  // Input index and names
   std::string fn;
   amrex::Vector<std::string> inNames;
   std::map<std::string,int> mi;
@@ -385,9 +385,9 @@ int main (int argc, char* argv[])
     fn = "Y(" + spn + ")";
     inNames.emplace_back(fn); nCompIn = inNames.size(); mi[fn] = nCompIn - 1;
   }
-  fn = "temp";
+  fn = "temp";  
   inNames.emplace_back(fn); nCompIn = inNames.size(); mi[fn] = nCompIn - 1; const int ITEMP = mi[fn];
-  fn = "HeatRelease";
+  fn = "HeatRelease";  
   inNames.emplace_back(fn); nCompIn = inNames.size(); mi[fn] = nCompIn - 1; const int IHRR = mi[fn];
   fn = "density";
   inNames.emplace_back(fn); nCompIn = inNames.size(); mi[fn] = nCompIn - 1; const int IRHO = mi[fn];
@@ -395,50 +395,43 @@ int main (int argc, char* argv[])
   inNames.emplace_back(fn); nCompIn = inNames.size(); mi[fn] = nCompIn - 1; const int IU = mi[fn];
   fn = "y_velocity";
   inNames.emplace_back(fn); nCompIn = inNames.size(); mi[fn] = nCompIn - 1; const int IV = mi[fn];
-  fn = "z_velocity";
+  fn = "z_velocity"; 
   inNames.emplace_back(fn); nCompIn = inNames.size(); mi[fn] = nCompIn - 1; const int IW = mi[fn];
 
   for (int i = 0; i < nCompIn; i++) {
     destFillComps.emplace_back(i);
   }
-  amrex::Print() << "Read " << nCompIn
+  amrex::Print() << "Read " << nCompIn 
     << " fields (inNames[i] -> destFillComps[i]):" << std::endl;
   for (int i=0; i<inNames.size(); ++i) {
     amrex::Print() << "   " << inNames[i] << " -> " << destFillComps[i] << std::endl;
   }
-
-  // List of output fields
+ 
+  // Output index and names (Y of <Y|X>)
   amrex::Vector<std::string> outNames;
   int nCompOut;
   std::map<std::string, int> mo;
   fn = "rho";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "mixture_fraction";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "temp";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "HeatRelease";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
-  fn = "HeatReleaseFI";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "Y(H2)";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "pv";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "rhorr(NO)";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "rhorr(N2O)";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
   fn = "rhorr(NNH)";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
-  fn = "FI";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
-  fn = "R10";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
-  fn = "zone";
-  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1; 
 
-  // List of fields to be conditioned upon (X of <Y|X>)
+
+  // Conditional variables (X of <Y|X>)
   const int nVars(pp.countval("vars"));
   if (nVars < 1) {
     Error("Needs to specify at least one conditioning variable.");
@@ -492,72 +485,15 @@ int main (int argc, char* argv[])
     nBinsTot *= nBins[i];
   }
 
-  // List of variables to be conditionally averaged (Y of <Y|X>)
+  // Variables to be averaged (Y of <Y|X>)
   amrex::Vector<std::string> avgVarNames;
   amrex::Vector<weight_t> avgVarWeights;
-  std::map<std::string, int> mav;
-  int nAvgVars = 0;
-  //int nAvgVars = nCompOut;
-  //for (int i = 0; i < nAvgVars; i++) {
-  //  avgVarNames.push_back(outNames[i]);
-  //  avgVarWeights.push_back(w_volume);
-  //}
-  // rho
-  fn = "rho"; avgVarNames.emplace_back(fn);
-  int ID_rho = avgVarNames.size()-1; mav[fn] = avgVarNames.size()-1;
-  // Z
-  fn = "mixture_fraction"; avgVarNames.emplace_back(fn);
-  int ID_Z = avgVarNames.size()-1; mav[fn] = avgVarNames.size()-1;
-  // rhoT
-  fn = "rhoT"; avgVarNames.emplace_back(fn);
-  int ID_rhoT = avgVarNames.size()-1; mav[fn] = avgVarNames.size()-1;
-  fn = "rhoT2"; avgVarNames.emplace_back(fn);
-  int ID_rhoT2 = avgVarNames.size()-1; mav[fn] = avgVarNames.size()-1;
-  // HRR
-  fn = "HeatRelease"; avgVarNames.emplace_back(fn);
-  int ID_HRR = avgVarNames.size()-1; mav[fn] = avgVarNames.size()-1;
-  fn = "HeatRelease2"; avgVarNames.emplace_back(fn);
-  int ID_HRR2 = avgVarNames.size()-1; mav[fn] = avgVarNames.size()-1;
-  // pv
-  fn = "pv"; avgVarNames.emplace_back(fn);
-  int ID_pv = avgVarNames.size()-1; mav[fn] = avgVarNames.size()-1;
-  // rhoY
-  int ID_rhoY = ID_pv + 1;
-  for (int isp = 0; isp < NUM_SPECIES; isp++) {
-    fn = "rhoY(" + spec_names[isp] + ")"; avgVarNames.emplace_back(fn);
-    mav[fn] = avgVarNames.size() - 1;
-  }
-  // rhoY2
-  int ID_rhoY2 = ID_rhoY + NUM_SPECIES;
-  for (int isp = 0; isp < NUM_SPECIES; isp++) {
-    fn = "rhoY2(" + spec_names[isp] + ")"; avgVarNames.emplace_back(fn);
-    mav[fn] = avgVarNames.size() - 1;
-  }
-  // wdot
-  int ID_wdot = ID_rhoY2 + NUM_SPECIES;
-  for (int isp = 0; isp < NUM_SPECIES; isp++) {
-    fn = "wdot(" + spec_names[isp] + ")"; avgVarNames.emplace_back(fn);
-    mav[fn] = avgVarNames.size() - 1;
-  }
-  // wdot2
-  int ID_wdot2 = ID_wdot + NUM_SPECIES;
-  for (int isp = 0; isp < NUM_SPECIES; isp++) {
-    fn = "wdot2(" + spec_names[isp] + ")"; avgVarNames.emplace_back(fn);
-    mav[fn] = avgVarNames.size() - 1;
-  }
-
-
-  fn = "rhorr(NO)";
-  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1;
-  fn = "rhorr(N2O)";
-  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1;
-  fn = "rhorr(NNH)";
-  avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1;
-
-  nAvgVars = avgVarNames.size();
+  int nAvgVars = nCompOut;
   for (int i = 0; i < nAvgVars; i++) {
-    avgVarWeights.emplace_back(w_volume);
+    avgVarNames.push_back(outNames[i]);
+    avgVarWeights.push_back(w_volume); 
   }
+
   Vector<Real> dataX(nVars);
   Vector<Real> dataY(nAvgVars);
 
@@ -567,11 +503,11 @@ int main (int argc, char* argv[])
   int nCompMid = 0;
   for (int i=0; i<nVars; i++) {
     fn = varNames[i];
-    midNames.emplace_back(fn); nCompMid = midNames.size(); mm[fn] = nCompMid - 1;
+    midNames.emplace_back(fn); nCompMid = midNames.size(); mm[fn] = nCompMid - 1; 
   }
   amrex::Print() << "midNames size: " << midNames.size() << std::endl;
 
-  // Progress variable
+  // Progress variable  
   Vector<Real> pv_min = {-0.23290922, -0.24825103, -0.26359285, -0.27893466, -0.29427648,
        -0.3096183 , -0.32496011, -0.34030193, -0.35564374, -0.37098556,
        -0.38632737, -0.40166919, -0.41701101, -0.43235282, -0.44769464,
@@ -615,9 +551,6 @@ int main (int argc, char* argv[])
 
     Vector<Real> probLo = amrData.ProbLo();
     Vector<Real> probHi = amrData.ProbHi();
-    amrex::Real Lx = probHi[0] - probLo[0];
-    amrex::Real Ly = probHi[1] - probLo[1];
-    amrex::Real Lz = probHi[2] - probLo[2];
 
     int finestLevel = amrData.FinestLevel();
     if (finestLevel > finestLevel_in) finestLevel = finestLevel_in;
@@ -659,8 +592,8 @@ int main (int argc, char* argv[])
     Vector<Real> volLvl(Nlev, 0);
 
     // Loop over levels
-    for (int lev=0; lev<Nlev; ++lev) {
-      // Level info
+    for (int lev=0; lev<Nlev; ++lev) {  
+      // Level info 
       const BoxArray ba = amrData.boxArray(lev);
       const DistributionMapping dm(ba);
       //const Vector<Real>& dx = amrData.DxLevel()[lev];
@@ -704,8 +637,6 @@ int main (int argc, char* argv[])
       MultiFab mf_gradu(ba, dm, BL_SPACEDIM+1, nGrow);
       MultiFab mf_gradv(ba, dm, BL_SPACEDIM+1, nGrow);
       MultiFab mf_gradw(ba, dm, BL_SPACEDIM+1, nGrow);
-      MultiFab mf_gradYfu(ba, dm, BL_SPACEDIM+1, nGrow);
-      MultiFab mf_gradYox(ba, dm, BL_SPACEDIM+1, nGrow);
 		  //MultiFab mf_su(ba, dm, 6, nGrow); // symmetric velocity tensor 0.5(du_i/dx_j+du_j/dx_i)
 		  //MultiFab mf_tau(ba, dm, 6, nGrow); // viscous force tensor
       //const int L11=0, L22=1, L33=2, L12=3, L13=4, L23=5;
@@ -713,7 +644,7 @@ int main (int argc, char* argv[])
       //const int LSUM = 6;
 
       // Mask if covered by finer level - mf_covered
-      MultiFab mf_covered(ba,dm,1,nGrow);
+      MultiFab mf_covered(ba,dm,1,nGrow); 
       mf_covered.setVal(0.0);
       if (lev < finestLevel) {
         auto rref = amrData.RefRatio()[lev];
@@ -734,7 +665,7 @@ int main (int argc, char* argv[])
       // Normalise cell volume for numerical accuracy
       if (lev == 0)
         vol0 = vol;
-      //vol /= vol0; // Commented out Apr 30 2024
+      vol /= vol0;
       if (verbose > 1) {
         std::cout << "   - collecting statistics" << std::endl;
         std::cout << "      - dx, dy, dz [m] =  " << dx[0] << ", " << dx[1] << ", " << dx[2] << "\n"
@@ -743,23 +674,12 @@ int main (int argc, char* argv[])
                   << std::endl;
       }
 
-      // Jet trajectory
-      const amrex::Real coeff_A = 0.55;
-      const amrex::Real coeff_B = 0.2;
-      const amrex::Real coeff_J = 6.6;
-      const amrex::Real Djet = 4.5E-4;
-      const amrex::Real slope_zone = 1.5;
-      const amrex::Real ZONE_LEEWARD = 1.5;
-      const amrex::Real ZONE_WINDWARD = 2.5;
-      const amrex::Real ZONE_INTERACTION = 3.5;
-
       //FArrayBox alias_fab(orig_fab, amrex::make_alias, 1, 2);
       // Calculate result variables & collect their statistics
 
       for (amrex::MFIter mfi(mf_in, amrex::TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
         const Box& bx = mfi.tilebox();
-        countLvl[lev] += bx.volume();
 
         // FArraybox reference to mf_in
         FArrayBox& fab_in = mf_in[mfi];
@@ -776,9 +696,6 @@ int main (int argc, char* argv[])
         FArrayBox& fab_gradu = mf_gradu[mfi];
         FArrayBox& fab_gradv = mf_gradv[mfi];
         FArrayBox& fab_gradw = mf_gradw[mfi];
-        FArrayBox& fab_gradYfu = mf_gradYfu[mfi];
-        FArrayBox& fab_gradYox = mf_gradYox[mfi];
-
         //FArrayBox& fab_su    = mf_su[mfi];
         //FArrayBox& fab_tau   = mf_tau[mfi];
 
@@ -798,14 +715,10 @@ int main (int argc, char* argv[])
         Array4<Real> const& Y_H2_a = mfv_out[lev].array(mfi, mo["Y(H2)"]);
         Array4<Real> const& T_out_a = mfv_out[lev].array(mfi, mo["temp"]);
         Array4<Real> const& HRR_out_a = mfv_out[lev].array(mfi, mo["HeatRelease"]);
-        Array4<Real> const& HRRFI_out_a = mfv_out[lev].array(mfi, mo["HeatReleaseFI"]);
         Array4<Real> const& pv_out_a = mfv_out[lev].array(mfi, mo["pv"]);
         Array4<Real> const& rhorr_NO_out_a = mfv_out[lev].array(mfi, mo["rhorr(NO)"]);
         Array4<Real> const& rhorr_N2O_out_a = mfv_out[lev].array(mfi, mo["rhorr(N2O)"]);
         Array4<Real> const& rhorr_NNH_out_a = mfv_out[lev].array(mfi, mo["rhorr(NNH)"]);
-        Array4<Real> const& FI_out_a = mfv_out[lev].array(mfi, mo["FI"]);
-        Array4<Real> const& R10_out_a = mfv_out[lev].array(mfi, mo["R10"]);
-        Array4<Real> const& zone_out_a = mfv_out[lev].array(mfi, mo["zone"]);
 
         //Array4<Real> const& mu_out_a = mfv_out[lev].array(mfi, mo["mu"]);
         //Array4<Real> const& ts_a      = mfv_out[lev].array(mfi, mo["ts11"]);
@@ -813,16 +726,14 @@ int main (int argc, char* argv[])
         // Array reference to mf_mid
         Array4<Real> const& mixfrac_mid_a = mf_mid.array(mfi, mm["mixture_fraction"]);
         Array4<Real> const& pv_mid_a = mf_mid.array(mfi, mm["pv"]);
-        Array4<Real> const& zone_mid_a = mf_mid.array(mfi, mm["zone"]);
-        Array4<Real> const& FI_mid_a = mf_mid.array(mfi, mm["FI"]);
-
         Array4<Real> const& rhowdot_mid_a = mf_mid.array(mfi, mm["pv"]);
+
 
         // Array reference intermediate
         Array4<Real> const& x_a     = mf_xyz.array(mfi, 0);
         Array4<Real> const& y_a     = mf_xyz.array(mfi, 1);
-        Array4<Real> const& z_a     = mf_xyz.array(mfi, 2);
-        Array4<Real> const& covered_a = mf_covered.array(mfi);
+        Array4<Real> const& z_a     = mf_xyz.array(mfi, 2);  
+        Array4<Real> const& covered_a = mf_covered.array(mfi); 
         Array4<Real> const& D_a     = mf_D.array(mfi);
         Array4<Real> const& lam_a   = mf_lam.array(mfi);
         Array4<Real> const& chi_a   = mf_chi.array(mfi);
@@ -833,8 +744,6 @@ int main (int argc, char* argv[])
         Array4<Real> const& gradu_a = mf_gradu.array(mfi);
         Array4<Real> const& gradv_a = mf_gradv.array(mfi);
         Array4<Real> const& gradw_a = mf_gradw.array(mfi);
-        Array4<Real> const& gradYfu_a = mf_gradYfu.array(mfi);
-        Array4<Real> const& gradYox_a = mf_gradYox.array(mfi);
 
         // Calculate coordiante
         const auto lo = lbound(bx);
@@ -869,219 +778,146 @@ int main (int argc, char* argv[])
                 BL_TO_FORTRAN_N_ANYD(fab_in,    mi["z_velocity"]),
                 BL_TO_FORTRAN_N_ANYD(fab_gradw, 0),
                 &(dx[0]));
-        gradient(BL_TO_FORTRAN_BOX(bx),
-                BL_TO_FORTRAN_N_ANYD(fab_in,    mi["Y(H2)"]),
-                BL_TO_FORTRAN_N_ANYD(fab_gradYfu, 0),
-                &(dx[0]));
-        gradient(BL_TO_FORTRAN_BOX(bx),
-                BL_TO_FORTRAN_N_ANYD(fab_in,    mi["Y(O2)"]),
-                BL_TO_FORTRAN_N_ANYD(fab_gradYox, 0),
-                &(dx[0]));
 
         amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
           // var_loc(i,j,k)
           amrex::Real wdot_loc[NUM_SPECIES] = {0.0_rt};
-          amrex::Real Ci_MKS[NUM_SPECIES] = {0.0_rt};
-          amrex::Real Ci_CGS[NUM_SPECIES] = {0.0_rt};
           amrex::Real Y_loc[NUM_SPECIES] = {0.0_rt};
-          amrex::Real X_loc[NUM_SPECIES] = {0.0_rt};
-          amrex::Real Qf[NUM_REACTIONS] = {0.0_rt};
-          amrex::Real Qr[NUM_REACTIONS] = {0.0_rt};
-          amrex::Real rho_loc     = 0.0_rt;
-          amrex::Real rho_cgs     = 0.0_rt;
-          amrex::Real Pcgs        = 0.0_rt;
-          amrex::Real T_loc       = 0.0_rt;
-          int reaction_map[NUM_REACTIONS];
-          GET_RMAP(reaction_map);
+          amrex::Real rho_loc = 0.0_rt;
+          amrex::Real rho_cgs = 0.0_rt;
+          amrex::Real T_loc = 0.0_rt;
 
           rho_loc = rho_a(i,j,k);
-          rho_cgs = rho_loc * 0.001_rt; // kg/m3 to g/cm3
           T_loc = T_a(i,j,k);
           for (int isp = 0; isp < NUM_SPECIES; isp++) {
             Y_loc[isp] = Y_a(i,j,k,isp);
           }
 
-          // mfv_out
+          // mf_out
           rho_out_a(i,j,k) = rho_a(i,j,k);
           T_out_a(i,j,k) = T_a(i,j,k);
+          HRR_out_a(i,j,k) = HRR_a(i,j,k);
           Y_H2_a(i,j,k) = Y_a(i,j,k,H2_ID);
-          // mfv_out - mixture fraction
+          // mf_out - mixture fraction
           amrex::Real Zlocal = 0.0;
           for (int isp = 0; isp < NUM_SPECIES; ++isp) {
             Zlocal += spec_Bilger_fact[isp] * Y_a(i,j,k,isp);
           }
           Zlocal = (Zlocal-Zox) / (Zfu-Zox);
           mixfrac_out_a(i,j,k) = Zlocal;
-          // mfv_out - progress variable
+          // mf_out - progress variable
           amrex::Real pv0, pv1;
           int iztab0 = 0;
           iztab0 = floor((Zlocal-ztab_min)/(ztab_max-ztab_min)*nztab);
           iztab0 = std::max(std::min(iztab0, nztab - 1), 0);
           if (iztab0 >= (nztab-1)) iztab0 = iztab0 - 1;
           amrex::Real r0 = 1 - (Zlocal - ztab[iztab0]) / dz_tab;
-          pv0 = pv_min[iztab0]*r0 + pv_min[iztab0+1]*(1-r0);
-          pv1 = pv_max[iztab0]*r0 + pv_max[iztab0+1]*(1-r0);
-          pv_out_a(i,j,k) = -1.0 * Y_a(i,j,k,H2_ID) +
+          pv0 = pv_min[iztab0]*r0 + pv_min[iztab0+1]*(1-r0); 
+          pv1 = pv_max[iztab0]*r0 + pv_max[iztab0+1]*(1-r0); 
+          pv_out_a(i,j,k) = -1.0 * Y_a(i,j,k,H2_ID) + 
                             -1.0 * Y_a(i,j,k,O2_ID) +
-                            +1.0 * Y_a(i,j,k,H2O_ID);
+                            +1.0 * Y_a(i,j,k,H2O_ID); 
           pv_out_a(i,j,k) = (pv_out_a(i,j,k)-pv0)/(pv1-pv0);
-          if (Zlocal < 1E-4) pv_out_a(i,j,k) = 0.0;
-          // mfv_out - wdot
-          eos.RTY2WDOT(rho_cgs, T_loc, Y_loc, wdot_loc);  // g/cm3
+          if (Zlocal < 1E-6) pv_out_a(i,j,k) = 0.0;
+          // mf_out - wdot
+          rho_cgs = rho_loc * 0.001_rt;
+          eos.RTY2WDOT(rho_cgs, T_loc, Y_loc, wdot_loc);
           //for (int n = 0; n < NUM_SPECIES; n++) {
           //  rr_a(i,j,k,n) = wdot[n] * 1000.0_rt; // rhodot, CGS -> MKS conversion
           //}
-          rhorr_NO_out_a(i,j,k) = wdot_loc[NO_ID] * 1000.0_rt; // kg/m3
+          rhorr_NO_out_a(i,j,k) = wdot_loc[NO_ID] * 1000.0_rt;
           rhorr_N2O_out_a(i,j,k) = wdot_loc[N2O_ID] * 1000.0_rt;
           rhorr_NNH_out_a(i,j,k) = wdot_loc[NNH_ID] * 1000.0_rt;
-          // net rate of reaction progress
-          eos.Y2X(Y_loc, X_loc);
-          CKPX(rho_cgs, T_a(i,j,k), X_loc, Pcgs);
-          CKYTCR(rho_cgs, T_a(i,j,k), Y_loc, Ci_CGS);
-          for (int isp = 0; isp < NUM_SPECIES; isp++) {
-            Ci_MKS[isp] = Ci_CGS[isp]*1.0e6_rt;                             // CGS -> MKS conversion
-          }
-          //CKKFKR(Pcgs, T_a(i,j,k), X_loc, Qf, Qr);
-          progressRateFR(Qf, Qr, Ci_MKS, T_a(i,j,k));
-          R10_out_a(i,j,k) = Qf[0]; //(Qf[reaction_map[10]] - Qr[reaction_map[10]]) * 1.0E6; // - Qr[9];
-          // mfv_out - FI
-          FI_out_a(i,j,k) = 0.0;
-          FI_out_a(i,j,k) = gradYfu_a(i,j,k,0) * gradYox_a(i,j,k,0) +
-                            gradYfu_a(i,j,k,1) * gradYox_a(i,j,k,1) +
-                            gradYfu_a(i,j,k,2) * gradYox_a(i,j,k,2);
-          FI_out_a(i,j,k) = FI_out_a(i,j,k) / std::fabs(FI_out_a(i,j,k));
-          //if (HRR_a(i,j,k) < 1E3) {
-          //  FI_out_a(i,j,k) = 0.0;
-          //}
-          HRR_out_a(i,j,k) = HRR_a(i,j,k);
-          if (FI_out_a(i,j,k) > 0.0) {
-            HRRFI_out_a(i,j,k) = HRR_a(i,j,k);
-          } else if (FI_out_a(i,j,k) < 0.0) {
-            HRRFI_out_a(i,j,k) = -HRR_a(i,j,k);
-          }
-          // zone
-          //ys = J * Djet * A * np.power(xs / (J*Djet), B)
-          amrex::Real yp = 0.0_rt;
-          amrex::Real hj = coeff_J * Djet * coeff_A * std::pow(x_a(i,j,k)/(coeff_J*Djet), coeff_B);
-          amrex::Real bl0, bl1, br0, br1, zl0, zl1, zr0, zr1, zp;
-          // Use periodicity along y direction
-          yp = probLo[1] + std::fmod(y_a(i,j,k)-probLo[1], Ly/2.);
-          bl0 = hj - (-slope_zone) * (-2.0*Djet); // Lean towards left or right
-          bl1 = hj - (-slope_zone) * (+2.0*Djet);
-          br0 = hj - (+slope_zone) * (-2.0*Djet);
-          br1 = hj - (+slope_zone) * (+2.0*Djet);
-          zl0 = (-slope_zone) * yp + bl0;
-          zl1 = (-slope_zone) * yp + bl1;
-          zr0 = (+slope_zone) * yp + br0;
-          zr1 = (+slope_zone) * yp + br1;
-          zp = z_a(i,j,k);
-          zone_out_a(i,j,k) = -1.0;
-          if ((zp>zr0) and (zp>zl0)) {
-            zone_out_a(i,j,k) = ZONE_WINDWARD;
-          } else if ((zp<zl0) and (zp<zr0)) {
-            zone_out_a(i,j,k) = ZONE_LEEWARD;
-          } else {
-            zone_out_a(i,j,k) = ZONE_INTERACTION;
-          }
-          if (x_a(i,j,k) < 0.0) {
-            zone_out_a(i,j,k) = -1.0; // Disregard inlet regions
-          }
 
           // mf_mid
           mixfrac_mid_a(i,j,k) = mixfrac_out_a(i,j,k);
           pv_mid_a(i,j,k) = pv_out_a(i,j,k);
-          zone_mid_a(i,j,k) = zone_out_a(i,j,k);
-          FI_mid_a(i,j,k) = FI_out_a(i,j,k);
+
+          //mu_out_a(i,j,k) = mu_a(i,j,k);
+
+          //su_a(i,j,k,L11) = gradu_a(i,j,k,0);
+          //su_a(i,j,k,L22) = gradv_a(i,j,k,1);
+          //su_a(i,j,k,L33) = gradw_a(i,j,k,2);
+          //su_a(i,j,k,L12) = 0.5 * (gradu_a(i,j,k,1) + gradv_a(i,j,k,0));
+          //su_a(i,j,k,L13) = 0.5 * (gradu_a(i,j,k,2) + gradw_a(i,j,k,0));
+          //su_a(i,j,k,L23) = 0.5 * (gradv_a(i,j,k,2) + gradw_a(i,j,k,1));
+
+          //Real skk = (1/3.) * (gradu_a(i,j,k,0)+gradv_a(i,j,k,1)+gradw_a(i,j,k,2));
+          //tau_a(i,j,k,L11) = 2. * mu_a(i,j,k) * (su_a(i,j,k,L11) - skk);
+          //tau_a(i,j,k,L22) = 2. * mu_a(i,j,k) * (su_a(i,j,k,L22) - skk);
+          //tau_a(i,j,k,L33) = 2. * mu_a(i,j,k) * (su_a(i,j,k,L33) - skk);
+          //tau_a(i,j,k,L12) = 2 * mu_a(i,j,k) * su_a(i,j,k,L12);
+          //tau_a(i,j,k,L13) = 2 * mu_a(i,j,k) * su_a(i,j,k,L13); 
+          //tau_a(i,j,k,L23) = 2 * mu_a(i,j,k) * su_a(i,j,k,L23); 
+
+          //Real coeff = 2 * mu_a(i,j,k) / rho_a(i,j,k);
+          //ts_a(i,j,k,L11) = su_a(i,j,k,L11);
+          //ts_a(i,j,k,L22) = su_a(i,j,k,L22);
+          //ts_a(i,j,k,L33) = su_a(i,j,k,L33);
+          //ts_a(i,j,k,L12) = su_a(i,j,k,L12);
+          //ts_a(i,j,k,L13) = su_a(i,j,k,L13);
+          //ts_a(i,j,k,L23) = su_a(i,k,k,L23);
+
+          //ts_a(i,j,k,LSUM) = ts_a(i,j,k,L11) * ts_a(i,j,k,L11) + 
+          //                   ts_a(i,j,k,L12) * ts_a(i,j,k,L12) + 
+          //                   ts_a(i,j,k,L13) * ts_a(i,j,k,L13) +
+          //                   ts_a(i,j,k,L21) * ts_a(i,j,k,L21) + 
+          //                   ts_a(i,j,k,L22) * ts_a(i,j,k,L22) +
+          //                   ts_a(i,j,k,L23) * ts_a(i,j,k,L23) +
+          //                   ts_a(i,j,k,L31) * ts_a(i,j,k,L31) +
+          //                   ts_a(i,j,k,L32) * ts_a(i,j,k,L32) + 
+          //                   ts_a(i,j,k,L33) * ts_a(i,j,k,L33);
 
         });
 
         // Collect statistics for mfi
-        amrex::Real rho_loc = 0.0_rt;
-        amrex::Real rho_cgs = 0.0_rt;
-        amrex::Real T_loc = 0.0_rt;
-        amrex::Real Y_loc[NUM_SPECIES] = {0.0_rt};
-        amrex::Real wdot_loc[NUM_SPECIES] = {0.0_rt};
+        countLvl[lev] += bx.volume();
         for (IntVect iv = bx.smallEnd(); iv <= bx.bigEnd(); bx.next(iv)) {
-          // Index
-          int i = iv[0];
-          int j = iv[1];
-          int k = iv[2];
-          // rho, T, Y
-          rho_loc = rho_a(i,j,k);
-          rho_cgs = rho_loc * 0.001_rt; // kg/m3 to g/cm3
-          T_loc   = T_a(i,j,k);
-          for (int isp = 0; isp < NUM_SPECIES; isp++) {
-            Y_loc[isp] = Y_a(i,j,k,isp);
-            wdot_loc[isp] = 0.0;
-          }
-          // wdot
-          eos.RTY2WDOT(rho_cgs, T_loc, Y_loc, wdot_loc);  // g/cm3
-          for (int isp = 0; isp < NUM_SPECIES; isp++) {
-            wdot_loc[isp] = wdot_loc[isp] * 1000.0_rt; // kg/m3
-          }
-
-          // Get dataX such as x, y, z and variables in mf_mid
-          for (int ivar = 0; ivar < nVars; ivar++) {
-            std::string vn = varNames[ivar];
+          // Get vector of conditional variables
+          // x, y, z in mf_xyz
+          // other variables in mf_mid
+          for (int i = 0; i < nVars; i++) {
+            std::string vn = varNames[i]; 
             if (vn == "x") {
-              dataX[ivar] = mf_xyz.array(mfi)(i, j, k, 0);
+              dataX[i] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 0);
             } else if (vn == "y") {
-              dataX[ivar] = mf_xyz.array(mfi)(i, j, k, 1);
+              dataX[i] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 1);
             } else if (vn == "z") {
-              dataX[ivar] = mf_xyz.array(mfi)(i, j, k, 2);
+              dataX[i] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 2); 
             } else {
-              dataX[ivar] = mf_mid.array(mfi)(i, j, k, mm[vn]);
-            }
+              dataX[i] = mf_mid.array(mfi)(iv[0], iv[1], iv[2], mm[vn]);
+            } 
           }
           //dataX[0] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 0);
           //dataX[1] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 1);
           //dataX[2] = mf_xyz.array(mfi)(iv[0], iv[1], iv[2], 2);
 
+          //fab_xyz.getVal(dataX.dataPtr(), iv);
+          fab_out.getVal(dataY.dataPtr(), iv);
           //Skip points overlapping with a finer levels
           skip = false;
-          if (covered_a(i, j, k) > 0.0) skip = true;
-          for (int ivar=0; ivar<nVars; ivar++) {
-            if ((incOutOfBounds[ivar] == 0) &&
-                ((dataX[ivar] < varBounds[ivar][0]) ||
-                 (dataX[ivar] >= varBounds[ivar][1]))) {
+          if (covered_a(iv[0],iv[1],iv[2]) > 0.0) skip = true;
+          for (int i=0; i<nVars; i++) {
+            if ((incOutOfBounds[i] == 0) &&
+                ((dataX[i] < varBounds[i][0]) ||
+                 (dataX[i] >= varBounds[i][1]))) {
               skip = true;
             }
           }
           if (skip) continue;
-
-          // Get dataY
-          //fab_out.getVal(dataY.dataPtr(), iv); // original way
-          dataY[ID_rho]   = rho_a(i,j,k);
-          dataY[ID_Z]     = mixfrac_out_a(i,j,k);
-          dataY[ID_rhoT]  = rho_a(i,j,k) * T_a(i,j,k);
-          dataY[ID_rhoT2] = rho_a(i,j,k) * T_a(i,j,k) * T_a(i,j,k);
-          dataY[ID_HRR]   = HRR_a(i,j,k);
-          dataY[ID_HRR2]  = HRR_a(i,j,k) * HRR_a(i,j,k);
-          for (int isp = 0; isp < NUM_SPECIES; isp++) {
-            dataY[ID_rhoY + isp] = rho_a(i,j,k) * Y_a(i,j,k,isp);
-            dataY[ID_rhoY2 + isp] = rho_a(i,j,k) * Y_a(i,j,k,isp) * Y_a(i,j,k,isp);
-            dataY[ID_wdot + isp] = rho_a(i,j,k) * wdot_loc[isp];
-            dataY[ID_wdot2 + isp] = rho_a(i,j,k) * wdot_loc[isp] * wdot_loc[isp];
-          }
-          dataY[ID_pv] = pv_out_a(i,j,k);
-
-          dataY[mav["rhorr(NO)"]] = rhorr_NO_out_a(i,j,k);
-          dataY[mav["rhorr(N2O)"]] = rhorr_N2O_out_a(i,j,k);
-          dataY[mav["rhorr(NNH)"]] = rhorr_NNH_out_a(i,j,k);
-
-          // Compute the bin in X space (<Y|X>)
-          for (int ivar=0; ivar<nVars; ivar++) {
-            bins[ivar] = computeBin(dataX[ivar], varBounds[ivar][0], varBounds[ivar][1], nBins[ivar], binType[ivar]);
+          // Compute the bin
+          for (int i=0; i<nVars; i++) {
+            bins[i] = computeBin(dataX[i], varBounds[i][0], varBounds[i][1], nBins[i], binType[i]);
           }
           bin = 0;
-          for (int ivar=0; ivar<nVars-1; ivar++) {
-            bin += bins[ivar];
-            bin *= nBins[ivar+1];
+          for (int i=0; i<nVars-1; i++) {
+            bin += bins[i];
+            bin *= nBins[i+1];
           }
           bin += bins[nVars-1];
 
           // Gather statistics
-          rho = dataY[mav["density"]];
+          rho = dataY[mo["density"]];
           m = rho * vol;
           count[bin] += 1;
           volMean[bin] += vol;
@@ -1090,11 +926,11 @@ int main (int argc, char* argv[])
           rhoStd[bin] += rho * rho;
           massMean[bin] += m;
           massStd[bin] += m * m;
-          for (int ivar=0; ivar<nAvgVars; ivar++) {
-            varMeanVal[ivar][bin] += dataY[ivar] * vol;
-            varStdVal[ivar][bin] += dataY[ivar] * dataY[ivar] * vol;
-            varMinVal[ivar][bin] += std::min(varMinVal[ivar][bin], dataY[ivar]);
-            varMaxVal[ivar][bin] += std::min(varMaxVal[ivar][bin], dataY[ivar]);
+          for (int i=0; i<nCompOut; i++) {
+            varMeanVal[i][bin] += dataY[i] * vol;
+            varStdVal[i][bin] += dataY[i] * dataY[i] * vol;
+            varMinVal[i][bin] += std::min(varMinVal[i][bin], dataY[i]);
+            varMaxVal[i][bin] += std::min(varMaxVal[i][bin], dataY[i]);
           }
         } // iv of mfi to collect statistics
       } // mfi - set variables && collect stats
@@ -1296,7 +1132,7 @@ int main (int argc, char* argv[])
 
     // Write output fields
     if (writeDerivedField) {
-      std::string outfilename(outDir + "/" + basename(plotFileNames[iPlot]) + "_derived");
+      std::string outfilename(outDir + "/" + basename(plotFileNames[iPlot]) + "_derived"); 
       Print() << "Writing ISRN derived data to " << outfilename << std::endl;
       //bool verb = false;
 	    amrex::Vector<int> istep;
@@ -1306,8 +1142,8 @@ int main (int argc, char* argv[])
 		    IntVect iv(AMREX_D_DECL(2,2,2));
         ref_ratio.emplace_back(iv);
       }
-	    WriteMultiLevelPlotfile(outfilename, Nlev,
-          GetVecOfConstPtrs(mfv_out), outNames, geoms, amrData.Time(), istep, ref_ratio);
+	    WriteMultiLevelPlotfile(outfilename, Nlev, 
+          GetVecOfConstPtrs(mfv_out), outNames, geoms, 0.0, istep, ref_ratio);
     }
   } // iPlot
 } // end of main

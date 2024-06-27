@@ -28,7 +28,7 @@ Ly = ymax - ymin; ny0 = 128
 Lz = zmax - zmin; nz0 = 96
 
 # Normalized parameters
-tau_flow = Ly / 20. 
+tau_flow = Ly / 20.
 
 finest_level = 1;
 res_x=nx0 * 2**finest_level
@@ -56,7 +56,7 @@ frb = slc.to_frb(width=((Lz, "cm"),(Lx, "cm")), resolution=res_xz)
 arr_temp = np.array(frb[fn])
 arr_mf = np.array(frb["mixture_fraction"])
 fig, ax = plt.subplots()
-im = ax.imshow(arr_temp.transpose(), 
+im = ax.imshow(arr_temp.transpose(),
               origin="lower", cmap="viridis", extent=[xmin, xmax, zmin, zmax],
               vmin=vmin, vmax=vmax)
 #ctr = ax.contour(arr_mf.transpose(), levels=[zst] ,origin='lower', colors=['white'], extent=[xmin, xmax, zmin, zmax])
@@ -94,8 +94,8 @@ plt.savefig(fn+"_"+dir+".png", dpi=300, bbox_inches="tight")
 
 field_name = "mixture_fraction"
 fig, ax = plt.subplots()
-spl = yt.SlicePlot(ds, "y", 
-             [(field_name)], 
+spl = yt.SlicePlot(ds, "y",
+             [(field_name)],
              center=(xmin+0.5*Lx, loc,zmin+0.5*Lz), width=((Lz, "cm"),(Lx, "cm")),)
 spl.set_log((field_name), False)
 spl.annotate_grids()

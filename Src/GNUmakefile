@@ -49,7 +49,9 @@ Reactions_dir := Fuego
 #EBASE         = tkeDisspRate
 #EBASE         = KolmogorovScale
 #EBASE          = FlameStructure_basic
-EBASE          = MicroMix
+#EBASE          = MicroMix
+EBASE          = RPA
+
 
 
 #NEEDS_f90_SRC = FALSE
@@ -92,6 +94,10 @@ ifeq ($(EBASE), MicroMix)
   LIBRARIES         += -lhdf5_cpp -lhdf5
 endif
 
+ifeq ($(EBASE), RPA)
+  #INCLUDE_LOCATIONS += $(HDF5_HOME)/include
+  LIBRARIES         += -lhdf5_cpp -lhdf5
+endif
 
 ifeq ($(EBASE), conditionalISRN)
   #INCLUDE_LOCATIONS += $(HDF5_HOME)/include

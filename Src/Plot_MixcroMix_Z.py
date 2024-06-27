@@ -11,6 +11,7 @@ import os.path as path
 import re
 import pandas as pd
 import cantera as ct
+from mixture_fraction import mf
 
 matplotlib.rcParams['mathtext.fontset'] = 'custom'
 matplotlib.rcParams['mathtext.rm'] = 'Bitstream Vera Sans'
@@ -21,14 +22,23 @@ matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 # Input
 # Where to output the result
-case_folder = "/scratch/b/bsavard/zisen347/PeleAnalysis/Src/res_MicroMix/"
+case_folder = "/scratch/b/bsavard/zisen347/PeleAnalysis/Src/res_MicroMix_FI/"
 # Where to read h5 files that contain condition smean
-fns = glob.glob(case_folder + "plt_07*_Y.h5")
+fns = glob.glob(case_folder + "plt_1*_Y.h5")
 # Data folder - where 1D flame data is stored
 data_folder = "/scratch/b/bsavard/zisen347/PeleAnalysis/RJICF/Data/UnstrainedPremixed1D"
+# Derived parameter
+fn = fns[0]
+f = h5py.File(fn, 'r+')
+tet = np.array(f["DATA"]["volume_mean"])
+nx = tet.shape[0]
+ny = tet.shape[1]
+nz = tet.shape[2]
+nmf = tet.shape[3]
+npv = tet.shape[4]
 
-zout = np.linspace(0, 1, 51)
-pvout = np.linspace(0, 1, 51)
+zout = np.linspace(0, 1, nmf)
+pvout = np.linspace(0, 1, npv)
 
 # Domain length of Pele Case
 xmin = -15.75E-4; xmax = 112.25E-4
@@ -49,20 +59,13 @@ fns1D_sorted = sorted(fns1D_unsorted, key=get_Z_key)
 Zs = []
 for ifn, fn in enumerate(fns1D_sorted):
   Zs.append(get_Z_key(fn))
-#%%
+
+# Domain size
 Lx = xmax - xmin 
 Ly = ymax - ymin 
 Lz = zmax - zmin
 
-# Read parameters
-fn = fns[0]
-f = h5py.File(fn, 'r+')
-tet = np.array(f["DATA"]["volume_mean"])
-nx = tet.shape[0]
-ny = tet.shape[1]
-nz = tet.shape[2]
-nmf = tet.shape[3]
-#%%
+# Load 0D states
 mech = "nuig_H2_4atm/chem.yaml"
 def get_states(zs, equilibrate = True):
   gas_f = ct.Solution(mech)
@@ -91,21 +94,88 @@ states_0D_min = get_states(zout, equilibrate=False)
 states_0D_max = get_states(zout, equilibrate=True)
 
 #%%
-wt_sum = np.zeros((nx, ny, nz, nmf))
-T_wtsum = np.zeros((nx, ny, nz, nmf))
-mf_wtsum = np.zeros((nx, ny, nz, nmf))
+# Load 1D states
+fn_CD = "/scratch/b/bsavard/zisen347/PeleAnalysis/RJICF/Data/CounterDiffusion1D/a=2.61E+03.csv"
+f_CD = pd.read_csv(fn_CD, index_col=False)
+df_CD = pd.read_csv(fn_CD)
+gas_CD = ct.Solution(mech)
+fstate_CD = ct.SolutionArray(gas_CD)
+fstate_CD.from_pandas(df_CD)
+gas_CD.X = "O2:0.21, N2:0.79"; Yox = gas_CD.Y
+gas_CD.X = "H2:1.0"; Yfu = gas_CD.Y
+zer = mf(gas_CD, Yox, Yfu)
+mf_CD = []
+for ix, x in enumerate(fstate_CD.grid):
+  gas_CD.TPY = fstate_CD.T[ix], fstate_CD.P[ix], fstate_CD.Y[ix,:]
+  mf_CD.append(zer.spec2mf(gas_CD.Y))
+mf_CD = np.array(mf_CD) 
+H2_ID = gas_CD.species_index("H2")
+#%%
+# xyzZC
+wt_xyzZC_sum = np.zeros((nx, ny, nz, nmf, npv))
+rho_xyzZC_wtsum = np.zeros((nx, ny, nz, nmf, npv))
+T_xyzZC_wtsum = np.zeros((nx, ny, nz, nmf, npv))
+mf_xyzZC_wtsum = np.zeros((nx, ny, nz, nmf, npv))
+pv_xyzZC_wtsum = np.zeros((nx, ny, nz, nmf, npv))
+hrr_xyzZC_wtsum = np.zeros((nx, ny, nz, nmf, npv))
+rhoY_H2_xyzZC_wtsum = np.zeros((nx, ny, nz, nmf, npv))
 
-wt_xyzZ_sum = wt_sum + f["DATA"]["volume_mean"]
-rho_xyzZ_sum = wt_sum + f["DATA"]["rho_mean"]
-T_xyzZ_wtsum = T_wtsum + f["DATA"]["temp_mean"]
-mf_xyzZ_wtsum = mf_wtsum + f["DATA"]["mixture_fraction_mean"]
-hrr_xyzZ_wtsum = mf_wtsum + f["DATA"]["HeatRelease_mean"]
 
-axis_sum = (0, 1, 2)
-wt_Z_sum = np.sum(wt_xyzZ_sum, axis=axis_sum)
-T_Z_sum = np.sum(T_xyzZ_wtsum, axis=axis_sum)
-mf_Z_sum = np.sum(mf_xyzZ_wtsum, axis=axis_sum)
-hrr_Z_sum = np.sum(hrr_xyzZ_wtsum, axis=axis_sum)
+for ifn, fn in enumerate(fns):
+  f = h5py.File(fn, 'r+')
+  print(fn)
+  wt_xyzZC_sum  = wt_xyzZC_sum  + f["DATA"]["volume_mean"]
+  rho_xyzZC_wtsum = rho_xyzZC_wtsum + f["DATA"]["rho_mean"]
+  T_xyzZC_wtsum = T_xyzZC_wtsum + f["DATA"]["temp_mean"]
+  mf_xyzZC_wtsum = mf_xyzZC_wtsum + f["DATA"]["mixture_fraction_mean"]
+  pv_xyzZC_wtsum = pv_xyzZC_wtsum + f["DATA"]["pv_mean"]
+  hrr_xyzZC_wtsum = hrr_xyzZC_wtsum + f["DATA"]["HeatRelease_mean"]
+  rhoY_H2_xyzZC_wtsum = rhoY_H2_xyzZC_wtsum + f["DATA"]["rhoY(H2)_mean"]
+#%%
+
+axis_sum = (0, 1, 2, 4)
+wt_Z_wtsum = np.sum(wt_xyzZC_sum, axis=axis_sum)
+rho_Z_wtsum = np.sum(rho_xyzZC_wtsum, axis=axis_sum)
+T_Z_wtsum = np.sum(T_xyzZC_wtsum, axis=axis_sum)
+mf_Z_wtsum = np.sum(mf_xyzZC_wtsum, axis=axis_sum)
+hrr_Z_wtsum = np.sum(hrr_xyzZC_wtsum, axis=axis_sum)
+rhoY_H2_Z_wtsum = np.sum(rhoY_H2_xyzZC_wtsum, axis=axis_sum)
+
+
+#%%
+mf_Z = mf_Z_wtsum / wt_Z_wtsum 
+T_Z = T_Z_wtsum / wt_Z_wtsum 
+rho_Z = rho_Z_wtsum / wt_Z_wtsum 
+rhoY_H2_Z = rhoY_H2_Z_wtsum / wt_Z_wtsum
+
+fig, ax = plt.subplots()
+ax.plot(mf_CD, fstate_CD.T, label=r"$1D-90\% \chi_\mathrm{st}^{extinction}$") 
+ax.plot(zout, T_Z, label=r"$\langle T | Z \rangle-2D$")
+ax.plot(zout, states_0D_min.T, color="k", linestyle="--", label="Pure mix")
+ax.plot(zout, states_0D_max.T, color="k", linestyle="-", label="Equilibirum")
+ax.legend()
+ax.legend(fontsize=20)
+#ax.set_ylim([300, 2500])
+ax.set_ylabel(r"$\langle Z|Z \rangle$", fontsize=20)
+
+fig, ax = plt.subplots()
+ax.plot(mf_CD, fstate_CD.Y[:,H2_ID], color="b", linewidth=3.0, linestyle = "--",
+        label=r"$\mathrm{1D}-90\% \chi_\mathrm{st}^{extinction}$") 
+ax.plot(zout, rhoY_H2_Z / rho_Z, color="r", linewidth=3.0, linestyle = "-",
+        label=r"$\mathrm{3D}$")
+ax.plot(zout, states_0D_min.Y[:,H2_ID], color="k", linestyle="--", label="Pure mix")
+ax.plot(zout, states_0D_max.Y[:,H2_ID], color="k", linewidth=3.0, linestyle = "-", 
+        label="Equilibirum")
+ax.legend()
+ax.legend(fontsize=20)
+ax.set_xlim([0, 0.1])
+ax.set_ylim([0, 0.1])
+ax.set_ylabel(r"$\langle Y_\mathrm{H2} |Z \rangle$", fontsize=20)
+ax.set_xlabel(r"$\langle Z \rangle$", fontsize=20)
+ax.tick_params(axis='both', which='major', labelsize=16)
+ax.tick_params(axis='both', which='minor', labelsize=16)
+
+#%%
 
 axis_sum = (1, 2)
 wt_xZ_sum = np.sum(wt_xyzZ_sum, axis=axis_sum)
@@ -127,9 +197,6 @@ ax.plot(zout, T_xZ[1,:], label=r"$x\in [0.25, 0.5] L_x$")
 ax.plot(zout, T_xZ[2,:], label=r"$x\in [0.5, 0.75] L_x$")
 ax.plot(zout, T_xZ[3,:], label=r"$x\in [0.75, 1.0] L_x$")
 
-ax.plot(zout, states_0D_min.T, color="k", label="Pure mix")
-ax.plot(zout, states_0D_max.T, color="k", label="Equilibirum")
-ax.legend()
 ax.set_ylim([300, 2500])
 ax.set_ylabel(r"$\langle T|Z \rangle$", fontsize=20)
 

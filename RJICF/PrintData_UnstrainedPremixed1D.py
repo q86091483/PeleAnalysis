@@ -19,8 +19,8 @@ import graphviz
 #do_things = ["do_plot", "do_laminar1D"]
 do_things = ["do_laminar1D"]
 # Which mixture to calculate
-Zs = np.linspace(0, 0.3, 61)
-#Zs = np.array([0.0252])
+#Zs = np.linspace(0, 0.3, 61)
+Zs = np.array([0.0275, 0.025])
 # Which mixture to plot
 plot_Zs = np.array([2.483E-01])
 # Which mechanism to use

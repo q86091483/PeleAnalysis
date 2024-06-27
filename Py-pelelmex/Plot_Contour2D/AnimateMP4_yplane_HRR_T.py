@@ -12,14 +12,12 @@ from amr_kitchen.mandoline import Mandoline
 from amr_kitchen import HeaderData
 
 # Input
-# Where original plot files are stored
-fig_folder = ("/scratch/b/bsavard/zisen347/PeleAnalysis/Py-pelelmex/"
-              "Figure/Slice2D_der_lev2/Micromix")
 # Case name
 case_name = "Micromix"
 # Patterns of plotfiles to be processed
 plt_pattern = "plt_*"
-str_plane = "HRR_T_y=-1.125E-03"
+str_plane = "HRR_T_y=-9.000E-04"
+mov_name = "HRR_T_y=-9.000E-04"
 zst = 0.0252
 Djet = 4.5E-4
 # Plot parameter
@@ -35,6 +33,7 @@ matplotlib.rcParams['font.family'] = 'STIXGeneral'
 # Output data folder
 fig_dir = "/scratch/b/bsavard/zisen347/PeleAnalysis/Py-pelelmex/Figure"
 fig_slice_dir = os.path.join(fig_dir, "Slice2D_der_lev2")
+#%%
 if not os.path.exists(fig_dir):
   os.mkdir(fig_dir)
 if not os.path.exists(fig_slice_dir):
@@ -55,10 +54,18 @@ def get_key(s):
   return float(sss)
 fns_sorted = sorted(fns_unsorted, key=get_key)
 #%%
-import imageio
-images = []
-for filename in fns_sorted:
-  print(filename)
-  images.append(imageio.imread(filename))
-imageio.mimsave("./" + str_plane + ".gif", images)
-#%%
+import cv2
+video_name = "./" + mov_name + ".mp4"
+frame = cv2.imread(fns_sorted[0])
+height, width, layers = frame.shape
+#cv2.VideoWriter(output_filename, fourcc, fps, self._window_shape)
+video = cv2.VideoWriter(video_name, cv2.VideoWriter_fourcc(*'XVID'), 10, (width,height))
+
+for image in fns_sorted:
+    video.write(cv2.imread(image))
+
+
+cv2.destroyAllWindows()
+video.release()
+
+# %%

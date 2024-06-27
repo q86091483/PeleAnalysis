@@ -13,32 +13,28 @@ gas_mix = ct.Solution("/scratch/b/bsavard/zisen347/PeleAnalysis/Py-pelelmex/Inpu
 
 # Input
 # Where plt files are stored
-plt_folder = "/scratch/b/bsavard/zisen347/scopingRuns/NUIG_Re4000_2J6_4atm/Level_3"
+plt_folder = "/scratch/b/bsavard/zisen347/PeleAnalysis/Src/res_MicroMix_derived"
 # Case name
 case_name = "Micromix"
 # Patterns of plotfiles to be processed
-plt_pattern = "plt_1[1,2,3]*"
+plt_pattern = "plt_1[23]*_derived"
 # Planes to be extracted
 Djet = 4.5E-4
-plane_x = np.array([0.0, 1.0, 2.0, 5.0, 8.0, 10.0, 14.0, 20.0, 24.0]) * Djet
-#plane_x = np.array([24.0]) * Djet
+plane_x = np.array([]) * Djet
 plane_y = np.array([]) * Djet
-plane_z = np.array([]) * Djet
+plane_z = np.array([4.5]) * Djet
 # Prefix
 str_prefix = "HRR_T"
 # Max level
 max_level = 2
 # Fields to be extracted
-field_names = ["density", "HeatRelease", "temp", "mixture_fraction", "mag_vort", 
-               "x_velocity", "y_velocity", "z_velocity",]
-for isp, spn in enumerate(gas_mix.species_names):
-  field_names.append("Y("+spn+")")
+field_names = ["HeatReleaseFI", "mixture_fraction", "pv"]
 
 # Output data folder
 output_dir = "../Data"
 if not os.path.exists(output_dir):
   os.mkdir(output_dir)
-output_slice_dir = os.path.join(output_dir, "Slice2D_plt_lev2")
+output_slice_dir = os.path.join(output_dir, "Slice2D_der_lev2")
 if not os.path.exists(output_slice_dir):
   os.mkdir(output_slice_dir)
 output_case_slice_dir = os.path.join(output_slice_dir, case_name)
@@ -50,13 +46,12 @@ fns_unsorted = glob.glob(os.path.join(plt_folder, plt_pattern))
 
 def get_key(s):
   ss = re.split("plt_", s)[-1]
+  ss = re.split("_derived", ss)[0]
   return int(ss)
 fns_sorted = sorted(fns_unsorted, key=get_key)
-
 for fn in fns_sorted:
   print(fn)
 
-#%%
 for ix, pos in enumerate(plane_x):
   normal = 0
 

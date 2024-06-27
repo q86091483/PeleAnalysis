@@ -4,11 +4,11 @@ import numpy as np
 finest_level = 3
 r = np.array([np.mean([1.0]),
               np.mean([0.9]),
-              np.mean([0.36]),
+              np.mean([0.40]),
               np.mean([0.22])])
-tadv = np.mean([170]) / 3600. # [h]
-nproc = 2000 # cores
-dt_finest = np.mean([9.5E-9])
+tadv = np.mean([105]) / 3600. # [h]
+nproc = 4000 # cores
+dt_finest = np.mean([1.1E-8])
 
 Lx = 0.0128
 Uc = 100.

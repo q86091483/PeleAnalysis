@@ -61,6 +61,8 @@ mpi*.txt
 *tmp*
 *.pdf
 *.gv
+*.mp4
+*.avi
 
 RJICF/Data/*
 RJICF/laminar1D*/*

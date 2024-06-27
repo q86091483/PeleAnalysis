@@ -993,7 +993,16 @@ int main (int argc, char* argv[])
             Ci_MKS[isp] = Ci_CGS[isp]*1.0e6_rt;                             // CGS -> MKS conversion
           }
           progressRateFR(Qf, Qr, Ci_MKS, T_a(i,j,k));
-          R10_out_a(i,j,k) = Qf[1] - Qr[1]; 
+          //amrex::Print() << "At cell: ";
+          //amrex::Print() << "Yloc = {";
+          //for (int isp = 0; isp < NUM_SPECIES; isp++) {
+          //  amrex::Print() << Y_loc[isp] << ",";
+          //}
+          //amrex::Print() << "}, Pcgs = " << Pcgs;
+          //amrex::Print() << ", T=" << T_a(i,j,k);
+          //amrex::Print() << ", rho_cgs=" << rho_cgs;
+          //amrex::Print() << ", R10=" << Qf[0] - Qr[0] << " |end" << std::endl;
+          R10_out_a(i,j,k) = Qf[0] - Qr[0]; 
 
           // mf_mid
           mixfrac_mid_a(i,j,k) = mixfrac_out_a(i,j,k);
@@ -1028,7 +1037,9 @@ int main (int argc, char* argv[])
             Y_loc[isp] = Y_a(i,j,k,isp);
             wdot_loc[isp] = 0.0;
           }
+
           eos.Y2X(Y_loc, X_loc);
+
           // wdot
           eos.RTY2WDOT(rho_cgs, T_loc, Y_loc, wdot_loc);  // g/cm3
           for (int isp = 0; isp < NUM_SPECIES; isp++) {
@@ -1086,6 +1097,7 @@ int main (int argc, char* argv[])
             dataY[ID_wdot + isp] = rho_a(i,j,k) * wdot_loc[isp];
             dataY[ID_wdot2 + isp] = rho_a(i,j,k) * wdot_loc[isp] * wdot_loc[isp];
           }
+
           for (int ir = 0; ir < NUM_REACTIONS; ir++) {
             dataY[ID_PRR + reaction_map[ir]] = Qf[ir] - Qr[ir];
           }
