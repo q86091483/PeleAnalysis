@@ -37,7 +37,7 @@ fns = glob.glob(os.path.join(case_folder, "plt_*.h5"))
 # Data folder - where 1D flame data is stored
 data_folder = "/scratch/b/bsavard/zisen347/PeleAnalysis/RJICF/Data/UnstrainedPremixed1D"
 # Field names
-field_names = [["T", "wdot(O2)", "wdot(H2)", "wdot(H2O)"], 
+field_names = [["T", "wdot(O2)", "wdot(H2)", "wdot(H2O)"],
                 ["wdot(NH)", "wdot(NNH)", "wdot(OH)", "wdot(H2O2)"],
                ["wdot(NO)", "wdot(N2O)", "wdot(NO2)", "wdot(N)"],
               ]
@@ -50,8 +50,8 @@ ny = tet.shape[1]
 nz = tet.shape[2]
 nmf = tet.shape[3]
 npv = tet.shape[4]
-nzo = tet.shape[5] 
-nfi = tet.shape[6] 
+nzo = tet.shape[5]
+nfi = tet.shape[6]
 zout = np.linspace(0, 1, nmf)
 pvout = np.linspace(0, 1, npv)
 labelsize = 16
@@ -59,8 +59,8 @@ labelsize = 16
 xmin = -15.75E-4; xmax = 112.25E-4
 ymin = -1.8E-3; ymax = 1.8E-3
 zmin = -0.0E-3; zmax = 5.6E-3
-Lx = xmax - xmin 
-Ly = ymax - ymin 
+Lx = xmax - xmin
+Ly = ymax - ymin
 Lz = zmax - zmin
 nmix = 30;
 # Mechanism
@@ -88,10 +88,10 @@ def get_states(zs, equilibrate = True):
   gas_f = ct.Solution(mech)
   gas_o = ct.Solution(mech)
   gas_m = ct.Solution(mech)
-  states = ct.SolutionArray(gas_m) 
+  states = ct.SolutionArray(gas_m)
   for iz, z in enumerate(zs):
     # Fuel and oxidizer stream
-    X_f    = {}; X_f["H2"] = 1.0; X_f["N2"] = 1 - X_f["H2"] 
+    X_f    = {}; X_f["H2"] = 1.0; X_f["N2"] = 1 - X_f["H2"]
     X_o    = {}; X_o["O2"] = 0.21; X_o["N2"] = 0.79
     gas_f.TPX = 300, 405300, X_f
     gas_o.TPX = 750, 405300, X_o
@@ -123,7 +123,7 @@ mf_CD = []
 for ix, x in enumerate(fstate_CD.grid):
   gas_CD.TPY = fstate_CD.T[ix], fstate_CD.P[ix], fstate_CD.Y[ix,:]
   mf_CD.append(zer.spec2mf(gas_CD.Y))
-mf_CD = np.array(mf_CD) 
+mf_CD = np.array(mf_CD)
 
 NO_ID = gas_CD.species_index("NO")
 NNH_ID = gas_CD.species_index("NNH")
@@ -159,7 +159,7 @@ def get_pveq(zs, equilibrate):
   print("Input zs for get_pveq: ", zs)
   for iz, z in enumerate(zs):
     # Fuel and oxidizer stream
-    X_f    = {}; X_f["H2"] = 1.0; X_f["N2"] = 1 - X_f["H2"] 
+    X_f    = {}; X_f["H2"] = 1.0; X_f["N2"] = 1 - X_f["H2"]
     X_o    = {}; X_o["O2"] = 0.21; X_o["N2"] = 0.79
     gas_f.TPX = 300, 405300, X_f
     gas_o.TPX = 750, 405300, X_o
@@ -237,12 +237,12 @@ wdot_xzoneFI_wtsum   = np.sum(wdot_wtsum, axis=axis_sum)
 wdot2_xzoneFI_wtsum   = np.sum(wdot2_wtsum, axis=axis_sum)
 
 #%%
-rho_xzoneFI    = rho_xzoneFI_wtsum / wt_xzoneFI_wtsum 
-mf_xzoneFI     = mf_xzoneFI_wtsum / wt_xzoneFI_wtsum 
-pv_xzoneFI     = pv_xzoneFI_wtsum / wt_xzoneFI_wtsum 
-rhoT_xzoneFI   = rhoT_xzoneFI_wtsum / wt_xzoneFI_wtsum 
-rhoT2_xzoneFI  = rhoT2_xzoneFI_wtsum / wt_xzoneFI_wtsum 
-hrr_xzoneFI    = hrr_xzoneFI_wtsum / wt_xzoneFI_wtsum 
+rho_xzoneFI    = rho_xzoneFI_wtsum / wt_xzoneFI_wtsum
+mf_xzoneFI     = mf_xzoneFI_wtsum / wt_xzoneFI_wtsum
+pv_xzoneFI     = pv_xzoneFI_wtsum / wt_xzoneFI_wtsum
+rhoT_xzoneFI   = rhoT_xzoneFI_wtsum / wt_xzoneFI_wtsum
+rhoT2_xzoneFI  = rhoT2_xzoneFI_wtsum / wt_xzoneFI_wtsum
+hrr_xzoneFI    = hrr_xzoneFI_wtsum / wt_xzoneFI_wtsum
 rhoY_xzoneFI   = np.zeros_like(rhoY_xzoneFI_wtsum)
 rhoY2_xzoneFI  = np.zeros_like(rhoY2_xzoneFI_wtsum)
 wdot_xzoneFI   = np.zeros_like(wdot_xzoneFI_wtsum)
@@ -258,28 +258,30 @@ x1D = np.linspace(xmin, xmax, nx) + (xmin-xmax)/nx/2
 x1D = x1D / 4.5E-4
 fig, ax = plt.subplots(figsize=(5,4))
 phi = hrr_xzoneFI_wtsum[:,:,:]
-phi_sum = np.sum(phi)
+phi_sum = np.sum(phi) * (1.28E-2/phi.shape[0])
 stitle = r"$\int \mathrm{HRR} \mathrm{d}V_{\mathrm{bin}(x)} / \int \mathrm{HRR} \mathrm{d}V_\mathrm{total}$"
+stitle = r"$f_{\mathrm{HRR}}(x \; ; \; \mathcal{M,Z})$"
 ax.plot(x1D[:], phi[:,0,0]/phi_sum, color="blue",  linestyle="-", label = r"$\mathrm{NP-Leeward}$")
 ax.plot(x1D[:], phi[:,1,0]/phi_sum, color="red",   linestyle="-", label = r"$\mathrm{NP-Windward}$")
 ax.plot(x1D[:], phi[:,2,0]/phi_sum, color="green", linestyle="-", label = r"$\mathrm{NP-Interaction}$")
 ax.plot(x1D[:], phi[:,0,1]/phi_sum, color="blue",  linestyle="--", label = r"$\mathrm{P-Leeward}$")
 ax.plot(x1D[:], phi[:,1,1]/phi_sum, color="red",   linestyle="--", label = r"$\mathrm{P-Windward}$")
 ax.plot(x1D[:], phi[:,2,1]/phi_sum, color="green", linestyle="--", label = r"$\mathrm{P-Interaction}$")
-ax.set_title(stitle, fontsize=18)
+ax.set_title(stitle, fontsize=20)
 ax.set_xlim([-1, x1D[-1]])
 ax.set_xlabel(r"$x/D_j$", fontsize=18)
-#ax.set_ylabel(stitle, fontsize=16)
+#ax.set_ylabel(r"$f_{\mathrm{HRR}}(x \; ; \; M,Z)$", fontsize=18)
 ax.tick_params(axis='both', which='major', labelsize=14)
 ax.tick_params(axis='both', which='minor', labelsize=14)
-ax.legend(fontsize=16, bbox_to_anchor=(0.9, 0.45))
+#ax.legend(fontsize=16, bbox_to_anchor=(0.9, 0.45))
 plt.savefig("HRR_x.png", dpi=300, bbox_inches="tight")
 #%%
 lw = 2.0
 fig, ax = plt.subplots(figsize=(5,4))
-phi = rhoY_xzoneFI_wtsum[:,:,:,NO_ID] 
-phi_sum = np.sum(phi)
+phi = rhoY_xzoneFI_wtsum[:,:,:,NO_ID]
+phi_sum = np.sum(phi) * (1.28E-2/phi.shape[0])
 stitle = r"$\int \rho Y_\mathrm{NO} \mathrm{d}V_{\mathrm{bin}(x)} / \int \rho Y_\mathrm{NO} \mathrm{d}V_\mathrm{total}$"
+stitle = r"$f_{\rho Y_\mathrm{NO}}(x \; ; \; \mathcal{M,R})$"
 ax.plot(x1D[:], phi[:,0,0]/phi_sum, color="blue",  linestyle="-", label = r"$\mathrm{NP-Leeward}$", linewidth=lw)
 ax.plot(x1D[:], phi[:,1,0]/phi_sum, color="red",   linestyle="-", label = r"$\mathrm{NP-Windward}$", linewidth=lw)
 ax.plot(x1D[:], phi[:,2,0]/phi_sum, color="green", linestyle="-", label = r"$\mathrm{NP-Interaction}$", linewidth=lw)
@@ -288,18 +290,18 @@ ax.plot(x1D[:], phi[:,1,1]/phi_sum, color="red",   linestyle="--", label = r"$\m
 ax.plot(x1D[:], phi[:,2,1]/phi_sum, color="green", linestyle="--", label = r"$\mathrm{P-Interaction}$", linewidth=lw)
 ax.set_xlim([-1, x1D[-1]])
 ax.set_xlabel(r"$x/D_\mathrm{j}$", fontsize=18)
-ax.set_title(stitle,fontsize=18)
+ax.set_title(stitle,fontsize=20)
 ax.tick_params(axis='both', which='major', labelsize=14)
 ax.tick_params(axis='both', which='minor', labelsize=14)
-ax.legend(fontsize=14)
+ax.legend(fontsize=14, frameon = False)
 fig.savefig("rhoYNO_x.png", dpi=300)
 
 #%%
 fig, ax = plt.subplots(figsize=(5,4))
-phi = wdot_xzoneFI_wtsum[:,:,:,NO_ID] 
-phi_sum = np.sum(wdot_xzoneFI_wtsum[:,:,:,NO_ID])
-
+phi = wdot_xzoneFI_wtsum[:,:,:,NO_ID]
+phi_sum = np.sum(wdot_xzoneFI_wtsum[:,:,:,NO_ID]) * (1.28E-2/phi.shape[0])
 stitle = r"$\int \rho \dot{\omega}_\mathrm{NO} \mathrm{d}V_{\mathrm{bin}(x)} / \int \rho \dot{\omega}_\mathrm{NO} \mathrm{d}V_{\mathrm{total}}$"
+stitle = r"$f_{\rho \dot{\omega}_\mathrm{NO}}(x \; ; \; \mathcal{M,R})$"
 ax.plot(x1D[:], phi[:,0,0]/phi_sum, color="blue",  linestyle="-", label = r"$\mathrm{NP-Leeward}$")
 ax.plot(x1D[:], phi[:,1,0]/phi_sum, color="red",   linestyle="-", label = r"$\mathrm{NP-Windward}$")
 ax.plot(x1D[:], phi[:,2,0]/phi_sum, color="green", linestyle="-", label = r"$\mathrm{NP-Interaction}$")
@@ -308,8 +310,7 @@ ax.plot(x1D[:], phi[:,1,1]/phi_sum, color="red",   linestyle="--", label = r"$\m
 ax.plot(x1D[:], phi[:,2,1]/phi_sum, color="green", linestyle="--", label = r"$\mathrm{P-Interaction}$")
 ax.set_xlim([-1, x1D[-1]])
 ax.set_xlabel(r"$x/D_\mathrm{j}$", fontsize=18)
-ax.set_title(stitle, fontsize=18)
-ax.
+ax.set_title(stitle, fontsize=20)
 ax.tick_params(axis='both', which='major', labelsize=14)
 ax.tick_params(axis='both', which='minor', labelsize=14)
 
@@ -318,7 +319,7 @@ fig.savefig("rhowdotNO.png", dpi=300)
 
 #%%
 fig, ax = plt.subplots(figsize=(5,4))
-phi = wdot_xzoneFI_wtsum[:,:,:,NO_ID] / rho_xzoneFI_wtsum[:,:,:] / hrr_xzoneFI_wtsum[:,:,:] 
+phi = wdot_xzoneFI_wtsum[:,:,:,NO_ID] / rho_xzoneFI_wtsum[:,:,:] / hrr_xzoneFI_wtsum[:,:,:]
 phi_sum = 1.0 #np.sum(phi)
 stitle = r"$\int \dot{\omega}_\mathrm{NO} \mathrm{d}V_{\mathrm{bin}(x)} / \int \mathrm{HRR} \mathrm{d}V_{\mathrm{bin}(x)} \; \mathrm{[kg/J]}$"
 ax.plot(x1D[:], phi[:,0,0]/phi_sum, color="blue",  linestyle="-", label = r"$\mathrm{NP-Leeward}$")

@@ -13,13 +13,18 @@ from amr_kitchen import HeaderData
 
 # Input
 # Case name
-case_name = "Micromix"
+case_name = "conv3D"
 # Patterns of plotfiles to be processed
-plt_pattern = "plt_*"
-str_plane = "HRR_T_y=-9.000E-04"
-mov_name = "HRR_T_y=-9.000E-04"
+plt_pattern = "plt_1*"
+str_plane = "HRR_T_y=-1.000E-03"
+mov_name = "Level1_AGEPV"
 zst = 0.0252
-Djet = 4.5E-4
+Djet = 5.0E-4
+# Output data folder
+fig_dir = "/scratch/b/bsavard/zisen347/PeleAnalysis/Py-pelelmex/Figure"
+fig_dir = "/scratch/b/bsavard/zisen347/PeleAnalysis/Figure"
+fig_slice_dir = os.path.join(fig_dir, "Slice2D_age_lev0")
+
 # Plot parameter
 npx = 2; npy = 2
 fig_unit_y = 1.5
@@ -30,9 +35,6 @@ matplotlib.rcParams['mathtext.it'] = 'Bitstream Vera Sans:italic'
 matplotlib.rcParams['mathtext.bf'] = 'Bitstream Vera Sans:bold'
 matplotlib.rcParams['mathtext.fontset'] = 'stix'
 matplotlib.rcParams['font.family'] = 'STIXGeneral'
-# Output data folder
-fig_dir = "/scratch/b/bsavard/zisen347/PeleAnalysis/Py-pelelmex/Figure"
-fig_slice_dir = os.path.join(fig_dir, "Slice2D_der_lev2")
 #%%
 if not os.path.exists(fig_dir):
   os.mkdir(fig_dir)

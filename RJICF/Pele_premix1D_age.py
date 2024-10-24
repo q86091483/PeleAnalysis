@@ -16,17 +16,17 @@ gas_mix = ct.Solution("/scratch/b/bsavard/zisen347/PeleAnalysis/RJICF/BurkeH2/ch
 
 # Input
 # Where plt files are stored
-plt_folder = "/scratch/b/bsavard/zisen347/scopingRuns/conv2D"
+plt_folder = "/scratch/b/bsavard/zisen347/scopingRuns/conv3D"
 # Case name
-case_name = "conv2D"
+case_name = "conv3D"
 lref = 1.0
 # Patterns of plotfiles to be processed
-plt_pattern = "plt_00950*"
+plt_pattern = "plt_1*"
 plane_x = np.array([])
 plane_y = np.array([]) * lref
 plane_z = np.array([0.0]) * lref
 # Patterns of npz files to be plotted
-plot_pattern = "plt_00950*"
+plot_pattern = "plt_1**"
 plot_plane_x = np.array([])
 plot_plane_y = np.array([]) * lref
 plot_plane_z = np.array([0.0]) * lref
@@ -37,12 +37,16 @@ str_prefix = "HRR_T"
 # Fields to be extracted
 field_names = ["density", "temp", "mixture_fraction", "mag_vort",
                "x_velocity", "y_velocity", "z_velocity",
-               "mixture_fraction_userdef_0", "age_0"]
+               "mixture_fraction_userdef_0", "age_0",
+               "mixture_fraction_userdef_1", "age_1",]
+
+#               "mixture_fraction_userdef_0", "age_0", "agepv_0",
+#               "mixture_fraction_userdef_1", "age_1", "agepv_1"]
 for isp, spn in enumerate(gas_mix.species_names):
   field_names.append("Y("+spn+")")
 # Fields to be plotted
-plot_names = [["x_velocity", "age_0"],
-              ["mixture_fraction_userdef_0", "mixture_fraction"]]
+plot_names = [["mixture_fraction_userdef_0", "x_velocity", ],
+              ["age_0", "mixAge_0"]]
 # Output data folder
 output_dir = "/scratch/b/bsavard/zisen347/PeleAnalysis/Data_age"
 fig_dir = "/scratch/b/bsavard/zisen347/PeleAnalysis/Figure_age"
@@ -141,6 +145,8 @@ for iz, pos in enumerate(plane_z):
   if not os.path.exists(fig_plane_case_slice_dir):
     os.mkdir(fig_plane_case_slice_dir)
 
+  loc_cb_long = [1E-4, 1.0E-4, 3E-4, 0.5E-4]
+
   for ifn, fn in enumerate(fns_plot_sorted):
     #str_plane = str_prefix+"="+"%.3E"%plane_y[iy]
     #fig_plane_case_slice_dir = os.path.join(fig_case_slice_dir, str_plane)
@@ -183,7 +189,7 @@ for iz, pos in enumerate(plane_z):
             cb.ax.set_xticklabels([str(vmin), "%.1E"%vmax], color="white", fontsize=labelsize-6)  # horizontal colorbar
 
         if (field_name == "mixture_fraction"):
-          vmin = -0.2; vmax = 1.2
+          vmin = -0.05; vmax = 1.05
           im = ax.imshow(f[field_name], origin="lower",
                     vmin = vmin, vmax = vmax, cmap="jet",
                     extent=extent, aspect='equal')
@@ -218,19 +224,22 @@ for iz, pos in enumerate(plane_z):
           ax.set_title(r"$\mathrm{log}(|\omega|)$", fontsize=labelsize-2, pad=3)
 
         if (field_name == "x_velocity"):
-          vmin = 8.0; vmax = 12
+          vmin = 0; vmax = 30
           im = ax.imshow(f[field_name], origin="lower",
-                   vmin = vmin, vmax = vmax, cmap="seismic",
+                   vmin = vmin, vmax = vmax, cmap="Purples",
                     extent=extent, aspect='equal')
           ax.set_title(r"$u_x \; \mathrm{[m/s]}$", fontsize=labelsize-2, pad=3)
 
-          #cax = ax.inset_axes(loc_cb, transform=ax.transData)
-          #cb = fig.colorbar(im, cax=cax, orientation='horizontal',
-          #                 ticks=[vmin, vmax])
-          #cb.ax.xaxis.set_tick_params(color="white")
-          #cb.ax.yaxis.set_tick_params(color="white")
-          #cb.outline.set_edgecolor("white")
-          #cb.ax.set_xticklabels([str(vmin), str(vmax)], color="white", fontsize=labelsize-6)  # horizontal colorbar
+          if True:
+            cax = ax.inset_axes(loc_cb_long, transform=ax.transData)
+            cb = fig.colorbar(im, cax=cax, orientation='horizontal',
+                          ticks=[vmin, vmax])
+            cb.ax.xaxis.set_tick_params(color="white")
+            cb.ax.yaxis.set_tick_params(color="white")
+            cb.outline.set_edgecolor("white")
+            cb.ax.set_xticklabels([vmin, vmax], color="white", fontsize=labelsize-4)  # horizontal colorbar
+            cb.ax.set_xticklabels([r"$0$", r"$30~\mathrm{m/s}$"], color="white", fontsize=labelsize-4)  # horizontal colorbar
+
         if (field_name == "y_velocity"):
           vmin = -1; vmax =1
           im = ax.imshow(f[field_name], origin="lower",
@@ -242,7 +251,7 @@ for iz, pos in enumerate(plane_z):
           U = f["x_velocity"]
           V = f["y_velocity"]
           stream = ax.streamplot(X, Y, U, V,
-              start_points = [(0.0001, 0.0001)],
+              start_points = [(-0.00025, 0.0001)],
                                   density=35)
           paths = stream.lines.get_paths()
           segments = stream.lines.get_segments()
@@ -310,22 +319,63 @@ for iz, pos in enumerate(plane_z):
           #           origin='lower', colors=['white'], extent=extent)
           ax.set_title(r"$Y_\mathrm{N}$", fontsize=labelsize-2, pad=3)
 
-        #if (ipy == npy-1):
-          #ax.set_xlabel(r"$x$", fontsize = labelsize)
-          #ax.set_xticks(np.array([0, 5, 10, 15, 20]))
-        #else:
-          #ax.set_xlabel([])
-          #ax.set_xticks(np.array([]))
         if (field_name == "mixture_fraction_userdef_0"):
-          vmin = -0.2; vmax = 1.2
+          vmin = -0.05; vmax = 1.05
+          im = ax.imshow(f[field_name] / f["density"], origin="lower",
+                   vmin = vmin, vmax = vmax, cmap="jet",
+                   extent=extent, aspect='equal')
+          #ax.contour(f["mixture_fraction"], levels=[0.0623],
+          #          origin='lower', colors=['white'], extent=extent)
+          ax.set_title(r"$\mathrm{Transported} \; Z_1$", fontsize=labelsize, pad=3)
+          if True:
+            cax = ax.inset_axes(loc_cb_long, transform=ax.transData)
+            cb = fig.colorbar(im, cax=cax, orientation='horizontal',
+                          ticks=[vmin, vmax])
+            cb.ax.xaxis.set_tick_params(color="black")
+            cb.ax.yaxis.set_tick_params(color="black")
+            cb.outline.set_edgecolor("black")
+            cb.ax.set_xticklabels([0.0, 1.0], color="white", fontsize=labelsize-4)  # horizontal colorbar
+            cb.ax.set_xticklabels([r"$0$", r"$1.0$"], color="white", fontsize=labelsize-4)  # horizontal colorbar
+
+
+        if (field_name == "mixture_fraction_userdef_1"):
+          vmin = -0.05; vmax = 1.05
           im = ax.imshow(f[field_name]/f["density"], origin="lower",
                    vmin = vmin, vmax = vmax, cmap="jet",
                    extent=extent, aspect='equal')
           #ax.contour(f["mixture_fraction"], levels=[0.0623],
           #          origin='lower', colors=['white'], extent=extent)
-          ax.set_title(r"$\mathrm{Transported} \; Z_1$", fontsize=labelsize-2, pad=3)
+          ax.set_title(r"$\mathrm{Transported} \; Z_2$", fontsize=labelsize-2, pad=3)
+          if True:
+            cax = ax.inset_axes(loc_cb_long, transform=ax.transData)
+            cb = fig.colorbar(im, cax=cax, orientation='horizontal',
+                          ticks=[vmin, vmax])
+            cb.ax.xaxis.set_tick_params(color="black")
+            cb.ax.yaxis.set_tick_params(color="black")
+            cb.outline.set_edgecolor("black")
+            cb.ax.set_xticklabels([0.0, 1.0], color="white", fontsize=labelsize-4)  # horizontal colorbar
+            cb.ax.set_xticklabels([r"$0$", r"$1.0$"], color="white", fontsize=labelsize-4)  # horizontal colorbar
 
         if (field_name == "age_0"):
+          vmin = -0.0; vmax = 3.2E-5
+          #im = ax.imshow(f[field_name]/f["mixture_fraction_userdef_0"], origin="lower",
+          im = ax.imshow(f[field_name]/f["mixture_fraction_userdef_0"], origin="lower",
+                   vmin = vmin, vmax = vmax, cmap="jet",
+                   extent=extent, aspect='equal')
+          #ax.contour(f["mixture_fraction"], levels=[0.0623],
+          #          origin='lower', colors=['white'], extent=extent)
+          ax.set_title(r"$\alpha_1 $", fontsize=labelsize-2, pad=3)
+          if True:
+            cax = ax.inset_axes(loc_cb_long, transform=ax.transData)
+            cb = fig.colorbar(im, cax=cax, orientation='horizontal',
+                          ticks=[vmin, vmax])
+            cb.ax.xaxis.set_tick_params(color="black")
+            cb.ax.yaxis.set_tick_params(color="black")
+            cb.outline.set_edgecolor("black")
+            cb.ax.set_xticklabels([0.0, 1.0], color="black", fontsize=labelsize-4)  # horizontal colorbar
+            cb.ax.set_xticklabels([r"$0$", r"$3.2\times 10^{-5}~\mathrm{s}$"], color="black", fontsize=labelsize-4)  # horizontal colorbar
+
+        if (field_name == "age_1"):
           vmin = -0.0; vmax = 8.0E-5
           #im = ax.imshow(f[field_name]/f["mixture_fraction_userdef_0"], origin="lower",
           im = ax.imshow(f[field_name]/f["density"], origin="lower",
@@ -333,8 +383,34 @@ for iz, pos in enumerate(plane_z):
                    extent=extent, aspect='equal')
           #ax.contour(f["mixture_fraction"], levels=[0.0623],
           #          origin='lower', colors=['white'], extent=extent)
+          ax.set_title(r"$Z_1 \alpha_2 $", fontsize=labelsize-2, pad=3)
+
+        if (field_name == "mixAge_0"):
+          vmin = -0.0; vmax = 4.0E-5
+          #im = ax.imshow(f[field_name]/f["mixture_fraction_userdef_0"], origin="lower",
+          phi = f["age_0"]
+          im = ax.imshow(phi/f["density"], origin="lower",
+                   vmin = vmin, vmax = vmax, cmap="jet",
+                   extent=extent, aspect='equal')
+          #ax.contour(f["mixture_fraction"], levels=[0.0623],
+          #          origin='lower', colors=['white'], extent=extent)
           ax.set_title(r"$Z_1 \alpha_1 $", fontsize=labelsize-2, pad=3)
 
+        if (ipy == npy-1):
+          ax.set_xlabel(r"$x~\mathrm{[mm]}$", fontsize = labelsize)
+          ax.set_xticks(np.array([0, 4E-4, 8E-4]))
+          ax.set_xticklabels([r"$0.0$", r"$0.4$", r"$0.8$"])
+        else:
+          ax.set_xticks(np.array([0, 4E-4, 8E-4]))
+          ax.set_xticklabels([r"$0.0$", r"$0.4$", r"$0.8$"])
+
+        if (ipx == 0):
+          ax.set_ylabel(r"$y~\mathrm{[mm]}$", fontsize = labelsize)
+          ax.set_yticks([-2E-4, 0, 2E-4])
+          ax.set_yticklabels([r"$-0.2$", r"$0.0$", r"$+0.2$"])
+        else:
+          ax.set_yticks([-2E-4, 0, 2E-4])
+          ax.set_yticklabels([r"$-0.2$", r"$0.0$", r"$+0.2$"])
 
     if print_mode == 1:
       plt.savefig(output_name+".png", dpi=300, bbox_inches="tight")
@@ -342,57 +418,74 @@ for iz, pos in enumerate(plane_z):
       plt.close()
     print(output_name)
 
-# %%
 from scipy.interpolate import RegularGridInterpolator
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize = (4, 3.2))
 X, Y = np.meshgrid(x1D, y1D, )
 U = f["x_velocity"]
 V = f["y_velocity"]
 vmin = 0.0; vmax = 1.0
-im = ax.imshow(f["mixture_fraction_userdef_0"]/f["density"], origin="lower",
-                   vmin = vmin, vmax = vmax, cmap="binary",
+im = ax.imshow(f["x_velocity"], origin="lower",
+                   vmin = 0.0, vmax = 30.0, cmap="Purples",
                    extent=extent, aspect='equal')
-stream = ax.streamplot(X, Y, U, V,
-            start_points = [(0.0001, 0.0000)],
+ax.set_xlabel(r"$x~\mathrm{[mm]}$", fontsize=20)
+ax.set_ylabel(r"$y~\mathrm{[mm]}$", fontsize=20)
+ax.set_xticks([0, 4E-4, 8E-4])
+ax.set_xticklabels([r"$0.0$", r"$0.4$", r"$0.8$"], fontsize = 18)
+ax.set_yticks([-2E-4, 0.0, 2E-4])
+ax.set_yticklabels([r"$-0.2$", r"$0.0$", r"$0.2$"], fontsize = 18)
+ax.set_title(r"$u_x$", fontsize = 18)
+
+ys = [0.00015, 0.00008, -0.00008, -0.00015, ]
+cs = ["red", "orange", "forestgreen", "blue", "magenta"]
+px = []
+py1 = []
+py2 = []
+for iy, yv in enumerate(ys):
+  stream = ax.streamplot(X, Y, U, V,
+            start_points = [(0.0001, yv)],
                            density=35)
 
-paths = stream.lines.get_paths()
-segments = stream.lines.get_segments()
-num_pts = len(segments)
-flow_line = np.full((num_pts, 2), np.nan)
-for i in range(num_pts):
-  flow_line[i,:] = segments[i][0,:]
-  ax.plot(flow_line[:,0], flow_line[:,1], color="magenta", linewidth=3.0)
+  paths = stream.lines.get_paths()
+  segments = stream.lines.get_segments()
+  num_pts = len(segments)
+  flow_line = np.full((num_pts, 2), np.nan)
+  for i in range(num_pts):
+    flow_line[i,:] = segments[i][0,:]
+    ax.plot(flow_line[:,0], flow_line[:,1], color=cs[iy], linewidth=2.0)
 
-interp_age = RegularGridInterpolator((y1D, x1D), f["age_0"] / f["mixture_fraction_userdef_0"], "linear")
-interp_u = RegularGridInterpolator((y1D, x1D), f["x_velocity"], "linear")
-interp_v = RegularGridInterpolator((y1D, x1D), f["y_velocity"], "linear")
+  interp_age = RegularGridInterpolator((y1D, x1D), f["age_0"] / f["mixture_fraction_userdef_0"], "linear")
+  interp_u = RegularGridInterpolator((y1D, x1D), f["x_velocity"], "linear")
+  interp_v = RegularGridInterpolator((y1D, x1D), f["y_velocity"], "linear")
 
-coords = np.stack([flow_line[:,1], flow_line[:,0]], axis=-1)
-age_1D = interp_age(coords)
-u_1D = interp_u(coords)
-v_1D = interp_v(coords)
-npt = u_1D.shape[0]
+  coords = np.stack([flow_line[:,1], flow_line[:,0]], axis=-1)
+  age_1D = interp_age(coords)
+  py1.append(age_1D)
+  u_1D = interp_u(coords)
+  v_1D = interp_v(coords)
+  npt = u_1D.shape[0]
 
-vel_1D = np.zeros_like(age_1D)
-vel_1D = np.sqrt(u_1D**2 + v_1D**2)
+  vel_1D = np.zeros_like(age_1D)
+  vel_1D = np.sqrt(u_1D**2 + v_1D**2)
 
-dx_1D = np.zeros_like(age_1D)
-dx_1D[0:-1] = np.sqrt((flow_line[1:,0] - flow_line[0:-1,0])**2 +
-            (flow_line[1:,1] - flow_line[0:-1,1])**2)
-dx_1D[-1] = 0.0
+  dx_1D = np.zeros_like(age_1D)
+  dx_1D[0:-1] = np.sqrt((flow_line[1:,0] - flow_line[0:-1,0])**2 +
+              (flow_line[1:,1] - flow_line[0:-1,1])**2)
+  dx_1D[-1] = 0.0
 
-age_1D_uv = np.zeros_like(age_1D)
-s_1D = np.zeros_like(age_1D)
-for i in range(1, npt):
-  age_1D_uv[i] = age_1D_uv[i-1] + dx_1D[i-1] / vel_1D[i-1]
-  s_1D[i] = s_1D[i-1] + dx_1D[i-1]
+  age_1D_uv = np.zeros_like(age_1D)
+  s_1D = np.zeros_like(age_1D)
+  for i in range(1, npt):
+    age_1D_uv[i] = age_1D_uv[i-1] + dx_1D[i-1] / vel_1D[i-1]
+    s_1D[i] = s_1D[i-1] + dx_1D[i-1]
+  px.append(s_1D)
+  py2.append(age_1D_uv)
 
 lw = 2.0
 fig, ax = plt.subplots(figsize=(4, 3))
-ax.plot(s_1D, age_1D, color="r", linewidth = lw, linestyle = "-",
+for ip, pv in enumerate(ys):
+  ax.plot(px[ip], py1[ip], color=cs[ip], linewidth = lw, linestyle = "-",
         label = r"$\alpha_1$")
-ax.plot(s_1D, age_1D_uv, color="b", linewidth = lw, linestyle = "--",
+  ax.plot(px[ip], py2[ip], color=cs[ip], linewidth = lw, linestyle = "--",
         label = r"$\int 1/|u| \mathrm{d}s$")
 labelsize = 16
 ax.set_xlabel(r"$\mathrm{Stream\; coordinate} \; s \; [m]$", fontsize = labelsize)
@@ -400,8 +493,8 @@ ax.set_ylabel(r"$\tau \; [s]$", fontsize = labelsize)
 ax.tick_params(axis='both', which='major', labelsize=labelsize)
 ax.tick_params(axis='both', which='minor', labelsize=labelsize)
 ax.set_xlim([0, 9E-4])
-ax.set_ylim([0, 9E-5])
-ax.legend(fontsize = labelsize)
+ax.set_ylim([0, 3E-5])
+#ax.legend(fontsize = labelsize)
 
 
 # %%

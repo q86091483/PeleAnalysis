@@ -4,7 +4,9 @@ import os
 from pathlib import Path
 os.environ['MPLCONFIGDIR'] = "./tmp"
 import numpy as np
+import matplotlib
 import matplotlib as mpl
+from matplotlib import rc
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 from scipy.interpolate import RegularGridInterpolator
@@ -17,18 +19,54 @@ Re_j   = 4913
 njet   = 2
 P      = 10.0 * ct.one_atm
 D_j    = 5.0E-4; A_j = 0.25 * np.pi * D_j * D_j
-intv   = 3.0; 
-Lx     = 26 * D_j;          
-Ly     = (2*intv+2) * D_j; 
-Lz     = 12 * D_j; 
+intv   = 3.0;
+Lx     = 26 * D_j;
+Ly     = (2*intv+2) * D_j;
+Lz     = 12 * D_j;
 A_c    = Ly * Lz
 T_j    = 300.;
 T_c    = 750.;
-X_j    = {}; X_j["H2"] = 1.0; X_j["N2"] = 1 - X_j["H2"] 
+X_j    = {}; X_j["H2"] = 1.0; X_j["N2"] = 1 - X_j["H2"]
 X_c    = {}; X_c["O2"] = 0.21; X_c["N2"] = 0.79
-mech   = "Wen30/chem.yaml"; 
+mech   = "Wen30/chem.yaml";
 freq   = 1000
 
+#%%
+if (True):
+  matplotlib.rcParams['mathtext.fontset'] = 'custom'
+  matplotlib.rcParams['mathtext.rm'] = 'Bitstream Vera Sans'
+  matplotlib.rcParams['mathtext.it'] = 'Bitstream Vera Sans:italic'
+  matplotlib.rcParams['mathtext.bf'] = 'Bitstream Vera Sans:bold'
+  matplotlib.rcParams['mathtext.fontset'] = 'stix'
+  matplotlib.rcParams['font.family'] = 'STIXGeneral'
+  Tc = 1750.
+  dT = 5.
+  Ts = np.linspace(300, 3000, 2700)
+  thd = 0.5 * (1 + np.tanh((Ts - Tc) / dT))
+  fig, ax = plt.subplots(figsize = (4.5, 4))
+  ax.plot(Ts, thd, "b", linewidth = 2.5)
+  ax.set_xlabel(r"$T~\mathrm{[K]}$", fontsize = 24, color = "black")
+  ax.set_xlim([1400, 2100])
+  ax.set_ylim([-0.0, 1.02])
+  ax.set_ylabel(r"$\dot{\omega}_{\alpha}(T)$", fontsize = 24, color = "blue")
+  ax.tick_params(axis='both', which='major', labelsize=22, )
+  ax.tick_params(axis='both', which='minor', labelsize=22, )
+  ax.tick_params(axis='y', colors = "blue")
+  ax.grid()
+
+  ax2 = ax.twinx()
+  xder = (Ts - Tc) / dT
+  deriv = 0.5 * (1 - np.tanh(xder)**2) / dT
+  ax2.plot(Ts, deriv, "r--", linewidth = 2.5)
+  ax2.set_ylabel(r"$\partial \dot{\omega}_{\alpha} / \partial T~\mathrm{[1/K]}$", fontsize = 24, color = "red")
+  ax2.tick_params(axis='both', which='major', labelsize=22)
+  ax2.tick_params(axis='both', which='minor', labelsize=22)
+  ax2.set_ylim([0, 0.2])
+  ax2.set_yticks([0, 0.1, 0.2])
+  ax2.tick_params(axis='y', colors = "red")
+  plt.savefig("./fT.png", bbox_inches="tight", dpi=400)
+
+#%%
 if (True):
   nb = 16
   ny = 32; d0 = Ly / ny;
@@ -45,7 +83,7 @@ if (True):
 #%%
 gas_j = ct.Solution(mech)
 gas_c = ct.Solution(mech)
-spn_out = gas_j.species_names 
+spn_out = gas_j.species_names
 
 id_H2 = gas_j.species_index("H2")
 id_O2 = gas_j.species_index("O2")
@@ -103,7 +141,7 @@ gas_s = ct.Solution(mech)
 res0D = []
 ncol = 4 + len(spn_out)
 nrow = nzbin
-res_pmf = np.zeros((nrow, ncol)) 
+res_pmf = np.zeros((nrow, ncol))
 for iz in range(0, nzbin):
   zs = zbins[iz]
   Ys = zs*gas_j.Y + (1-zs)*gas_c.Y
@@ -175,13 +213,13 @@ theta_mix = m_j / (m_j + m_c)
 theta_c1 = 1 - 0.2 * np.power(xc/H, 2)
 theta_c2 = theta_mix + (1-theta_mix) * np.power(0.6 / (xc/H), 0.5)
 theta_c = theta_c1
-indx = (xc/H > 1.0); 
+indx = (xc/H > 1.0);
 theta_c[indx] = (theta_c2[indx] + theta_c1[indx])/2.
 
 cn = 0.2 * np.power(xc/H, -0.6) * np.exp(4.0 * np.power(xc/H, 2))
 rcn = 1 - np.exp(-cn)
 
-cp = 0.5 * np.power(xc/H, 1.0) #4. 
+cp = 0.5 * np.power(xc/H, 1.0) #4.
 rcp = 1 - np.exp(-cp)
 
 mf_j = 1.0
@@ -194,7 +232,7 @@ for ix in range(0, Nx):
     if ix < ix0:
       theta_norm[ix,iy,iz] = 0.0
       continue
-    zdis = z_[iz] - zc[ic] 
+    zdis = z_[iz] - zc[ic]
     if zdis > 0:
       bot = -np.log(2)*zdis**2
       bot = bot / (wp[ic]+1E-30)**2
@@ -215,7 +253,7 @@ for ix in range(0, Nx):
     ibin = int(mf[ix,iy,iz]/dZ)
     ibin = np.amax((0,ibin))
     ibin = np.amin((nzbin-2,ibin))
-    z0 = ibin*dZ; r0 = mf[ix,iy,iz] - z0 
+    z0 = ibin*dZ; r0 = mf[ix,iy,iz] - z0
     temp[ix,iy,iz] = res0D[ibin]*(1-r0) + res0D[ibin+1]*r0
 for iy in range(1, Ny):
   mf[:,iy,:] = mf[:,0,:]
@@ -225,14 +263,14 @@ phi2D = temp[:,Ny-1,:]
 vmin=0.; vmax=0.25
 vmin=400; vmax=2700
 #im = ax.imshow(phi2D.transpose(), extent=[xmin, xmax, zmin, zmax], origin="lower",
-#         vmin = vmin, vmax = vmax, 
-#          cmap=cm.viridis) 
+#         vmin = vmin, vmax = vmax,
+#          cmap=cm.viridis)
 #ctrz = ax.contourf(mf[:,5,:].transpose(), extent=[xmin, xmax, zmin, zmax], origin="lower",
 #          vmin=vmin, vmax=vmax, levels=np.linspace(vmin,vmax,20),
-#          cmap=cm.viridis) 
+#          cmap=cm.viridis)
 ctr = ax.imshow(phi2D.transpose(), extent=[xmin, xmax, zmin, zmax], origin="lower",
           vmin=vmin, vmax=vmax, #levels=np.linspace(vmin,vmax,20),
-          cmap=cm.viridis, aspect="equal") 
+          cmap=cm.viridis, aspect="equal")
 #ax.contour(ctrz, levels=[zst], colors='r')
 ax3 = ax2.twinx()
 ax3.plot(xc, theta_c, "orange")

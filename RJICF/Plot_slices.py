@@ -21,20 +21,22 @@ matplotlib.rcParams['font.family'] = 'STIXGeneral'
 fn = "/scratch/b/bsavard/zisen347/scopingRuns/NUIG_Re4000_2J6_4atm/Level_3/plt_11000"
 #fn = "/scratch/b/bsavard/zisen347/scopingRuns/Debug_cases/MicroMix_cfl/plt_11000"
 
+fn = "/scratch/b/bsavard/zisen347/scopingRuns/exascale/MicroMix/plt_00200"
+
 
 ds = yt.load(fn) # unit_system="cgs")
 zst = 0.0252
 #%%
 xmin = -15.75E-4; xmax = 112.25E-4
 #xmin = -7.5E-4; xmax = 1.325E-2
-ymin = -1.8E-3; ymax = 1.8E-3
+ymin = -2.0E-3; ymax = 2.0E-3
 zmin = -0.0E-3; zmax = 5.6E-3
-Lx = xmax - xmin; nx0 = 256
-Ly = ymax - ymin; ny0 = 72
-Lz = zmax - zmin; nz0 = 112
+Lx = xmax - xmin; nx0 = 128
+Ly = ymax - ymin; ny0 = 40
+Lz = zmax - zmin; nz0 = 56
 
 # Normalized parameters
-tau_flow = Ly / 20. 
+tau_flow = Ly / 20.
 
 finest_level = 2;
 res_x=nx0 * 2**finest_level
@@ -60,7 +62,7 @@ slc = ds.slice(dir, coord=loc, center=(xmin+0.5*Lx, loc, zmin+0.5*Lz), )
 frb = slc.to_frb(width=((Lz, "cm"),(Lx, "cm")), resolution=res_xz)
 arr_mf = np.array(frb["mixture_fraction"])
 fig, ax = plt.subplots()
-im = ax.imshow(arr_mf.transpose(), 
+im = ax.imshow(arr_mf.transpose(),
               origin="lower", cmap="viridis", extent=[xmin, xmax, zmin, zmax],
               vmin=vmin, vmax=vmax)
 ctr = ax.contour(arr_mf.transpose(), levels=[zst] ,origin='lower', colors=['white'], extent=[xmin, xmax, zmin, zmax])
@@ -94,7 +96,7 @@ frb = slc.to_frb(width=((Lz, "cm"),(Lx, "cm")), resolution=res_xz)
 arr_temp = np.array(frb[fn])
 arr_mf = np.array(frb["mixture_fraction"])
 fig, ax = plt.subplots()
-im = ax.imshow(arr_temp.transpose(), 
+im = ax.imshow(arr_temp.transpose(),
               origin="lower", cmap="jet", extent=[xmin, xmax, zmin, zmax],
               vmin=vmin, vmax=vmax)
 #ctr = ax.contour(arr_mf.transpose(), levels=[zst] ,origin='lower', colors=['white'], extent=[xmin, xmax, zmin, zmax])
@@ -110,7 +112,7 @@ slc = ds.slice(dir, coord=loc, center=(xmin+0.5*Lx, loc, zmin+0.5*Lz), )
 frb = slc.to_frb(width=((Lz, "cm"),(Lx, "cm")), resolution=res_xz)
 arr_temp = np.array(frb[fn])
 fig, ax = plt.subplots()
-im = ax.imshow(arr_temp.transpose(), 
+im = ax.imshow(arr_temp.transpose(),
               origin="lower", cmap="viridis", extent=[xmin, xmax, zmin, zmax],
               vmin=vmin, vmax=vmax)
 #ctr = ax.contour(arr_mf.transpose(), levels=[zst] ,origin='lower', colors=['white'], extent=[xmin, xmax, zmin, zmax])
@@ -157,8 +159,8 @@ plt.savefig(fn+"_"+dir+".png", dpi=300, bbox_inches="tight")
 #%%
 #fig = plt.figure()
 fn  = "mag_vort"
-spl = yt.SlicePlot(ds, "y", 
-             [(fn)], 
+spl = yt.SlicePlot(ds, "y",
+             [(fn)],
              origin='native',
              center=(xmin+0.5*Lx, loc,zmin+0.5*Lz), width=((Lz, "cm"),(Lx, "cm")), )
 spl.set_log((fn), False)
@@ -172,8 +174,8 @@ spl.save()
 
 #%%
 fn  = "HeatRelease"
-spl = yt.SlicePlot(ds, "y", 
-             [(fn)], 
+spl = yt.SlicePlot(ds, "y",
+             [(fn)],
              origin='native',
              center=(xmin+0.5*Lx, loc,zmin+0.5*Lz), width=((Lz, "cm"),(Lx, "cm")), )
 spl.set_log((fn), False)
@@ -187,8 +189,8 @@ spl.save()
 
 #%%
 fn  = "z_velocity"
-spl = yt.SlicePlot(ds, "y", 
-             [(fn)], 
+spl = yt.SlicePlot(ds, "y",
+             [(fn)],
              origin='native',
              center=(xmin+0.5*Lx, loc,zmin+0.5*Lz), width=((Lz, "cm"),(Lx, "cm")), )
 spl.set_log((fn), False)
@@ -251,7 +253,7 @@ slc = ds.slice(dir, coord=loc, center=(xmin+0.5*Lx, ymin+0.5*Ly, loc), )
 frb = slc.to_frb(width=((Lx, "cm"),(Ly, "cm")), resolution=res_xy)
 arr_temp = np.array(frb[fn])
 fig, ax = plt.subplots()
-im = ax.imshow(arr_temp.transpose(), origin="lower", cmap="hot", 
+im = ax.imshow(arr_temp.transpose(), origin="lower", cmap="hot",
                vmin=vmin, vmax=vmax,
                extent=[ymin, ymax, xmin, xmax])
 arr_mf = np.array(frb[fn])
@@ -266,15 +268,15 @@ height = 0*lref
 fn = "Y(H2)"; dir = "z"; loc = height
 vmin = 0.0; vmax = 1.0
 palette = copy(plt.get_cmap('jet_r'))
-palette.set_over('white', 0.0) 
+palette.set_over('white', 0.0)
 slc = ds.slice(dir, coord=loc, center=(xmin+0.5*Lx, ymin+0.5*Ly, loc), )
 frb = slc.to_frb(width=((Lx, "cm"),(Ly, "cm")), resolution=res_xy)
 arr_temp = np.array(frb[fn])
 fig, ax = plt.subplots()
 im = ax.imshow(arr_temp.transpose(), origin="lower", cmap="viridis", extent=[ymin, ymax, xmin, xmax],
                vmin = vmin, vmax = vmax)
-#ax.add_patch(plt.Circle((1*lref, 0.0), lref, color='b', fill=False, linestyle="--"))              
-#ax.add_patch(plt.Circle((1*lref, 0.0), lref, color='b', fill=False, linestyle="--"))              
+#ax.add_patch(plt.Circle((1*lref, 0.0), lref, color='b', fill=False, linestyle="--"))
+#ax.add_patch(plt.Circle((1*lref, 0.0), lref, color='b', fill=False, linestyle="--"))
 arr_mf = np.array(frb[fn])
 #ctr = ax.contour(arr_mf.transpose(), levels=[zst] ,origin='lower', colors=['white'], extent=[ymin, ymax, xmin, xmax])
 divider = make_axes_locatable(ax)

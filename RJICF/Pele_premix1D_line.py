@@ -21,12 +21,12 @@ plt_folder = "/scratch/b/bsavard/zisen347/scopingRuns/conv2D"
 case_name = "conv2D"
 lref = 1.0
 # Patterns of plotfiles to be processed
-plt_pattern = "plt_01000*"
+plt_pattern = "plt_00200*"
 plane_x = np.array([])
 plane_y = np.array([0.0]) * lref
 plane_z = np.array([]) * lref
 # Patterns of npz files to be plotted
-plot_pattern = "plt_01000*"
+plot_pattern = "plt_00200*"
 plot_plane_x = np.array([])
 plot_plane_y = np.array([0.0]) * lref
 plot_plane_z = np.array([]) * lref
