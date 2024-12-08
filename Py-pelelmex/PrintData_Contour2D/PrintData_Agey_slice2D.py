@@ -9,13 +9,13 @@ import glob
 import numpy as np
 
 import cantera as ct
-gas_mix = ct.Solution("/scratch/b/bsavard/zisen347/PeleAnalysis/Py-pelelmex/Input/BurkeH2/chem.yaml")
+gas_mix = ct.Solution("/scratch/b/bsavard/zisen347/PeleAnalysis/Py-pelelmex/Input/nuig_H2_4atm/chem.yaml")
 
 # Input
 # Where plt files are stored
-plt_folder = "/scratch/b/bsavard/zisen347/scopingRuns/conv3D"
+plt_folder = "/scratch/b/bsavard/zisen347/scopingRuns/MicroMix_age"
 # Case name
-case_name = "conv3D"
+case_name = "MicroMix_age"
 # Patterns of plotfiles to be processed
 plt_pattern = "plt_0*"
 # Planes to be extracted

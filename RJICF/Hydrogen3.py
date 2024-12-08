@@ -26,7 +26,7 @@ T_j    = 300.;
 T_c    = 750.;
 X_j    = {}; X_j["H2"] = 1.0; X_j["N2"] = 1 - X_j["H2"]
 X_c    = {}; X_c["O2"] = 0.21; X_c["N2"] = 0.79
-mech   = "BurkeH2/chem.yaml";
+mech   = "/scratch/b/bsavard/zisen347/PeleAnalysis/Py-pelelmex/Input/BurkeH2/chem.yaml";
 freq   = 1000
 
 if (True):

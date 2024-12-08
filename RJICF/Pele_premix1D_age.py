@@ -16,12 +16,12 @@ gas_mix = ct.Solution("/scratch/b/bsavard/zisen347/PeleAnalysis/RJICF/BurkeH2/ch
 
 # Input
 # Where plt files are stored
-plt_folder = "/scratch/b/bsavard/zisen347/scopingRuns/conv3D"
+plt_folder = "/scratch/b/bsavard/zisen347/scopingRuns/conv2D"
 # Case name
-case_name = "conv3D"
+case_name = "conv2D"
 lref = 1.0
 # Patterns of plotfiles to be processed
-plt_pattern = "plt_1*"
+plt_pattern = "plt_02000*"
 plane_x = np.array([])
 plane_y = np.array([]) * lref
 plane_z = np.array([0.0]) * lref

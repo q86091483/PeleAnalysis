@@ -13,13 +13,13 @@ from amr_kitchen import HeaderData
 
 # Input
 # Case name
-case_name = "conv3D"
+case_name = "MicroMix_age"
 # Patterns of plotfiles to be processed
-plt_pattern = "plt_1*"
+plt_pattern = "plt_*"
 str_plane = "HRR_T_y=-1.000E-03"
-mov_name = "Level1_AGEPV"
+mov_name = "workshop"
 zst = 0.0252
-Djet = 5.0E-4
+Djet = 4.5E-4
 # Output data folder
 fig_dir = "/scratch/b/bsavard/zisen347/PeleAnalysis/Py-pelelmex/Figure"
 fig_dir = "/scratch/b/bsavard/zisen347/PeleAnalysis/Figure"

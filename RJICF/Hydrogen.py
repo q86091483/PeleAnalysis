@@ -39,14 +39,14 @@ if (True):
   matplotlib.rcParams['mathtext.bf'] = 'Bitstream Vera Sans:bold'
   matplotlib.rcParams['mathtext.fontset'] = 'stix'
   matplotlib.rcParams['font.family'] = 'STIXGeneral'
-  Tc = 1750.
+  Tc = 1850.
   dT = 5.
   Ts = np.linspace(300, 3000, 2700)
   thd = 0.5 * (1 + np.tanh((Ts - Tc) / dT))
   fig, ax = plt.subplots(figsize = (4.5, 4))
   ax.plot(Ts, thd, "b", linewidth = 2.5)
   ax.set_xlabel(r"$T~\mathrm{[K]}$", fontsize = 24, color = "black")
-  ax.set_xlim([1400, 2100])
+  ax.set_xlim([1600, 2100])
   ax.set_ylim([-0.0, 1.02])
   ax.set_ylabel(r"$\dot{\omega}_{\alpha}(T)$", fontsize = 24, color = "blue")
   ax.tick_params(axis='both', which='major', labelsize=22, )

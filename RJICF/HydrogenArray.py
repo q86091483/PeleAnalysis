@@ -16,6 +16,7 @@ import pandas as pd
 do_things = ["Lz_J", "do_laminar1D"]
 do_things = []
 mech = "nuig_H2"
+#mech = "/scratch/b/bsavard/zisen347/PeleAnalysis/Py-pelelmex/Input/BurkeH2"
 
 #if (False):
 #  fig, ax = plt.subplots()
@@ -31,20 +32,21 @@ mech = "nuig_H2"
 # 0. Initialize parameter ---------------------------------------
 def get_param_base():
   param_base = {}
-  param_base["Re_j"]   = 4913
+  param_base["Re_j"]   = 8000
   param_base["njet"]   = 2
-  param_base["P"]      = 10.0 * ct.one_atm 
-  param_base["D_j"]    = 5.0E-4
+  param_base["P"]      = 4.0 * ct.one_atm
+  param_base["D_j"]    = 6E-4
   param_base["J"]      = 6.634717274460312
   param_base["equiv"]  = 0.6
   param_base["intv"]   = 3.0
   param_base["T_j"]    = 300.
   param_base["T_c"]    = 750.
-  X_j = {}; X_j["H2"] = 1.0; X_j["N2"] = 1 - X_j["H2"] 
+  X_j = {}; X_j["H2"] = 1.0; X_j["N2"] = 1 - X_j["H2"]
   X_c = {}; X_c["O2"] = 0.21; X_c["N2"] = 0.79
   param_base["X_j"]    = X_j
   param_base["X_c"]    = X_c
   param_base["mech"]   = mech + "/chem.yaml"
+  param_base["mech"] = "/scratch/b/bsavard/zisen347/PeleAnalysis/Py-pelelmex/Input/nuig_H2_4atm/chem.yaml"
   return param_base
 #%%
 
@@ -82,7 +84,7 @@ def get_param_derived(param):
   U_c = np.sqrt(1/param["J"]) * np.sqrt(rho_j/rho_c) * U_j
   m_c = m_j * (gas_mix.Y[id_O2] + gas_mix.Y[id_N2])/ gas_mix.Y[id_H2]
   A = m_c / U_c / rho_c
-  Ly  = (2*param["intv"]+2) * param["D_j"] 
+  Ly  = (2*param["intv"]+2) * param["D_j"]
   Lz = A / Ly
   ufix = (m_j + m_c) / (gas_mix.density * A)
   #print(gas_mix.density, gas_j.density, gas_c.density)
@@ -151,7 +153,7 @@ def get_ngrid(lev, nx0, ny0, nz0, r):
   return n
 #%%
 def get_flame_name(Patm, Tj, Tc, z):
-  str1 = "laminar1D_HydrogenArray/" + mech + "/P=" + "%i" % Patm
+  str1 = "/scratch/b/bsavard/zisen347/PeleAnalysis/RJICF/laminar1D_HydrogenArray/" + mech + "/P=" + "%i" % Patm
   str1 = str1 + "_Tj=" + "%i" % Tj
   str1 = str1 + "_Tc=" + "%i" % Tc
   str1 = str1 + "_Z=" + "%.4f" % z
@@ -168,7 +170,7 @@ if "do_laminar1D" in do_things:
 if do_laminar1D:
   for iP, Patm in enumerate(Patms):
     for m, Tj in enumerate(Tjs):
-      for n, Tc in enumerate(Tcs): 
+      for n, Tc in enumerate(Tcs):
         for k, Z in enumerate(Zs):
           param_base = get_param_base()
           param_base["P"] = Patm * ct.one_atm
@@ -204,9 +206,9 @@ if do_laminar1D:
           #print(fn)
 #%% Parameters for computation cost
 cost_per_cell_step = 3.0E-7
-rs = np.array([np.mean([1.0]), 
-              np.mean([1.0]), 
-              np.mean([0.8]), 
+rs = np.array([np.mean([1.0]),
+              np.mean([1.0]),
+              np.mean([0.8]),
               np.mean([0.4]),
               np.mean([0.2])  ])
 def get_ncell_lev(lev, nx0, ny0, nz0, r):
@@ -226,8 +228,8 @@ Tj = 300
 Tc = 750
 Z = 0.0252
 Patms = [3, 4, 5, 6, 8, 10]
-Reys = [4000, 4500, 4750]
-D_js = [4.5E-4, 5E-4]
+Reys = [4000, 6000, 8000]
+D_js = [4.5E-4, 8E-4]
 ngrid_per_Dj = 5*9/10 # grids for 1 jet diameter
 eta=9E-6
 
@@ -302,7 +304,7 @@ if do_plot_all:
       nnu4[iR].append([])
       for iP, Patm in enumerate(Patms):
         # laminar 1D flame
-        fn = get_flame_name(Patm, Tj, Tc, Z) 
+        fn = get_flame_name(Patm, Tj, Tc, Z)
         f = pd.read_csv(fn)
         T = f["T"].values
         x = f["grid"].values
@@ -323,11 +325,12 @@ if do_plot_all:
         param_derived = get_param_derived(param_base)
         nu_js[iR][iD].append(param_derived["nu_j"])
         U_js[iR][iD].append(param_derived["U_j"])
+        print(U_js[iR][iD])
         U_cs[iR][iD].append(param_derived["U_c"])
         Ma_js[iR][iD].append(param_derived["Ma_j"])
         Ma_cs[iR][iD].append(param_derived["Ma_c"])
         #print(Patm, Re, param_derived["U_j"])
-        # Base level mesh size 
+        # Base level mesh size
         dx0 = param_derived["D_j"] / ngrid_per_Dj
         ngs3[iR][iD].append(lf / (dx0/8))
         ngs4[iR][iD].append(lf / (dx0/16))
@@ -367,7 +370,7 @@ if do_plot_all:
         delta_nu[iR][iD].append(param_derived["delta_nu"])
         nnu4[iR][iD].append(param_derived["delta_nu"]/(dx0/16))
 #%%
-field_names = [["lf", "sl", "U_j", "Ma_j", "U_c"], 
+field_names = [["lf", "sl", "U_j", "Ma_j", "U_c"],
                ["ngs", "Lzs", "dts", "Nts", "ncell"],
                ["cost", "neta", "nnu", "ufix", "delta_nu"]]
 npy = len(field_names)
@@ -488,5 +491,5 @@ plt.savefig("params.png", dpi=300, bbox_inches="tight")
 #%%
 
 
-      
+
 

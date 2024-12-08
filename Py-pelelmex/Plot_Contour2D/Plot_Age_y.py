@@ -17,21 +17,21 @@ import imageio
 # Where original plot files are stored
 str_plane = "HRR_T_y=-1.000E-03"
 data_folder = ("/scratch/b/bsavard/zisen347/PeleAnalysis/"
-              "Data_age/Slice2D_plt_lev0/conv3D/" + str_plane)
+              "Data_age/Slice2D_plt_lev0/MicroMix_age/" + str_plane)
 str_plane = "HRR_T_y=-1.000E-03"
 der_folder = ("/scratch/b/bsavard/zisen347/PeleAnalysis/"
-              "Data_age/Slice2D_plt_lev0/conv3D/" + str_plane)
+              "Data_age/Slice2D_plt_lev0/MicroMix_age/" + str_plane)
 tfine = 5.960E-4
 eps_age = 1E-6
 # Case name
-case_name = "conv3D"
+case_name = "MicroMix_age"
 plane_info = r"$\mathrm{Centre\; plane}$"
 # Patterns of plotfiles to be processed
-data_pattern = "plt_1*"
+data_pattern = "plt_08*"
 # Field_names
-field_names = [["mixture_fraction", "mixture_fraction_userdef_0", "temp", "x_velocity"],
-              ["age_0", "age_1", "mixAge_0", "mixAge_1"],
-              ["agepv_0", "agepv_1", "mixAgepv_0", "mixAgepv_1"]]
+field_names = [["temp", "Y(NO)", ],
+              ["age_0", "age_1", ],
+              ["agepv_0", "agepv_1", ]]
 #field_names = [["mixture_fraction", "temp"],["x_velocity", "y_velocity"]]
 # Output data folder
 fig_dir = os.path.abspath("/scratch/b/bsavard/zisen347/PeleAnalysis/Figure")
@@ -39,7 +39,7 @@ fig_slice_dir = os.path.join(fig_dir, "Slice2D_age_lev0")
 # if print on screen or write to file
 print_mode = 1
 # Micromix case parameter
-zst = 0.001
+zst = 0.0252
 Djet = 4.5E-4
 # Get plot file names
 fnn = os.path.join(data_folder, data_pattern)
@@ -174,10 +174,10 @@ for i, ifn in enumerate(range(0, nfns)):
         im = ax.imshow(f[field_name], origin="lower",
                   vmin = vmin, vmax = vmax, cmap="jet",
                   extent=extent, aspect='equal')
-        #ax.contour(mixf, levels=[1E-3],
-        #           origin='lower', colors=['white'], extent=extent)
-        ax.contour(temperature, levels=[1750],
-                   origin='lower', colors=['magenta'], extent=extent)
+        ax.contour(mixf, levels=[2.52E-2],
+                   origin='lower', colors=['white'], extent=extent)
+        #ax.contour(temperature, levels=[1750],
+        #           origin='lower', colors=['magenta'], extent=extent)
         ax.set_title(r"$T~\mathrm{[K]}$", fontsize=labelsize-2, pad=3)
         ax.text(x=12.0, y=11.0, s=r"$t="+("%.3f"%(time*1000))+"\mathrm{[ms]}$", c="black")
 
@@ -277,7 +277,7 @@ for i, ifn in enumerate(range(0, nfns)):
         cb.ax.set_xticklabels([str(vmin), str(vmax)], color="black", fontsize=labelsize-6)  # horizontal colorbar
 
       if (field_name == "Y(NO)"):
-        vmin = 0.0; vmax = 1E-4
+        vmin = 0.0; vmax = 1.5E-4
         im = ax.imshow(f[field_name], origin="lower",
                   vmin = vmin, vmax = vmax, cmap="jet",
                   extent=extent, aspect='equal')
@@ -405,7 +405,7 @@ for i, ifn in enumerate(range(0, nfns)):
         cb.ax.set_xticklabels([str(vmin), "%.1E"%vmax], color="white", fontsize=labelsize-6)  # horizontal colorbar
 
       if (field_name == "age_0"):
-        vmin = 0; vmax = 4.0E-4
+        vmin = 0; vmax = 3.0E-4
         rhoMixf = fder["mixture_fraction_userdef_0"] + np.amax(fder["mixture_fraction_userdef_0"]) * eps_age
         mixf = fder["mixture_fraction_userdef_0"] / fder["density"]
         im = ax.imshow(fder[field_name] / rhoMixf, origin="lower",
@@ -413,8 +413,8 @@ for i, ifn in enumerate(range(0, nfns)):
                   extent=extent, aspect='equal')
         #ax.contour(mixf, levels=[1-0.0623],
         #           origin='lower', colors=['white'], extent=extent)
-        ax.contour(temperature, levels=[1750],
-                   origin='lower', colors=['magenta'], extent=extent)
+        #ax.contour(temperature, levels=[1750],
+        #           origin='lower', colors=['magenta'], extent=extent)
         ax.set_title(r"$\alpha_\mathrm{jet}$", fontsize=labelsize-2, pad=3)
 
         cax = ax.inset_axes(loc_cb, transform=ax.transData)
@@ -424,8 +424,9 @@ for i, ifn in enumerate(range(0, nfns)):
         cb.ax.yaxis.set_tick_params(color="white")
         cb.outline.set_edgecolor("white")
         cb.ax.set_xticklabels([str(vmin), "%.1E"%vmax], color="white", fontsize=labelsize-6)  # horizontal colorbar
+
       if (field_name == "age_1"):
-        vmin = 0; vmax = 4.0E-4
+        vmin = 0; vmax = 3.0E-4
         rhoMixf = fder["mixture_fraction_userdef_1"] + np.amax(fder["mixture_fraction_userdef_1"]) * eps_age
         mixf = fder["mixture_fraction_userdef_1"] / fder["density"]
         im = ax.imshow(fder[field_name] / rhoMixf, origin="lower",
@@ -434,8 +435,8 @@ for i, ifn in enumerate(range(0, nfns)):
 
         #ax.contour(mixf, levels=[zst],
         #           origin='lower', colors=['white'], extent=extent)
-        ax.contour(temperature, levels=[1750],
-                   origin='lower', colors=['magenta'], extent=extent)
+        #ax.contour(temperature, levels=[1750],
+        #           origin='lower', colors=['magenta'], extent=extent)
         ax.set_title(r"$\alpha_\mathrm{air}$", fontsize=labelsize-2, pad=3)
 
         cax = ax.inset_axes(loc_cb, transform=ax.transData)
@@ -453,10 +454,10 @@ for i, ifn in enumerate(range(0, nfns)):
         im = ax.imshow(fder[field_name] / rhoMixf, origin="lower",
                   vmin = vmin, vmax = vmax, cmap="jet",
                   extent=extent, aspect='equal')
-        ax.contour(mixf, levels=[zst],
-                   origin='lower', colors=['white'], extent=extent)
-        ax.contour(temperature, levels=[1750],
-                   origin='lower', colors=['magenta'], extent=extent)
+        #ax.contour(mixf, levels=[zst],
+        #           origin='lower', colors=['white'], extent=extent)
+        #ax.contour(temperature, levels=[1750],
+        #           origin='lower', colors=['magenta'], extent=extent)
         ax.set_title(r"$\alpha_\mathrm{p,jet}$", fontsize=labelsize-2, pad=3)
 
         cax = ax.inset_axes(loc_cb, transform=ax.transData)
@@ -474,10 +475,10 @@ for i, ifn in enumerate(range(0, nfns)):
         im = ax.imshow(fder[field_name] / rhoMixf, origin="lower",
                   vmin = vmin, vmax = vmax, cmap="jet",
                   extent=extent, aspect='equal')
-        ax.contour(mixf, levels=[zst],
-                   origin='lower', colors=['white'], extent=extent)
-        ax.contour(temperature, levels=[1750],
-                   origin='lower', colors=['magenta'], extent=extent)
+        #ax.contour(mixf, levels=[zst],
+        #           origin='lower', colors=['white'], extent=extent)
+        #ax.contour(temperature, levels=[1750],
+        #           origin='lower', colors=['magenta'], extent=extent)
         ax.set_title(r"$\alpha_\mathrm{p,air}$", fontsize=labelsize-2, pad=3)
 
         cax = ax.inset_axes(loc_cb, transform=ax.transData)

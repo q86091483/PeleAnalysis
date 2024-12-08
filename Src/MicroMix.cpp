@@ -17,6 +17,11 @@
 
 using namespace amrex;
 
+#define NUMMIXF 2
+#define NUMAGE 2
+#define NUMAGEPV 2
+#define NUMAUX (NUMMIXF + NUMAGE + NUMAGEPV)
+
 // Set write precision
 #ifdef BL_USE_DOUBLE
 #    define H5T_REAL H5::PredType::NATIVE_DOUBLE
@@ -397,6 +402,20 @@ int main (int argc, char* argv[])
   inNames.emplace_back(fn); nCompIn = inNames.size(); mi[fn] = nCompIn - 1; const int IV = mi[fn];
   fn = "z_velocity";
   inNames.emplace_back(fn); nCompIn = inNames.size(); mi[fn] = nCompIn - 1; const int IW = mi[fn];
+#if (NUMAUX > 0)
+  fn = "mixture_fraction_userdef_0";
+  inNames.emplace_back(fn); nCompIn = inNames.size(); mi[fn] = nCompIn - 1; const int IMIXF0 = mi[fn];
+  fn = "mixture_fraction_userdef_1";
+  inNames.emplace_back(fn); nCompIn = inNames.size(); mi[fn] = nCompIn - 1; const int IMIXF1 = mi[fn];
+  fn = "age_0";
+  inNames.emplace_back(fn); nCompIn = inNames.size(); mi[fn] = nCompIn - 1; const int IAGE0 = mi[fn];
+  fn = "age_1";
+  inNames.emplace_back(fn); nCompIn = inNames.size(); mi[fn] = nCompIn - 1; const int IAGE1 = mi[fn];
+  fn = "agepv_0";
+  inNames.emplace_back(fn); nCompIn = inNames.size(); mi[fn] = nCompIn - 1; const int IAGEPV0 = mi[fn];
+  fn = "agepv_1";
+  inNames.emplace_back(fn); nCompIn = inNames.size(); mi[fn] = nCompIn - 1; const int IAGEPV1 = mi[fn];
+#endif
 
   for (int i = 0; i < nCompIn; i++) {
     destFillComps.emplace_back(i);
@@ -437,6 +456,11 @@ int main (int argc, char* argv[])
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
   fn = "zone";
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
+#if (NUMAUX > 0)
+  fn = "agepv_1";
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
+#endif
+
 
   // List of fields to be conditioned upon (X of <Y|X>)
   const int nVars(pp.countval("vars"));
@@ -545,14 +569,17 @@ int main (int argc, char* argv[])
     fn = "wdot2(" + spec_names[isp] + ")"; avgVarNames.emplace_back(fn);
     mav[fn] = avgVarNames.size() - 1;
   }
-
-
   fn = "rhorr(NO)";
   avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1;
   fn = "rhorr(N2O)";
   avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1;
   fn = "rhorr(NNH)";
   avgVarNames.emplace_back(fn); mav[fn] = avgVarNames.size() - 1;
+#if (NUMAUX > 0)
+  // Residence times
+	fn = "agepv_1"; avgVarNames.emplace_back(fn);
+  int ID_agepv1 = avgVarNames.size()-1; mav[fn] = avgVarNames.size()-1;
+#endif
 
   nAvgVars = avgVarNames.size();
   for (int i = 0; i < nAvgVars; i++) {
@@ -791,6 +818,14 @@ int main (int argc, char* argv[])
         Array4<Real> const& U_a     = mf_in.array(mfi, mi["x_velocity"]);
         Array4<Real> const& V_a     = mf_in.array(mfi, mi["y_velocity"]);
         Array4<Real> const& W_a     = mf_in.array(mfi, mi["z_velocity"]);
+#if (NUMAUX > 0)
+        Array4<Real> const& mixture_fraction_userdef_0_a = mf_in.array(mfi, mi["mixture_fraction_userdef_0"]);	
+        Array4<Real> const& mixture_fraction_userdef_1_a = mf_in.array(mfi, mi["mixfrac_fraction_userdef_1"]);	
+        Array4<Real> const& age_0_a = mf_in.array(mfi, mi["age_0"]);	
+        Array4<Real> const& age_1_a = mf_in.array(mfi, mi["age_1"]);	
+        Array4<Real> const& agepv_0_a = mf_in.array(mfi, mi["agepv_0"]);	
+        Array4<Real> const& agepv_1_a = mf_in.array(mfi, mi["agepv_1"]);	
+#endif
 
         // Array reference to mfv_out
         Array4<Real> const& rho_out_a = mfv_out[lev].array(mfi, mo["rho"]);
@@ -806,6 +841,9 @@ int main (int argc, char* argv[])
         Array4<Real> const& FI_out_a = mfv_out[lev].array(mfi, mo["FI"]);
         Array4<Real> const& R10_out_a = mfv_out[lev].array(mfi, mo["R10"]);
         Array4<Real> const& zone_out_a = mfv_out[lev].array(mfi, mo["zone"]);
+#if (NUMAUX > 0)
+        Array4<Real> const& agepv_1_out_a = mfv_out[lev].array(mfi, mo["agepv_1"]);
+#endif
 
         //Array4<Real> const& mu_out_a = mfv_out[lev].array(mfi, mo["mu"]);
         //Array4<Real> const& ts_a      = mfv_out[lev].array(mfi, mo["ts11"]);
@@ -815,6 +853,9 @@ int main (int argc, char* argv[])
         Array4<Real> const& pv_mid_a = mf_mid.array(mfi, mm["pv"]);
         Array4<Real> const& zone_mid_a = mf_mid.array(mfi, mm["zone"]);
         Array4<Real> const& FI_mid_a = mf_mid.array(mfi, mm["FI"]);
+#if (NUMAUX > 0)
+				Array4<Real> const& agepv_1_mid_a = mf_mid.array(mfi, mm["agepv_1"]); 
+#endif
 
         Array4<Real> const& rhowdot_mid_a = mf_mid.array(mfi, mm["pv"]);
 
@@ -987,11 +1028,16 @@ int main (int argc, char* argv[])
             zone_out_a(i,j,k) = -1.0; // Disregard inlet regions
           }
 
-          // mf_mid
+          // set mf_mid
           mixfrac_mid_a(i,j,k) = mixfrac_out_a(i,j,k);
-          pv_mid_a(i,j,k) = pv_out_a(i,j,k);
+          pv_mid_a(i,j,k) = pv_out_a(i,j,k); //pv_out_a(i,j,k);
           zone_mid_a(i,j,k) = zone_out_a(i,j,k);
           FI_mid_a(i,j,k) = FI_out_a(i,j,k);
+#if (NUMAUX > 0)
+					// mixture_fraction_userdef = rho * Z
+					agepv_1_mid_a(i,j,k) = agepv_1_a(i,j,k) / (mixture_fraction_userdef_1_a(i,j,k) + 1E-6);
+					agepv_1_out_a(i,j,k) = agepv_1_a(i,j,k) / (mixture_fraction_userdef_1_a(i,j,k) + 1E-6);
+#endif
 
         });
 
@@ -1068,7 +1114,9 @@ int main (int argc, char* argv[])
           dataY[mav["rhorr(NO)"]] = rhorr_NO_out_a(i,j,k);
           dataY[mav["rhorr(N2O)"]] = rhorr_N2O_out_a(i,j,k);
           dataY[mav["rhorr(NNH)"]] = rhorr_NNH_out_a(i,j,k);
-
+#if (NUMAUX > 0)
+          dataY[mav["agepv_1"]] = agepv_1_out_a(i,j,k);
+#endif
           // Compute the bin in X space (<Y|X>)
           for (int ivar=0; ivar<nVars; ivar++) {
             bins[ivar] = computeBin(dataX[ivar], varBounds[ivar][0], varBounds[ivar][1], nBins[ivar], binType[ivar]);
