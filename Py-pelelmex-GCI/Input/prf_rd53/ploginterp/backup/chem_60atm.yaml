@@ -1,0 +1,2220 @@
+generator: YamlWriter
+cantera-version: 3.0.0
+git-commit: 806842d
+date: Sat Feb  1 14:19:16 2025
+phases:
+  - name: fixed_pressure_mech
+    transport: mixture-averaged
+    kinetics: gas
+    thermo: ideal-gas
+    elements: [N, H, O, C]
+    species: [N2, H2, H, O2, O, H2O, OH, H2O2, HO2, CO, CO2, CH4, CH3, CH2, CH3O, CH2O,
+    HCO, HCOH, C2H6, C2H5, C2H5O2H, C2H5O2, C2H4, C2H3, CHOCHO, C2H3OO,
+    CHCHO, C2H2, C2H5O, PC2H4OH, O2C2H4OH, CH2CHO, CH2CO, HCCO, C3H8, IC3H7,
+    NC3H7, C3H6OOH1-2, C3H6OOH1-3, C3H6, C3H5-A, CH3CHCHO, C3H5O, AC3H5OOH,
+    C3H4-P, C3H4-A, C3H3, C3H2, C2H3CHO, C2H3CO, NC7H16, C7H15, C7H15O2,
+    C7H14OOH, O2C7H14OOH, C7KET, C5H11CO, IC8H18, C8H17, C8H17O2, C8H16OOH,
+    O2C8H16OOH, C8KET, C6H13CO, C8H16, C6H6]
+    state:
+      T: 1.0e-03
+      density: 1.0e-03
+      Y: {N2: 1.0}
+species:
+  - name: N2
+    composition: {N: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [3.53100528, -1.23660988e-04, -5.02999433e-07, 2.43530612e-09,
+        -1.40881235e-12, -1046.97628, 2.96747038]
+        - [2.95257637, 1.3969004e-03, -4.92631603e-07, 7.86010195e-11,
+        -4.60755204e-15, -923.948688, 5.87188762]
+    transport:
+      model: gas
+      geometry: linear
+      diameter: 3.621
+      well-depth: 97.53
+      polarizability: 1.76
+      rotational-relaxation: 4.0
+  - name: H2
+    composition: {H: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [2.34433112, 7.98052075e-03, -1.9478151e-05, 2.01572094e-08,
+        -7.37611761e-12, -917.935173, 0.683010238]
+        - [2.93286575, 8.26608026e-04, -1.46402364e-07, 1.54100414e-11,
+        -6.888048e-16, -813.065581, -1.02432865]
+    transport:
+      model: gas
+      geometry: linear
+      diameter: 2.92
+      well-depth: 38.0
+      polarizability: 0.79
+      rotational-relaxation: 280.0
+  - name: H
+    composition: {H: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 6000.0, 6000.0]
+      data:
+        - [2.5, 0.0, 0.0, 0.0, 0.0, 2.547366e+04, -0.44668285]
+        - [2.5, 0.0, 0.0, 0.0, 0.0, 2.547366e+04, -0.44668285]
+    transport:
+      model: gas
+      geometry: atom
+      diameter: 2.05
+      well-depth: 145.0
+  - name: O2
+    composition: {O: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [3.78245636, -2.99673416e-03, 9.84730201e-06, -9.68129509e-09,
+        3.24372837e-12, -1063.94356, 3.65767573]
+        - [3.66096065, 6.56365811e-04, -1.41149627e-07, 2.05797935e-11,
+        -1.29913436e-15, -1215.97718, 3.41536279]
+    transport:
+      model: gas
+      geometry: linear
+      diameter: 3.458
+      well-depth: 107.4
+      polarizability: 1.6
+      rotational-relaxation: 3.8
+  - name: O
+    composition: {O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [3.1682671, -3.27931884e-03, 6.64306396e-06, -6.12806624e-09,
+        2.11265971e-12, 2.91222592e+04, 2.05193346]
+        - [2.54363697, -2.73162486e-05, -4.1902952e-09, 4.95481845e-12,
+        -4.79553694e-16, 2.9226012e+04, 4.92229457]
+    transport:
+      model: gas
+      geometry: atom
+      diameter: 2.75
+      well-depth: 80.0
+  - name: H2O
+    composition: {H: 2.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [4.1986352, -2.0364017e-03, 6.5203416e-06, -5.4879269e-09, 1.771968e-12,
+        -3.0293726e+04, -0.84900901]
+        - [2.6770389, 2.9731816e-03, -7.7376889e-07, 9.4433514e-11, -4.2689991e-15,
+        -2.9885894e+04, 6.88255]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 2.605
+      well-depth: 572.4
+      dipole: 1.844
+      rotational-relaxation: 4.0
+  - name: OH
+    composition: {H: 1.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [3.99198424, -2.40106655e-03, 4.61664033e-06, -3.87916306e-09,
+        1.36319502e-12, 3368.89836, -0.103998477]
+        - [2.83853033, 1.10741289e-03, -2.94000209e-07, 4.20698729e-11,
+        -2.4228989e-15, 3697.80808, 5.84494652]
+    transport:
+      model: gas
+      geometry: linear
+      diameter: 2.75
+      well-depth: 80.0
+  - name: H2O2
+    composition: {H: 2.0, O: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [4.31515149, -8.47390622e-04, 1.76404323e-05, -2.26762944e-08,
+        9.08950158e-12, -1.77067437e+04, 3.27373319]
+        - [4.57977305, 4.05326003e-03, -1.2984473e-06, 1.982114e-10,
+        -1.13968792e-14, -1.80071775e+04, 0.664970694]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 3.458
+      well-depth: 107.4
+      rotational-relaxation: 3.8
+  - name: HO2
+    composition: {H: 1.0, O: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 5000.0]
+      data:
+        - [4.30179807, -4.74912097e-03, 2.11582905e-05, -2.42763914e-08,
+        9.29225225e-12, 264.018485, 3.7166622]
+        - [4.17228741, 1.88117627e-03, -3.46277286e-07, 1.94657549e-11,
+        1.76256905e-16, 31.0206839, 2.95767672]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 3.458
+      well-depth: 107.4
+      rotational-relaxation: 1.0
+  - name: CO
+    composition: {C: 1.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [3.5795335, -6.1035369e-04, 1.0168143e-06, 9.0700586e-10, -9.0442449e-13,
+        -1.4344086e+04, 3.5084093]
+        - [3.0484859, 1.3517281e-03, -4.8579405e-07, 7.8853644e-11, -4.6980746e-15,
+        -1.4266117e+04, 6.0170977]
+    transport:
+      model: gas
+      geometry: linear
+      diameter: 3.65
+      well-depth: 98.1
+      polarizability: 1.95
+      rotational-relaxation: 1.8
+  - name: CO2
+    composition: {C: 1.0, O: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [2.356813, 8.9841299e-03, -7.1220632e-06, 2.4573008e-09, -1.4288548e-13,
+        -4.8371971e+04, 9.9009035]
+        - [4.6365111, 2.7414569e-03, -9.9589759e-07, 1.6038666e-10, -9.1619857e-15,
+        -4.9024904e+04, -1.9348955]
+    transport:
+      model: gas
+      geometry: linear
+      diameter: 3.763
+      well-depth: 244.0
+      polarizability: 2.65
+      rotational-relaxation: 2.1
+  - name: CH4
+    composition: {C: 1.0, H: 4.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [5.14911468, -0.0136622009, 4.91453921e-05, -4.84246767e-08,
+        1.66603441e-11, -1.02465983e+04, -4.63848842]
+        - [1.65326226, 0.0100263099, -3.31661238e-06, 5.36483138e-10,
+        -3.14696758e-14, -1.00095936e+04, 9.90506283]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 3.746
+      well-depth: 141.4
+      polarizability: 2.6
+      rotational-relaxation: 13.0
+  - name: CH3
+    composition: {C: 1.0, H: 3.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [3.6571797, 2.1265979e-03, 5.4583883e-06, -6.6181003e-09, 2.4657074e-12,
+        1.6422716e+04, 1.6735354]
+        - [2.9781206, 5.797852e-03, -1.97558e-06, 3.072979e-10, -1.7917416e-14,
+        1.6509513e+04, 4.7224799]
+    transport:
+      model: gas
+      geometry: linear
+      diameter: 3.8
+      well-depth: 144.0
+  - name: CH2
+    composition: {C: 1.0, H: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [3.71757846, 1.2739126e-03, 2.17347251e-06, -3.488585e-09, 1.65208866e-12,
+        4.58723866e+04, 1.75297945]
+        - [3.14631886, 3.03671259e-03, -9.96474439e-07, 1.5048358e-10,
+        -8.57335515e-15, 4.60412605e+04, 4.72341711]
+    transport:
+      model: gas
+      geometry: linear
+      diameter: 3.8
+      well-depth: 144.0
+  - name: CH3O
+    composition: {C: 1.0, H: 3.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [3.71180502, -2.80463306e-03, 3.76550971e-05, -4.73072089e-08,
+        1.8658842e-11, 1295.6976, 6.57240864]
+        - [4.75779238, 7.44142474e-03, -2.69705176e-06, 4.38090504e-10,
+        -2.63537098e-14, 378.11194, -1.96680028]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 3.69
+      well-depth: 417.0
+      dipole: 1.7
+      rotational-relaxation: 2.0
+  - name: CH2O
+    composition: {C: 1.0, H: 2.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [4.79372312, -9.90833322e-03, 3.7321999e-05, -3.79285237e-08,
+        1.31772641e-11, -1.43791953e+04, 0.602798058]
+        - [3.16952665, 6.1932056e-03, -2.25056366e-06, 3.6597566e-10,
+        -2.20149458e-14, -1.45486831e+04, 6.04207898]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 3.59
+      well-depth: 498.0
+      rotational-relaxation: 2.0
+  - name: HCO
+    composition: {C: 1.0, H: 1.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [4.2375461, -3.32075257e-03, 1.40030264e-05, -1.34239995e-08,
+        4.37416208e-12, 3872.41185, 3.30834869]
+        - [3.92001542, 2.52279324e-03, -6.71004164e-07, 1.05615948e-10,
+        -7.43798261e-15, 3653.42928, 3.58077056]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 3.59
+      well-depth: 498.0
+  - name: HCOH
+    composition: {C: 1.0, H: 2.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1398.0, 5000.0]
+      data:
+        - [-2.82157421, 0.0357331702, -3.8086158e-05, 1.86205951e-08,
+        -3.45957838e-12, 1.12956672e+04, 34.8487757]
+        - [9.18749272, 1.52011152e-03, -6.27603516e-07, 1.09727989e-10,
+        -6.89655128e-15, 7813.64593, -27.3434214]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 3.59
+      well-depth: 498.0
+      rotational-relaxation: 1.0
+  - name: C2H6
+    composition: {C: 2.0, H: 6.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [4.29142572, -5.50154901e-03, 5.99438458e-05, -7.08466469e-08,
+        2.68685836e-11, -1.15222056e+04, 2.66678994]
+        - [4.04666411, 0.0153538802, -5.47039485e-06, 8.77826544e-10,
+        -5.23167531e-14, -1.24473499e+04, -0.968698313]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.35
+      well-depth: 247.5
+      rotational-relaxation: 1.5
+  - name: C2H5
+    composition: {C: 2.0, H: 5.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1387.0, 5000.0]
+      data:
+        - [1.32730217, 0.0176656753, -6.14926558e-06, -3.01143466e-10,
+        4.38617775e-13, 1.34284028e+04, 17.1789216]
+        - [5.8878439, 0.0103076793, -3.46844396e-06, 5.32499257e-10,
+        -3.06512651e-14, 1.15065499e+04, -8.49651771]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.35
+      well-depth: 247.5
+      rotational-relaxation: 1.5
+  - name: C2H5O2H
+    composition: {C: 2.0, H: 6.0, O: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1390.0, 5000.0]
+      data:
+        - [1.83755328, 0.0338053586, -2.3754814e-05, 9.31974865e-09,
+        -1.58003428e-12, -2.15814086e+04, 18.0977584]
+        - [10.4823538, 0.0134779879, -4.62179078e-06, 7.18618519e-10,
+        -4.17307436e-14, -2.46578171e+04, -28.4294243]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.41
+      well-depth: 470.6
+      rotational-relaxation: 1.5
+  - name: C2H5O2
+    composition: {C: 2.0, H: 5.0, O: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1389.0, 5000.0]
+      data:
+        - [3.90351912, 0.0222599212, -1.01610079e-05, 1.71709751e-09,
+        1.88166738e-14, -5096.54081, 8.9872275]
+        - [9.5028257, 0.0120429839, -4.09491581e-06, 6.33049241e-10,
+        -3.66133788e-14, -7370.69391, -22.171713]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.41
+      well-depth: 470.6
+      rotational-relaxation: 1.5
+  - name: C2H4
+    composition: {C: 2.0, H: 4.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1392.0, 5000.0]
+      data:
+        - [0.481118223, 0.018377806, -9.99633565e-06, 2.73211039e-09,
+        -3.01837289e-13, 5443.86648, 18.5867157]
+        - [5.07061289, 9.11140768e-03, -3.10506692e-06, 4.80733851e-10,
+        -2.78321396e-14, 3663.91217, -6.64501414]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 3.496
+      well-depth: 238.4
+      rotational-relaxation: 1.5
+  - name: C2H3
+    composition: {C: 2.0, H: 3.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1400.0, 5000.0]
+      data:
+        - [1.25545094, 0.0157481597, -1.12218328e-05, 4.50915682e-09,
+        -7.74861577e-13, 3.47435574e+04, 16.9664043]
+        - [4.99675415, 6.55838271e-03, -2.20921909e-06, 3.39300272e-10,
+        -1.95316926e-14, 3.34604382e+04, -3.01451097]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 3.721
+      well-depth: 265.3
+      rotational-relaxation: 1.0
+  - name: CHOCHO
+    composition: {C: 2.0, H: 2.0, O: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1386.0, 5000.0]
+      data:
+        - [1.8810512, 0.0236386368, -1.83443295e-05, 6.84842963e-09,
+        -9.92733674e-13, -2.6928019e+04, 15.9154793]
+        - [9.75438561, 4.97645947e-03, -1.74410483e-06, 2.75586994e-10,
+        -1.61969892e-14, -2.95832896e+04, -26.1878329]
+    transport:
+      model: gas
+      geometry: linear
+      diameter: 4.01
+      well-depth: 440.2
+      rotational-relaxation: 2.0
+  - name: C2H3OO
+    composition: {C: 2.0, H: 3.0, O: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [298.15, 1000.0, 2000.0]
+      data:
+        - [1.09784776, 0.0295333237, -2.2774436e-05, 7.20559155e-09,
+        -3.07929092e-13, 1.13996101e+04, 21.3563583]
+        - [6.04483828, 0.0145511127, -7.50974622e-06, 1.8348828e-09,
+        -1.66689681e-13, 1.01699244e+04, -3.71144913]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 3.97
+      well-depth: 436.0
+      rotational-relaxation: 2.0
+  - name: CHCHO
+    composition: {C: 2.0, H: 2.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [298.15, 1000.0, 2000.0]
+      data:
+        - [2.33256751, 0.0162952986, -9.72052177e-06, 5.15124155e-10,
+        1.03836514e-12, 2.96585452e+04, 13.9904923]
+        - [4.9263291, 9.71712147e-03, -5.5485598e-06, 1.53068537e-09,
+        -1.64742462e-13, 2.89499494e+04, 0.527874677]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 3.97
+      well-depth: 436.0
+      rotational-relaxation: 2.0
+  - name: C2H2
+    composition: {C: 2.0, H: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [0.808679682, 0.0233615762, -3.55172234e-05, 2.80152958e-08,
+        -8.50075165e-12, 2.64289808e+04, 13.9396761]
+        - [4.65878489, 4.88396667e-03, -1.60828888e-06, 2.46974544e-10,
+        -1.38605959e-14, 2.57594042e+04, -3.99838194]
+    transport:
+      model: gas
+      geometry: linear
+      diameter: 3.721
+      well-depth: 265.3
+      rotational-relaxation: 2.5
+  - name: C2H5O
+    composition: {C: 2.0, H: 5.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1467.0, 5000.0]
+      data:
+        - [2.90353584, 0.0177256708, -2.69624757e-06, -3.45830533e-09,
+        1.25224784e-12, -3289.3029, 11.3545591]
+        - [8.19120635, 0.0110391986, -3.75270536e-06, 5.80275784e-10,
+        -3.35735146e-14, -5668.47208, -19.0131344]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.41
+      well-depth: 470.6
+      rotational-relaxation: 1.5
+  - name: PC2H4OH
+    composition: {C: 2.0, H: 5.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1395.0, 5000.0]
+      data:
+        - [2.59479867, 0.0227100669, -1.39473846e-05, 4.70095591e-09,
+        -6.90044236e-13, -4914.86975, 14.3240718]
+        - [8.0675015, 0.0106143554, -3.5799936e-06, 5.5036376e-10, -3.17051769e-14,
+        -6927.47939, -15.3833428]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.41
+      well-depth: 470.6
+      rotational-relaxation: 1.5
+  - name: O2C2H4OH
+    composition: {C: 2.0, H: 5.0, O: 3.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1506.0, 5000.0]
+      data:
+        - [7.040098, 0.0159564166, 2.21097416e-06, -7.05197355e-09, 2.08266026e-12,
+        -2.24524432e+04, -1.75361758]
+        - [12.7503881, 0.0111514325, -3.83473891e-06, 5.98155829e-10,
+        -3.48372108e-14, -2.52770876e+04, -35.4317608]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 5.664
+      well-depth: 523.2
+      dipole: 1.7
+      rotational-relaxation: 1.0
+  - name: CH2CHO
+    composition: {C: 2.0, H: 3.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [298.0, 1000.0, 3000.0]
+      data:
+        - [0.986311004, 0.0224920216, -1.64812936e-05, 5.86617239e-09,
+        -6.81551147e-13, 1071.63704, 19.5196726]
+        - [3.6302633, 0.0141239404, -7.16478146e-06, 1.76263004e-09,
+        -1.70391996e-13, 429.875072, 6.20577997]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 3.97
+      well-depth: 436.0
+      rotational-relaxation: 2.0
+  - name: CH2CO
+    composition: {C: 2.0, H: 2.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1000.0, 5000.0]
+      data:
+        - [1.81422511, 0.019900859, -2.21416008e-05, 1.45028521e-08,
+        -3.98877068e-12, -7053.94926, 13.6079359]
+        - [5.35869367, 6.95641586e-03, -2.64802637e-06, 4.65067592e-10,
+        -3.0864182e-14, -7902.94013, -3.98525731]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 3.97
+      well-depth: 436.0
+      rotational-relaxation: 2.0
+  - name: HCCO
+    composition: {C: 2.0, H: 1.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [1.87607969, 0.0221205418, -3.58869325e-05, 3.05402541e-08,
+        -1.01281069e-11, 2.0163384e+04, 13.696829]
+        - [5.91479333, 3.7140873e-03, -1.3013701e-06, 2.06473345e-10,
+        -1.21476759e-14, 1.93596301e+04, -5.50567269]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 2.5
+      well-depth: 150.0
+      rotational-relaxation: 1.0
+  - name: C3H8
+    composition: {C: 3.0, H: 8.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1390.0, 5000.0]
+      data:
+        - [0.24087847, 0.0339548599, -1.60930874e-05, 2.83480628e-09,
+        2.78195172e-14, -1.40362853e+04, 21.65008]
+        - [9.1554131, 0.0172574139, -5.85614868e-06, 9.04190155e-10,
+        -5.22523772e-14, -1.75762439e+04, -27.741851]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.81
+      well-depth: 303.4
+      rotational-relaxation: 1.0
+  - name: IC3H7
+    composition: {C: 3.0, H: 7.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [298.0, 1000.0, 6000.0]
+      data:
+        - [-0.897467137, 0.0415744022, -4.94778349e-05, 4.56493655e-08,
+        -1.79085437e-11, 9939.50407, 29.2641758]
+        - [6.70775549, 0.0174048076, -6.07615926e-06, 9.60084351e-10,
+        -5.6565649e-14, 7553.77821, -10.3686516]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.81
+      well-depth: 303.4
+      rotational-relaxation: 1.0
+  - name: NC3H7
+    composition: {C: 3.0, H: 7.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [298.0, 1000.0, 6000.0]
+      data:
+        - [-2.20120865, 0.0529641653, -7.23640506e-05, 6.3699694e-08,
+        -2.29332581e-11, 1.15130744e+04, 34.3669174]
+        - [7.48614243, 0.0165769478, -5.74876481e-06, 9.04103694e-10,
+        -5.30867231e-14, 8937.10008, -14.2595379]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.81
+      well-depth: 303.4
+      rotational-relaxation: 1.0
+  - name: C3H6OOH1-2
+    composition: {C: 3.0, H: 7.0, O: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [298.0, 1000.0, 3000.0]
+      data:
+        - [3.22239332, 0.0330560778, -8.08099836e-06, -9.65892147e-09,
+        5.35196836e-12, -0.828965983, 16.6771262]
+        - [5.8237676, 0.0298001534, -1.50805567e-05, 3.70519144e-09, -3.5803603e-13,
+        -840.082264, 2.43596968]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.662
+      well-depth: 435.2
+      dipole: 2.7
+      rotational-relaxation: 1.0
+  - name: C3H6OOH1-3
+    composition: {C: 3.0, H: 7.0, O: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1401.0, 5000.0]
+      data:
+        - [1.74271107, 0.0453733504, -3.57580373e-05, 1.48540053e-08,
+        -2.49981756e-12, 232.580844, 22.0973041]
+        - [13.9130757, 0.0140218463, -4.55921149e-06, 6.84182417e-10,
+        -3.87696213e-14, -3656.50518, -42.1532559]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.662
+      well-depth: 435.2
+      dipole: 2.7
+      rotational-relaxation: 1.0
+  - name: C3H6
+    composition: {C: 3.0, H: 6.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [3.83464468, 3.29078952e-03, 5.05228001e-05, -6.66251176e-08,
+        2.63707473e-11, 788.717123, 7.53408013]
+        - [6.03870234, 0.0162963931, -5.821308e-06, 9.35936829e-10, -5.58603143e-14,
+        -741.715057, -8.43825992]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.14
+      well-depth: 307.8
+      rotational-relaxation: 1.0
+  - name: C3H5-A
+    composition: {C: 3.0, H: 5.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1373.0, 5000.0]
+      data:
+        - [0.447889052, 0.0279507544, -1.69490036e-05, 5.54378883e-09,
+        -8.95719069e-13, 1.92565554e+04, 21.3053621]
+        - [8.83926244, 0.010848952, -3.76807987e-06, 5.91217237e-10,
+        -3.45595703e-14, 1.60424092e+04, -24.7555313]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.22
+      well-depth: 316.0
+      rotational-relaxation: 1.0
+  - name: CH3CHCHO
+    composition: {C: 3.0, H: 5.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1424.0, 5000.0]
+      data:
+        - [1.47166733, 0.0269251618, -1.00248013e-05, -1.13421435e-09,
+        1.03416658e-12, -4041.42023, 18.8722472]
+        - [10.6781476, 0.0112805711, -3.89010759e-06, 6.07617268e-10,
+        -3.54120848e-14, -7732.34209, -32.4971238]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.687
+      well-depth: 387.86
+  - name: C3H5O
+    composition: {C: 3.0, H: 5.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1402.0, 5000.0]
+      data:
+        - [0.824068673, 0.0346749909, -2.51786795e-05, 9.56781953e-09,
+        -1.48085302e-12, 1.04203725e+04, 22.828307]
+        - [10.2638186, 0.0117609932, -3.89837957e-06, 5.92650815e-10,
+        -3.38867417e-14, 7259.38472, -27.5108651]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.82
+      well-depth: 411.0
+      rotational-relaxation: 1.0
+  - name: AC3H5OOH
+    composition: {C: 3.0, H: 6.0, O: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [298.0, 1000.0, 6000.0]
+      data:
+        - [3.18124993, 0.0435233041, -5.16277353e-05, 4.32011427e-08,
+        -1.57714983e-11, -7635.21503, 12.1725683]
+        - [12.0838649, 0.0147946591, -5.13212591e-06, 8.07504999e-10,
+        -4.74394983e-14, -1.02184463e+04, -33.6434791]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.997
+      well-depth: 481.5
+      dipole: 1.7
+      rotational-relaxation: 1.0
+  - name: C3H4-P
+    composition: {C: 3.0, H: 4.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [2.6803869, 0.015799651, 2.5070596e-06, -1.3657623e-08, 6.6154285e-12,
+        2.0802374e+04, 9.8769351]
+        - [6.02524, 0.011336542, -4.0223391e-06, 6.4376063e-10, -3.8299635e-14,
+        1.9620942e+04, -8.6043785]
+    transport:
+      model: gas
+      geometry: linear
+      diameter: 4.29
+      well-depth: 324.8
+      rotational-relaxation: 1.0
+  - name: C3H4-A
+    composition: {C: 3.0, H: 4.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [2.6130445, 0.012122575, 1.853988e-05, -3.4525149e-08, 1.5335079e-11,
+        2.1541567e+04, 10.226139]
+        - [6.3168722, 0.011133728, -3.9629378e-06, 6.3564238e-10, -3.787554e-14,
+        2.0117495e+04, -10.995766]
+    transport:
+      model: gas
+      geometry: linear
+      diameter: 4.29
+      well-depth: 324.8
+      rotational-relaxation: 1.0
+  - name: C3H3
+    composition: {C: 3.0, H: 3.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [1.35110873, 0.0327411291, -4.73827407e-05, 3.7631022e-08,
+        -1.18541128e-11, 4.07679941e+04, 15.2058598]
+        - [7.14221719, 7.61902211e-03, -2.6746003e-06, 4.24914904e-10,
+        -2.51475443e-14, 3.95709594e+04, -12.584869]
+    transport:
+      model: gas
+      geometry: linear
+      diameter: 4.29
+      well-depth: 324.8
+      rotational-relaxation: 1.0
+  - name: C3H2
+    composition: {C: 3.0, H: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [298.0, 1000.0, 3000.0]
+      data:
+        - [6.45665171, 8.89254866e-03, -8.95504077e-06, 5.94559895e-09,
+        -1.65668523e-12, 6.35070148e+04, -6.95417172]
+        - [7.06992917, 5.3930816e-03, -2.17231495e-06, 4.25227595e-10,
+        -3.28500977e-14, 6.3437888e+04, -9.64827316]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.1
+      well-depth: 209.0
+      rotational-relaxation: 1.0
+  - name: C2H3CHO
+    composition: {C: 3.0, H: 4.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [298.0, 1000.0, 3000.0]
+      data:
+        - [1.30858881, 0.0290665687, -1.85267312e-05, 5.10575873e-09,
+        -3.1235785e-13, -9341.39504, 17.5831373]
+        - [4.27745325, 0.0208995067, -1.10621906e-05, 2.80392911e-09,
+        -2.76871274e-13, -1.01465486e+04, 2.26814496]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.958
+      well-depth: 428.8
+      dipole: 2.9
+      rotational-relaxation: 1.0
+  - name: C2H3CO
+    composition: {C: 3.0, H: 3.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [298.0, 1000.0, 3000.0]
+      data:
+        - [1.67431562, 0.0253644779, -1.74055511e-05, 5.43382478e-09,
+        -4.34352533e-13, 1.02237218e+04, 17.8417413]
+        - [4.57165627, 0.0167235781, -8.58791816e-06, 2.13315141e-09,
+        -2.07752945e-13, 9487.46848, 3.10327903]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 4.12
+      well-depth: 443.2
+      rotational-relaxation: 1.0
+  - name: NC7H16
+    composition: {C: 7.0, H: 16.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1391.0, 5000.0]
+      data:
+        - [-1.26836187, 0.085435582, -5.25346786e-05, 1.62945721e-08,
+        -2.02394925e-12, -2.56586565e+04, 35.3732912]
+        - [22.2148969, 0.034767575, -1.18407129e-05, 1.83298478e-09,
+        -1.06130266e-13, -3.42760081e+04, -92.3040196]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 6.253
+      well-depth: 459.6
+      rotational-relaxation: 1.0
+  - name: C7H15
+    composition: {C: 7.0, H: 15.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1391.0, 5000.0]
+      data:
+        - [-0.499570406, 0.0808826467, -5.00532754e-05, 1.56549308e-08,
+        -1.96616227e-12, -1045.90223, 34.6564011]
+        - [21.7940709, 0.0326280243, -1.11138244e-05, 1.72067148e-09,
+        -9.96366999e-14, -9209.38221, -86.4954311]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 6.253
+      well-depth: 459.6
+      rotational-relaxation: 1.0
+  - name: C7H15O2
+    composition: {C: 7.0, H: 15.0, O: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1000.0, 5000.0]
+      data:
+        - [2.37499334, 0.0834651906, -5.1389732e-05, 1.64217662e-08,
+        -2.19505216e-12, -1.99237961e+04, 25.3067342]
+        - [24.9023689, 0.035071692, -1.20440306e-05, 1.87464822e-09,
+        -1.08947791e-13, -2.8297605e+04, -97.3923542]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 6.317
+      well-depth: 561.0
+      dipole: 1.7
+      rotational-relaxation: 1.0
+  - name: C7H14OOH
+    composition: {C: 7.0, H: 15.0, O: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1000.0, 5000.0]
+      data:
+        - [2.49875186, 0.0832443344, -4.85933986e-05, 1.2892795e-08,
+        -1.09878385e-12, -1.36530733e+04, 27.3754005]
+        - [27.0028807, 0.0322272216, -1.09366516e-05, 1.68977918e-09,
+        -9.77321946e-14, -2.27229231e+04, -106.33217]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 6.317
+      well-depth: 561.0
+      dipole: 1.7
+      rotational-relaxation: 1.0
+  - name: O2C7H14OOH
+    composition: {C: 7.0, H: 15.0, O: 4.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1000.0, 5000.0]
+      data:
+        - [3.84933185, 0.0945955097, -5.94934121e-05, 1.78836457e-08,
+        -2.00618696e-12, -3.32051631e+04, 22.591203]
+        - [32.3937788, 0.0333911097, -1.15672104e-05, 1.81146023e-09,
+        -1.05739941e-13, -4.36321048e+04, -132.597311]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 7.229
+      well-depth: 600.6
+      dipole: 1.8
+      rotational-relaxation: 1.0
+  - name: C7KET
+    composition: {C: 7.0, H: 14.0, O: 3.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1382.0, 5000.0]
+      data:
+        - [4.1902303, 0.0843118237, -5.44315814e-05, 1.85837721e-08,
+        -2.72768938e-12, -5.00570382e+04, 18.5783455]
+        - [28.0512936, 0.0327356029, -1.14107044e-05, 1.79404506e-09,
+        -1.05002142e-13, -5.89640173e+04, -111.392338]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 6.506
+      well-depth: 581.3
+      dipole: 2.0
+      rotational-relaxation: 1.0
+  - name: C5H11CO
+    composition: {C: 6.0, H: 11.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1000.0, 5000.0]
+      data:
+        - [2.14479069, 0.0617863563, -3.7413469e-05, 1.13283795e-08,
+        -1.36917698e-12, -1.43451172e+04, 22.3128045]
+        - [19.4783812, 0.0250466029, -8.54861346e-06, 1.32557944e-09,
+        -7.68503296e-14, -2.07923937e+04, -72.1995578]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 6.009
+      well-depth: 498.6
+      dipole: 2.0
+      rotational-relaxation: 1.0
+  - name: IC8H18
+    composition: {C: 8.0, H: 18.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1396.0, 5000.0]
+      data:
+        - [-4.20868893, 0.111440581, -7.91346582e-05, 2.92406242e-08,
+        -4.43743191e-12, -2.99446875e+04, 44.9521701]
+        - [27.137359, 0.037900489, -1.29437358e-05, 2.00760372e-09, -1.1640058e-13,
+        -4.07958177e+04, -123.277495]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 6.414
+      well-depth: 458.5
+      rotational-relaxation: 1.0
+  - name: C8H17
+    composition: {C: 8.0, H: 17.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1000.0, 5000.0]
+      data:
+        - [-2.45792, 0.100416, -5.52412e-05, 8.18171e-10, 7.48841e-12, -6563.07,
+        39.5814]
+        - [16.5781, 0.0479568, -1.5833e-05, 2.45887e-09, -1.47904e-13, -1.13886e+04,
+        -57.7977]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 6.414
+      well-depth: 458.5
+      rotational-relaxation: 1.0
+  - name: C8H17O2
+    composition: {C: 8.0, H: 17.0, O: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1000.0, 5000.0]
+      data:
+        - [-1.3313, 0.107392, -5.66082e-05, -2.14473e-09, 8.62014e-12, -2.33465e+04,
+        38.0377]
+        - [26.179, 0.0402621, -1.2184e-05, 1.77416e-09, -1.01822e-13, -3.13354e+04,
+        -106.205]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 6.506
+      well-depth: 581.3
+      dipole: 2.0
+      rotational-relaxation: 1.0
+  - name: C8H16OOH
+    composition: {C: 8.0, H: 17.0, O: 2.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1000.0, 5000.0]
+      data:
+        - [4.63771, 0.0770682, 5.46587e-06, -6.02176e-08, 2.84759e-11, -2.20723e+04,
+        12.2966]
+        - [25.9673, 0.0394986, -1.17491e-05, 1.69063e-09, -9.62759e-14,
+        -2.86414e+04, -102.359]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 6.506
+      well-depth: 581.3
+      dipole: 2.0
+      rotational-relaxation: 1.0
+  - name: O2C8H16OOH
+    composition: {C: 8.0, H: 17.0, O: 4.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1000.0, 5000.0]
+      data:
+        - [0.766149, 0.115621, -6.49312e-05, 3.70399e-10, 8.7761e-12, -3.41337e+04,
+        34.1493]
+        - [31.2917, 0.039272, -1.14955e-05, 1.63072e-09, -9.17048e-14, -4.28382e+04,
+        -125.286]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 6.506
+      well-depth: 581.3
+      dipole: 2.0
+      rotational-relaxation: 1.0
+  - name: C8KET
+    composition: {C: 8.0, H: 16.0, O: 3.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1000.0, 5000.0]
+      data:
+        - [-1.22819, 0.110258, -6.32868e-05, 2.95991e-09, 7.38667e-12, -5.15453e+04,
+        43.1889]
+        - [23.4007, 0.0458018, -1.53548e-05, 2.41072e-09, -1.46115e-13,
+        -5.82798e+04, -84.3852]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 6.506
+      well-depth: 581.3
+      dipole: 2.0
+      rotational-relaxation: 1.0
+  - name: C6H13CO
+    composition: {C: 7.0, H: 13.0, O: 1.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1000.0, 5000.0]
+      data:
+        - [2.14479069, 0.0617863563, -3.7413469e-05, 1.13283795e-08,
+        -1.36917698e-12, -1.43451172e+04, 22.3128045]
+        - [19.4783812, 0.0250466029, -8.54861346e-06, 1.32557944e-09,
+        -7.68503296e-14, -2.07923937e+04, -72.1995578]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 6.506
+      well-depth: 581.3
+      dipole: 2.0
+      rotational-relaxation: 1.0
+  - name: C8H16
+    composition: {C: 8.0, H: 16.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [300.0, 1394.0, 5000.0]
+      data:
+        - [-2.79610447, 0.100836172, -7.12250651e-05, 2.60659824e-08,
+        -3.90031814e-12, -1.64002496e+04, 38.8854068]
+        - [25.6756746, 0.0341801998, -1.16002952e-05, 1.79195478e-09,
+        -1.03613002e-13, -2.62458324e+04, -113.928273]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 6.44
+      well-depth: 485.6
+      dipole: 0.3
+      rotational-relaxation: 1.0
+  - name: C6H6
+    composition: {C: 6.0, H: 6.0}
+    thermo:
+      model: NASA7
+      temperature-ranges: [200.0, 1000.0, 6000.0]
+      data:
+        - [0.504818632, 0.0185020642, 7.38345881e-05, -1.18135741e-07,
+        5.07210429e-11, 8552.47913, 21.6412893]
+        - [11.0809576, 0.0207176746, -7.52145991e-06, 1.22320984e-09,
+        -7.36091279e-14, 4306.41035, -40.041331]
+    transport:
+      model: gas
+      geometry: nonlinear
+      diameter: 5.23
+      well-depth: 468.5
+      polarizability: 10.3
+      rotational-relaxation: 1.0
+reactions:
+  - equation: IC8H18 + O2 => C8H17 + HO2
+    rate-constant: {A: 6.0e+12, b: 0.0, Ea: 1.92464e+08}
+  - equation: C8H17 + HO2 => IC8H18 + O2
+    rate-constant: {A: 1.0e+09, b: 0.0, Ea: 0.0}
+  - equation: C8H17 + O2 => C8H17O2
+    rate-constant: {A: 1.0e+09, b: 0.0, Ea: 0.0}
+  - equation: C8H17O2 => C8H17 + O2
+    rate-constant: {A: 2.51e+13, b: 0.0, Ea: 1.146416e+08}
+  - equation: C8H17O2 => C8H16OOH
+    rate-constant: {A: 1.51e+11, b: 0.0, Ea: 9.12112e+07}
+  - equation: C8H16OOH => C8H17O2
+    rate-constant: {A: 1.0e+11, b: 0.0, Ea: 4.6024e+07}
+  - equation: C8H16OOH + O2 => O2C8H16OOH
+    rate-constant: {A: 1.16e+08, b: 0.0, Ea: 0.0}
+  - equation: O2C8H16OOH => C8H16OOH + O2
+    rate-constant: {A: 2.51e+13, b: 0.0, Ea: 1.146416e+08}
+  - equation: O2C8H16OOH => C8KET + OH
+    rate-constant: {A: 8.91e+10, b: 0.0, Ea: 7.1128e+07}
+  - equation: C8KET => C6H13CO + CH2O + OH
+    rate-constant: {A: 3.98e+15, b: 0.0, Ea: 1.79912e+08}
+  - equation: C6H13CO + O2 => C3H5-A + CO + HO2 + IC3H7
+    rate-constant: {A: 3.16e+10, b: 0.0, Ea: 4.184e+07}
+  - equation: IC8H18 + OH => C8H17 + H2O
+    rate-constant: {A: 2.0e+10, b: 0.0, Ea: 1.2552e+07}
+  - equation: C8H17 + O2 => C8H16 + HO2
+    rate-constant: {A: 3.16e+08, b: 0.0, Ea: 2.5104e+07}
+  - equation: C8H16 + HO2 => C8H17 + O2
+    rate-constant: {A: 3.16e+08, b: 0.0, Ea: 8.1588e+07}
+  - equation: C8H16 + O2 => C3H6 + CH2O + HCO + IC3H7
+    rate-constant: {A: 3.16e+10, b: 0.0, Ea: 4.184e+07}
+  - equation: HO2 + IC8H18 => C8H17 + H2O2
+    rate-constant: {A: 1.0e+10, b: 0.0, Ea: 7.09188e+07}
+  - equation: C8H17 => C2H4 + C3H6 + IC3H7
+    rate-constant: {A: 1.117e+17, b: -1.27, Ea: 1.242648e+08}
+  - equation: NC7H16 + O2 => C7H15 + HO2
+    rate-constant: {A: 2.1e+13, b: 0.0, Ea: 1.92464e+08}
+  - equation: C7H15 + HO2 => NC7H16 + O2
+    rate-constant: {A: 1.0e+09, b: 0.0, Ea: 0.0}
+  - equation: C7H15 + O2 => C7H15O2
+    rate-constant: {A: 3.0e+09, b: 0.0, Ea: 0.0}
+  - equation: C7H15O2 => C7H15 + O2
+    rate-constant: {A: 2.51e+13, b: 0.0, Ea: 1.146416e+08}
+  - equation: C7H15O2 => C7H14OOH
+    rate-constant: {A: 1.51e+11, b: 0.0, Ea: 7.9496e+07}
+  - equation: C7H14OOH => C7H15O2
+    rate-constant: {A: 1.0e+11, b: 0.0, Ea: 4.6024e+07}
+  - equation: C7H14OOH + O2 => O2C7H14OOH
+    rate-constant: {A: 6.16e+07, b: 0.0, Ea: 0.0}
+  - equation: O2C7H14OOH => C7H14OOH + O2
+    rate-constant: {A: 2.51e+13, b: 0.0, Ea: 1.146416e+08}
+  - equation: O2C7H14OOH => C7KET + OH
+    rate-constant: {A: 8.91e+10, b: 0.0, Ea: 7.1128e+07}
+  - equation: C7KET => C5H11CO + CH2O + OH
+    rate-constant: {A: 3.98e+15, b: 0.0, Ea: 1.79912e+08}
+  - equation: C5H11CO + O2 => C2H3 + CO + HO2 + NC3H7
+    rate-constant: {A: 3.16e+10, b: 0.0, Ea: 4.184e+07}
+  - equation: NC7H16 + OH => C7H15 + H2O
+    rate-constant: {A: 5.0e+10, b: 0.0, Ea: 1.2552e+07}
+  - equation: HO2 + NC7H16 => C7H15 + H2O2
+    rate-constant: {A: 1.0e+10, b: 0.0, Ea: 7.09188e+07}
+  - equation: C7H15 => C2H4 + C2H5 + C3H6
+    rate-constant: {A: 2.75e+13, b: 0.0, Ea: 1.2054104e+08}
+  - equation: H2 + M <=> 2 H + M
+    type: three-body
+    rate-constant: {A: 4.577e+16, b: -1.4, Ea: 4.368096e+08}
+    efficiencies: {C2H6: 3.0, CH4: 2.0, CO: 1.9, CO2: 3.8, H2: 2.5, H2O: 12.0}
+  - equation: H2 + O <=> H + OH
+    duplicate: true
+    rate-constant: {A: 3.8e+09, b: 0.0, Ea: 3.3254432e+07}
+    duplicate: true
+  - equation: H2 + O <=> H + OH
+    duplicate: true
+    rate-constant: {A: 8.8e+11, b: 0.0, Ea: 8.02282e+07}
+    duplicate: true
+  - equation: H2 + OH <=> H + H2O
+    rate-constant: {A: 2.2e+05, b: 1.51, Ea: 1.435112e+07}
+  - equation: 2 O + M <=> O2 + M
+    type: three-body
+    rate-constant: {A: 6.165e+09, b: -0.5, Ea: 0.0}
+    efficiencies: {C2H6: 3.0, CH4: 2.0, CO: 1.9, CO2: 3.8, H2: 2.5, H2O: 12.0}
+  - equation: H + O2 <=> O + OH
+    rate-constant: {A: 1.04e+11, b: 0.0, Ea: 6.3956624e+07}
+  - equation: H + OH (+M) <=> H2O (+M)
+    type: falloff
+    low-P-rate-constant: {A: 2.2e+16, b: -2.0, Ea: 0.0}
+    high-P-rate-constant: {A: 2.5e+10, b: 0.234, Ea: -4.76976e+05}
+    Troe: {A: 0.73, T3: 1.0e-30, T1: 1.0e+30, T2: 1.0e+30}
+    efficiencies: {H2: 2.5, H2O: 10.4}
+  - equation: 2 OH <=> H2O + O
+    rate-constant: {A: 2880.0, b: 1.79, Ea: 7.322e+06}
+  - equation: H + O + M <=> OH + M
+    type: three-body
+    rate-constant: {A: 4.714e+12, b: -1.0, Ea: 0.0}
+    efficiencies: {C2H6: 3.0, CH4: 2.0, CO: 1.5, CO2: 2.0, H2: 2.5, H2O: 12.0}
+  - equation: H2O2 (+M) <=> 2 OH (+M)
+    type: falloff
+    low-P-rate-constant: {A: 2.3530181e+21, b: -2.2929358, Ea: 2.0394240652e+08}
+    high-P-rate-constant: {A: 2.0e+12, b: 0.9, Ea: 2.03965816e+08}
+    Troe: {A: 0.43, T3: 1.0e-30, T1: 1.0e+30}
+    efficiencies: {CO: 2.8, CO2: 1.06, H2: 3.7, H2O: 5.1, H2O2: 5.2, N2: 1.5, O2: 0.79}
+  - equation: H + H2O2 <=> H2O + OH
+    rate-constant: {A: 2.41e+10, b: 0.0, Ea: 1.661048e+07}
+  - equation: H + H2O2 <=> H2 + HO2
+    rate-constant: {A: 2.15e+07, b: 1.0, Ea: 2.5104e+07}
+  - equation: H2O2 + O <=> HO2 + OH
+    rate-constant: {A: 9550.0, b: 2.0, Ea: 1.661048e+07}
+  - equation: H2O2 + OH <=> H2O + HO2
+    duplicate: true
+    rate-constant: {A: 1.74e+09, b: 0.0, Ea: 1.330512e+06}
+    duplicate: true
+  - equation: H2O2 + OH <=> H2O + HO2
+    duplicate: true
+    rate-constant: {A: 7.59e+10, b: 0.0, Ea: 3.0413496e+07}
+    duplicate: true
+  - equation: H + HO2 <=> H2 + O2
+    rate-constant: {A: 1.1e+04, b: 1.94, Ea: -2.715416e+06}
+  - equation: H + HO2 <=> 2 OH
+    rate-constant: {A: 7.079e+10, b: 0.0, Ea: 1.23428e+06}
+  - equation: HO2 + O <=> O2 + OH
+    rate-constant: {A: 3.25e+10, b: 0.0, Ea: 0.0}
+  - equation: HO2 + OH <=> H2O + O2
+    duplicate: true
+    rate-constant: {A: 1.93e+17, b: -2.49, Ea: 2.44446016e+06}
+    duplicate: true
+  - equation: HO2 + OH <=> H2O + O2
+    duplicate: true
+    rate-constant: {A: 1.21e+06, b: 1.24, Ea: -5.47091472e+06}
+    duplicate: true
+  - equation: 2 HO2 <=> H2O2 + O2
+    duplicate: true
+    rate-constant: {A: 1.214e+07, b: 0.422, Ea: -6.19449568e+06}
+    duplicate: true
+  - equation: 2 HO2 <=> H2O2 + O2
+    duplicate: true
+    rate-constant: {A: 1.688e+13, b: -0.681, Ea: 5.410606544e+07}
+    duplicate: true
+  - equation: H + O2 (+M) <=> HO2 (+M)
+    type: falloff
+    low-P-rate-constant: {A: 1.737e+13, b: -1.23, Ea: 0.0}
+    high-P-rate-constant: {A: 4.65e+09, b: 0.44, Ea: 0.0}
+    Troe: {A: 0.67, T3: 1.0e-30, T1: 1.0e+30, T2: 1.0e+30}
+    efficiencies: {C2H6: 3.0, CH4: 2.0, CO: 1.9, CO2: 3.8, H2: 1.3, H2O: 10.0}
+  - equation: CO + O (+M) <=> CO2 (+M)
+    type: falloff
+    low-P-rate-constant: {A: 1.173e+18, b: -2.79, Ea: 1.7535144e+07}
+    high-P-rate-constant: {A: 1.362e+07, b: 0.0, Ea: 9.974656e+06}
+    efficiencies: {CO: 1.75, CO2: 3.6, H2: 2.0, H2O: 12.0}
+  - equation: CO + OH <=> CO2 + H
+    rate-constant: {A: 3215.862534830703, b: 1.631101916744068, Ea: -1.652808950434855e+06}
+  - equation: CO + HO2 <=> CO2 + OH
+    rate-constant: {A: 8.55, b: 2.52, Ea: 6.510304e+07}
+  - equation: CO + O2 <=> CO2 + O
+    rate-constant: {A: 1.119e+09, b: 0.0, Ea: 1.995768e+08}
+  - equation: CH3 + H (+M) <=> CH4 (+M)
+    type: falloff
+    low-P-rate-constant: {A: 8.54e+26, b: -4.69, Ea: 9.2048e+06}
+    high-P-rate-constant: {A: 6.47e+10, b: 0.185, Ea: -2.25936e+05}
+    Troe: {A: 0.516194, T3: 3637.8482, T1: 1.0, T2: 1.0e+30}
+    efficiencies: {C2H6: 3.0, CH4: 2.0, CO: 1.5, CO2: 2.0, H2: 2.0, H2O: 6.0, N2: 1.4}
+  - equation: CH4 + H <=> CH3 + H2
+    rate-constant: {A: 4.08, b: 3.16, Ea: 3.6635104e+07}
+  - equation: CH4 + O <=> CH3 + OH
+    rate-constant: {A: 4900.0, b: 2.2, Ea: 3.1760744e+07}
+  - equation: CH4 + OH <=> CH3 + H2O
+    rate-constant: {A: 5654.76, b: 1.93695, Ea: 1.11138328432e+07}
+  - equation: CH4 + HO2 <=> CH3 + H2O2
+    rate-constant: {A: 0.0112, b: 3.74, Ea: 8.7901656e+07}
+  - equation: CH3 + HO2 <=> CH4 + O2
+    rate-constant: {A: 120.0, b: 2.227, Ea: -1.264137024e+07}
+  - equation: CH2 + CH4 <=> 2 CH3
+    rate-constant: {A: 2460.0, b: 2.0, Ea: 3.460168e+07}
+  - equation: CH2 + H (+M) <=> CH3 (+M)
+    type: falloff
+    low-P-rate-constant: {A: 1.04e+20, b: -2.76, Ea: 6.6944e+06}
+    high-P-rate-constant: {A: 6.0e+11, b: 0.0, Ea: 0.0}
+    Troe: {A: 0.562, T3: 91.0, T1: 5836.0, T2: 8552.0}
+    efficiencies: {C2H6: 3.0, CH4: 2.0, CO: 1.5, CO2: 2.0, H2: 2.0, H2O: 6.0}
+  - equation: CH2 + O2 <=> CH2O + O
+    rate-constant: {A: 130.0, b: 2.4202, Ea: 6.711136e+06}
+  - equation: CH2 + O2 => CO2 + 2 H
+    rate-constant: {A: 1.05e+06, b: 0.9929, Ea: -1.125496e+06}
+  - equation: CH2 + O2 => CO + H + OH
+    rate-constant: {A: 650.0, b: 0.9929, Ea: -1.125496e+06}
+  - equation: CH2 + O => CO + 2 H
+    rate-constant: {A: 5.0e+10, b: 0.0, Ea: 0.0}
+  - equation: CH2 + H2 <=> CH3 + H
+    rate-constant: {A: 440.0, b: 2.39, Ea: 3.07524e+07}
+  - equation: CH3 + O2 <=> CH3O + O
+    rate-constant: {A: 7.546e+09, b: 0.0, Ea: 1.1849088e+08}
+  - equation: CH3 + O2 <=> CH2O + OH
+    rate-constant: {A: 2.641e-03, b: 3.283, Ea: 3.391132e+07}
+  - equation: CH3 + O <=> CH2O + H
+    rate-constant: {A: 5.54e+10, b: 0.05, Ea: -5.69024e+05}
+  - equation: CH3 + OH <=> CH2 + H2O
+    rate-constant: {A: 42.93, b: 2.568, Ea: 1.67267952e+07}
+  - equation: CH3 + OH <=> CH2O + H2
+    rate-constant: {A: 2.992888888888892e+06, b: 0.5918888888888886,
+    Ea: -3.086862222222217e+06}
+  - equation: CH3 + OH <=> CH3O + H
+    rate-constant: {A: 1.545555555555556e+06, b: 0.9854444444444443,
+    Ea: 5.025448888888889e+07}
+  - equation: CH3 + OH <=> H2 + HCOH
+    rate-constant: {A: 9.466666667358676e+17, b: -1.397888888888890,
+    Ea: 1.236046577777779e+07}
+  - equation: CH3 + HO2 <=> CH3O + OH
+    rate-constant: {A: 1.06879e+09, b: 0.2725, Ea: -2.898972264e+06}
+  - equation: CH3O + OH <=> CH2O + H2O
+    rate-constant: {A: 0.36192, b: 2.4976, Ea: 7.905450432e+06}
+  - equation: CH3O + O2 <=> CH2O + HO2
+    rate-constant: {A: 2.17e+07, b: 0.0, Ea: 7.3165608e+06}
+  - equation: CH3O + H <=> CH2O + H2
+    rate-constant: {A: 2.0e+10, b: 0.0, Ea: 0.0}
+  - equation: CH3O + HO2 <=> CH2O + H2O2
+    rate-constant: {A: 3.01e+08, b: 0.0, Ea: 0.0}
+  - equation: CH3 + CH3O <=> CH2O + CH4
+    rate-constant: {A: 1.2e+10, b: 0.0, Ea: 0.0}
+  - equation: HCOH + O2 => CO2 + H + OH
+    rate-constant: {A: 5.0e+09, b: 0.0, Ea: 0.0}
+  - equation: HCOH + O2 <=> CO2 + H2O
+    rate-constant: {A: 3.0e+10, b: 0.0, Ea: 0.0}
+  - equation: HCOH + O => CO2 + 2 H
+    rate-constant: {A: 5.0e+10, b: 0.0, Ea: 0.0}
+  - equation: HCOH + O => CO + H + OH
+    rate-constant: {A: 3.0e+10, b: 0.0, Ea: 0.0}
+  - equation: H + HCOH <=> CH2O + H
+    rate-constant: {A: 2.0e+11, b: 0.0, Ea: 0.0}
+  - equation: HCOH + OH <=> H2O + HCO
+    rate-constant: {A: 2.0e+10, b: 0.0, Ea: 0.0}
+  - equation: H + HCO (+M) <=> CH2O (+M)
+    type: falloff
+    low-P-rate-constant: {A: 1.35e+18, b: -2.57, Ea: 5.9622e+06}
+    high-P-rate-constant: {A: 1.09e+09, b: 0.48, Ea: -1.08784e+06}
+    Troe: {A: 0.7824, T3: 271.0, T1: 2755.0, T2: 6570.0}
+  - equation: CO + H2 (+M) <=> CH2O (+M)
+    type: falloff
+    low-P-rate-constant: {A: 5.07e+21, b: -3.42, Ea: 3.52912032e+08}
+    high-P-rate-constant: {A: 4.3e+04, b: 1.5, Ea: 3.330464e+08}
+    Troe: {A: 0.932, T3: 197.0, T1: 1540.0, T2: 1.03e+04}
+  - equation: CH2O + O2 <=> HCO + HO2
+    rate-constant: {A: 8.07e+12, b: 0.0, Ea: 2.2350928e+08}
+  - equation: CH2O + O <=> HCO + OH
+    rate-constant: {A: 6.26e+06, b: 1.15, Ea: 9.45584e+06}
+  - equation: CH2O + H <=> H2 + HCO
+    rate-constant: {A: 106.91154, b: 2.73093, Ea: 7.89579376e+06}
+  - equation: CH2O + OH <=> H2O + HCO
+    rate-constant: {A: 2.185e+06, b: 1.1782, Ea: -2.41006768e+06}
+  - equation: CH2O + HO2 <=> H2O2 + HCO
+    rate-constant: {A: 7.1e-06, b: 4.517, Ea: 2.753072e+07}
+  - equation: CH2O + CH3 <=> CH4 + HCO
+    rate-constant: {A: 2.93e-05, b: 4.3, Ea: 1.1844904e+07}
+  - equation: CH2O + OH => CO + H + H2O
+    rate-constant: {A: 2.565e+08, b: 0.69304, Ea: 3.91986408e+07}
+  - equation: CH2O + H => CO + H2 + H
+    rate-constant: {A: 1.94e+04, b: 2.192, Ea: 4.912137336e+07}
+  - equation: HCO + M <=> CO + H + M
+    type: three-body
+    rate-constant: {A: 4.75e+08, b: 0.66, Ea: 6.221608e+07}
+    efficiencies: {C2H6: 3.0, CH4: 2.0, CO: 1.5, CO2: 2.0, H2: 2.0, H2O: 6.0}
+  - equation: HCO + O2 <=> CO + HO2
+    rate-constant: {A: 1.2e+07, b: 0.807, Ea: -3.041768e+06}
+  - equation: HCO + O <=> CO + OH
+    rate-constant: {A: 3.02e+10, b: 0.0, Ea: 0.0}
+  - equation: H + HCO <=> CO + H2
+    rate-constant: {A: 1.204e+11, b: 0.0, Ea: 0.0}
+  - equation: HCO + OH <=> CO + H2O
+    rate-constant: {A: 3.011e+10, b: 0.0, Ea: 0.0}
+  - equation: CH3 + HCO <=> CH4 + CO
+    rate-constant: {A: 2.65e+10, b: 0.0, Ea: 0.0}
+  - equation: 2 HCO <=> CH2O + CO
+    rate-constant: {A: 2.7e+10, b: 0.0, Ea: 0.0}
+  - equation: HCO + O <=> CO2 + H
+    rate-constant: {A: 3.0e+10, b: 0.0, Ea: 0.0}
+  - equation: HCO + HO2 => CO2 + H + OH
+    rate-constant: {A: 3.0e+10, b: 0.0, Ea: 0.0}
+  - equation: 2 HCO => 2 CO + H2
+    rate-constant: {A: 3.0e+09, b: 0.0, Ea: 0.0}
+  - equation: CH3O (+M) <=> CH2O + H (+M)
+    type: falloff
+    low-P-rate-constant: {A: 6.022e+13, b: -0.547, Ea: 7.54119976e+07}
+    high-P-rate-constant: {A: 1.13e+10, b: 1.21, Ea: 1.007712216e+08}
+    Troe: {A: 0.341, T3: 28.0, T1: 1000.0, T2: 2339.0}
+    efficiencies: {C2H6: 3.0, CH4: 2.0, CO: 1.5, CO2: 2.0, H2: 2.0, H2O: 6.0, O2: 1.0}
+  - equation: 2 CH3 (+M) <=> C2H6 (+M)
+    type: falloff
+    low-P-rate-constant: {A: 8.054e+25, b: -3.75, Ea: 4.1070144e+06}
+    high-P-rate-constant: {A: 2.277e+12, b: -0.69, Ea: 7.317816e+05}
+    Troe: {A: 0.0, T3: 570.0, T1: 1.0e+30, T2: 1.0e+30}
+    efficiencies: {CO: 2.0, CO2: 3.0, H2O: 5.0}
+  - equation: C2H5 + H (+M) <=> C2H6 (+M)
+    type: falloff
+    low-P-rate-constant: {A: 1.99e+35, b: -7.08, Ea: 2.797004e+07}
+    high-P-rate-constant: {A: 5.21e+14, b: -0.99, Ea: 6.61072e+06}
+    Troe: {A: 0.842, T3: 125.0, T1: 2219.0, T2: 6882.0}
+    efficiencies: {C2H6: 3.0, CH4: 2.0, CO: 1.5, CO2: 2.0, H2: 2.0, H2O: 6.0}
+  - equation: 2 CH3 <=> C2H5 + H
+    rate-constant: {A: 1.377897222222221e+11, b: 0.3307777777777783,
+    Ea: 5.632245111111112e+07}
+  - equation: C2H6 + O2 <=> C2H5 + HO2
+    rate-constant: {A: 6.03e+10, b: 0.0, Ea: 2.1702408e+08}
+  - equation: C2H6 + O <=> C2H5 + OH
+    rate-constant: {A: 3550.0, b: 2.4, Ea: 2.439272e+07}
+  - equation: C2H6 + H <=> C2H5 + H2
+    duplicate: true
+    rate-constant: {A: 7.35, b: 3.1, Ea: 2.234256e+07}
+    duplicate: true
+  - equation: C2H6 + H <=> C2H5 + H2
+    duplicate: true
+    rate-constant: {A: 3.26e+11, b: 0.0, Ea: 5.73208e+07}
+    duplicate: true
+  - equation: C2H6 + OH <=> C2H5 + H2O
+    rate-constant: {A: 1613.9, b: 2.224, Ea: 3.10130632e+06}
+  - equation: C2H6 + HO2 <=> C2H5 + H2O2
+    rate-constant: {A: 0.0346, b: 3.61, Ea: 7.079328e+07}
+  - equation: C2H6 + CH3 <=> C2H5 + CH4
+    rate-constant: {A: 0.0345, b: 3.44, Ea: 4.3475944e+07}
+  - equation: C2H5O2 + C2H6 <=> C2H5 + C2H5O2H
+    rate-constant: {A: 8.6e-03, b: 3.76, Ea: 7.19648e+07}
+  - equation: C2H4 + H (+M) <=> C2H5 (+M)
+    type: falloff
+    low-P-rate-constant: {A: 1.419e+33, b: -6.642, Ea: 2.4137496e+07}
+    high-P-rate-constant: {A: 9.569e+05, b: 1.463, Ea: 5.66932e+06}
+    Troe: {A: -0.569, T3: 299.0, T1: -9147.0, T2: 152.4}
+    efficiencies: {C2H6: 3.0, CH4: 2.0, CO: 1.5, CO2: 2.0, H2: 2.0, H2O: 6.0}
+  - equation: C2H5 + H <=> C2H4 + H2
+    rate-constant: {A: 1.81e+08, b: 0.0, Ea: 0.0}
+  - equation: 2 C2H4 <=> C2H3 + C2H5
+    rate-constant: {A: 4.82e+11, b: 0.0, Ea: 2.9928152e+08}
+  - equation: C2H5 + CH3 <=> C2H4 + CH4
+    rate-constant: {A: 11.8, b: 2.45, Ea: -1.2221464e+07}
+  - equation: C2H5 + O <=> C2H5O
+    rate-constant: {A: 3.17e+10, b: 0.03, Ea: -1.648496e+06}
+  - equation: C2H5 + O <=> C2H4 + OH
+    rate-constant: {A: 3.17e+09, b: 0.03, Ea: -1.648496e+06}
+  - equation: C2H5 + OH <=> C2H4 + H2O
+    rate-constant: {A: 1.586736e+21, b: -3.177811111111111, Ea: 2.51943744e+07}
+  - equation: C2H5 + HO2 <=> C2H5O + OH
+    rate-constant: {A: 1.0e+09, b: 0.269, Ea: -2.878592e+06}
+  - equation: C2H5 + HO2 <=> C2H4 + H2O2
+    rate-constant: {A: 6.2e+09, b: 0.0, Ea: 0.0}
+  - equation: C2H5 + O2 <=> C2H5O2
+    rate-constant: {A: 7.094971428571421e+36, b: -8.521428571428570,
+    Ea: 3.227836457142857e+07}
+  - equation: C2H5 + O2 <=> C2H4 + HO2
+    rate-constant: {A: 1.419142857142859e+09, b: -0.11, Ea: 1.473903657142858e+07}
+  - equation: C2H5O2 <=> C2H4 + HO2
+    rate-constant: {A: 4.138985714285709e+36, b: -7.474285714285713,
+    Ea: 1.547721371428571e+08}
+  - equation: C2H5O2 + HO2 <=> C2H5O2H + O2
+    rate-constant: {A: 1.75e+07, b: 0.0, Ea: -1.37026e+07}
+  - equation: C2H5O2 + CH2O <=> C2H5O2H + HCO
+    rate-constant: {A: 1.99e+09, b: 0.0, Ea: 4.878544e+07}
+  - equation: C2H5O2 + CH4 <=> C2H5O2H + CH3
+    rate-constant: {A: 0.0124, b: 3.69, Ea: 8.91192e+07}
+  - equation: C2H5O2 + H2 <=> C2H5O2H + H
+    rate-constant: {A: 1.5e+11, b: 0.0, Ea: 1.0890952e+08}
+  - equation: C2H5O2H <=> C2H5O + OH
+    rate-constant: {A: 6.31e+14, b: 0.0, Ea: 1.769832e+08}
+  - equation: C2H3 + H <=> C2H4
+    rate-constant: {A: 1.436929455555554e+14, b: -0.5012922222222218,
+    Ea: 3.117419857022220e+06}
+  - equation: C2H4 + O2 <=> C2H3 + HO2
+    rate-constant: {A: 7.17e+10, b: 0.0, Ea: 2.5108184e+08}
+  - equation: C2H4 + H <=> C2H3 + H2
+    rate-constant: {A: 6189.0, b: 2.31, Ea: 5.36803016e+07}
+  - equation: C2H4 + OH <=> C2H3 + H2O
+    rate-constant: {A: 1.3488e-04, b: 4.1965, Ea: -3.62179592e+06}
+  - equation: C2H4 + HO2 <=> C2H3 + H2O2
+    rate-constant: {A: 1.914, b: 3.059, Ea: 8.70213424e+07}
+  - equation: C2H4 + C2H5O2 <=> C2H3 + C2H5O2H
+    rate-constant: {A: 3.828, b: 3.059, Ea: 8.70213424e+07}
+  - equation: C2H4 + CH3 <=> C2H3 + CH4
+    duplicate: true
+    rate-constant: {A: 0.975564, b: 2.947, Ea: 6.3379232e+07}
+    duplicate: true
+  - equation: C2H4 + CH3 <=> C2H3 + CH4
+    duplicate: true
+    rate-constant: {A: 8.1297e-08, b: 4.417, Ea: 3.69689872e+07}
+    duplicate: true
+  - equation: C2H4 + C2H5 <=> C2H3 + C2H6
+    duplicate: true
+    rate-constant: {A: 0.487782, b: 2.947, Ea: 6.3379232e+07}
+    duplicate: true
+  - equation: C2H4 + C2H5 <=> C2H3 + C2H6
+    duplicate: true
+    rate-constant: {A: 4.06485e-08, b: 4.417, Ea: 3.69689872e+07}
+    duplicate: true
+  - equation: C2H4 + O <=> CH3 + HCO
+    rate-constant: {A: 5.708e+14, b: -1.713, Ea: 1.208238784e+07}
+  - equation: C2H4 + O <=> CH2CHO + H
+    rate-constant: {A: 3.005e+07, b: 0.795, Ea: 8.16938552e+06}
+  - equation: C2H4 + O <=> CH2 + CH2O
+    rate-constant: {A: 5775.0, b: 1.991, Ea: 1.1965194e+07}
+  - equation: C2H4 + O <=> CH2CO + H2
+    rate-constant: {A: 2.118e+13, b: -1.617, Ea: 1.196469192e+07}
+  - equation: C2H4 + OH <=> CH2O + CH3
+    rate-constant: {A: 1.316745777777779e+06, b: 1.057777777777777,
+    Ea: 1.779385466666668e+07}
+  - equation: C2H4 + OH <=> PC2H4OH
+    rate-constant: {A: 1.139833333333332e+33, b: -7.097, Ea: 3.059615084444445e+07}
+  - equation: C2H2 + H (+M) <=> C2H3 (+M)
+    type: falloff
+    low-P-rate-constant: {A: 6.346e+25, b: -4.664, Ea: 1.581552e+07}
+    high-P-rate-constant: {A: 1.71e+07, b: 1.266, Ea: 1.1334456e+07}
+    Troe: {A: 0.788, T3: -1.02e+04, T1: 1.0e-30}
+    efficiencies: {C2H6: 3.0, CH4: 2.0, CO: 1.5, CO2: 2.0, H2: 2.0, H2O: 6.0, N2: 1.4}
+  - equation: C2H3 + O2 <=> C2H3OO
+    duplicate: true
+    rate-constant: {A: 4.292414933333331e+50, b: -12.32111111111111,
+    Ea: 7.012481871345030e+07}
+  - equation: C2H3 + O2 <=> C2H3OO
+    duplicate: true
+    rate-constant: {A: 1.395953216374269e+26, b: -5.621461988304094,
+    Ea: 1.492919709941521e+07}
+  - equation: C2H3 + O2 <=> CHCHO + OH
+    duplicate: true
+    rate-constant: {A: 1.508775741403508e+17, b: -2.599181286549707,
+    Ea: 1.842358581520467e+07}
+  - equation: C2H3 + O2 <=> CHCHO + OH
+    duplicate: true
+    rate-constant: {A: 7.059853801169597e+10, b: -0.2059649122807021,
+    Ea: 1.157940350877194e+07}
+  - equation: C2H3 + O2 <=> CH2CHO + O
+    duplicate: true
+    rate-constant: {A: 6.667192982456146e+19, b: -2.816491228070176,
+    Ea: 3.078266671345029e+07}
+  - equation: C2H3 + O2 <=> CH2CHO + O
+    duplicate: true
+    rate-constant: {A: 7.950701754385966e+06, b: 0.6907602339181287, Ea: 1.9585304e+06}
+  - equation: C2H3 + O2 <=> C2H2 + HO2
+    duplicate: true
+    rate-constant: {A: 5.445789473684216e+07, b: 0.6346198830409354,
+    Ea: 1.924180004678363e+07}
+  - equation: C2H3 + O2 <=> C2H2 + HO2
+    duplicate: true
+    rate-constant: {A: 4.468304093567253e-03, b: 3.07, Ea: -1.321637515789473e+06}
+  - equation: C2H3 + O2 <=> CHOCHO + H
+    duplicate: true
+    rate-constant: {A: 1.427440350877192e+15, b: -1.698187134502924,
+    Ea: 1.207005702923976e+07}
+  - equation: C2H3 + O2 <=> CHOCHO + H
+    duplicate: true
+    rate-constant: {A: 1.868421052709943e+12, b: -0.3022222222222238,
+    Ea: -1.557270119298246e+07}
+  - equation: C2H3 + O2 <=> CH2CO + OH
+    duplicate: true
+    rate-constant: {A: 1.214561403508772, b: 2.371695906432748, Ea: 2.567052828070175e+07}
+  - equation: C2H3 + O2 <=> CH2CO + OH
+    duplicate: true
+    rate-constant: {A: 9.751403508771930e-04, b: 2.912456140350877,
+    Ea: 9.008861567251462e+06}
+  - equation: C2H3 + O2 <=> CH2O + HCO
+    duplicate: true
+    rate-constant: {A: 1.168982456140351e+33, b: -7.357894736842105,
+    Ea: 5.381773988304093e+07}
+  - equation: C2H3 + O2 <=> CH2O + HCO
+    duplicate: true
+    rate-constant: {A: 7.319532163742688e+12, b: -1.285263157894737,
+    Ea: 5.090753543859649e+06}
+  - equation: C2H3 + O2 => CH2O + CO + H
+    duplicate: true
+    rate-constant: {A: 2.731812865497076e+33, b: -7.357894736842105,
+    Ea: 5.381773988304093e+07}
+  - equation: C2H3 + O2 => CH2O + CO + H
+    duplicate: true
+    rate-constant: {A: 1.702596491228070e+13, b: -1.285263157894737,
+    Ea: 5.090753543859649e+06}
+  - equation: C2H3 + O2 <=> CH3O + CO
+    duplicate: true
+    rate-constant: {A: 8.013450292408720e+20, b: -4.091988304093568,
+    Ea: -2.200569172397660e+07}
+  - equation: C2H3 + O2 <=> CH3O + CO
+    duplicate: true
+    rate-constant: {A: 4.165672514619887e+13, b: -1.761169590643275,
+    Ea: 1.029861015204679e+07}
+  - equation: C2H3 + O2 <=> CH3 + CO2
+    duplicate: true
+    rate-constant: {A: 2.990584795321637e+32, b: -7.658654970760234,
+    Ea: 5.580012397660819e+07}
+  - equation: C2H3 + O2 <=> CH3 + CO2
+    duplicate: true
+    rate-constant: {A: 1.056385964912281e+11, b: -1.197719298245614,
+    Ea: 4.864426058479534e+06}
+  - equation: C2H3OO <=> CHCHO + OH
+    duplicate: true
+    rate-constant: {A: 9.975438596491235e+50, b: -11.40608187134503,
+    Ea: 2.314799223391813e+08}
+  - equation: C2H3OO <=> CHCHO + OH
+    duplicate: true
+    rate-constant: {A: 1.099415204678362e+103, b: -27.13163742690058,
+    Ea: 2.680468589473684e+08}
+  - equation: C2H3OO <=> CH2CHO + O
+    duplicate: true
+    rate-constant: {A: 1.087719298245697e+68, b: -15.11105263157894,
+    Ea: 2.454769927485380e+08}
+  - equation: C2H3OO <=> CH2CHO + O
+    duplicate: true
+    rate-constant: {A: 3.733990058479530e+31, b: -5.602923976608187,
+    Ea: 1.716763709941520e+08}
+  - equation: C2H3OO <=> CHOCHO + H
+    duplicate: true
+    rate-constant: {A: 7.368421052631574e+58, b: -10.31912280701754,
+    Ea: 1.853614764912281e+08}
+  - equation: C2H3OO <=> CHOCHO + H
+    duplicate: true
+    rate-constant: {A: 3.118187247368423e+29, b: -4.457602339181287,
+    Ea: 1.332711658479532e+08}
+  - equation: C2H3OO <=> CH2CO + OH
+    duplicate: true
+    rate-constant: {A: 1.844754385964914e+36, b: -7.639122807017544,
+    Ea: 2.212694942690059e+08}
+  - equation: C2H3OO <=> CH2CO + OH
+    duplicate: true
+    rate-constant: {A: 0.04402526315789477, b: 3.125380116959064,
+    Ea: 1.365638025730994e+08}
+  - equation: C2H3OO <=> CH2O + HCO
+    duplicate: true
+    rate-constant: {A: 4.263157894736840e+171, b: -27.97228070175438,
+    Ea: 5.312089590643273e+08}
+  - equation: C2H3OO <=> CH2O + HCO
+    duplicate: true
+    rate-constant: {A: 9.0514619883041e+174, b: -26.34725146198832,
+    Ea: 2.063494970760234e+08}
+  - equation: C2H3OO => CH2O + CO + H
+    rate-constant: {A: 3.220491228070174e+34, b: -6.533684210526316,
+    Ea: 1.490213567251462e+08}
+  - equation: C2H3OO <=> CH3O + CO
+    rate-constant: {A: 7.485380116959061e+78, b: -14.21649122807017,
+    Ea: 2.478325113450292e+08}
+  - equation: C2H3 + H <=> C2H2 + H2
+    rate-constant: {A: 2.33581e+05, b: 1.32572, Ea: -5.258585088e+06}
+  - equation: C2H3 + CH3 <=> C2H2 + CH4
+    rate-constant: {A: 2.05e+10, b: 0.0, Ea: 0.0}
+  - equation: 2 C2H3 <=> C2H2 + C2H4
+    rate-constant: {A: 1.45e+10, b: 0.0, Ea: 0.0}
+  - equation: C2H3 + HO2 => CH2CHO + OH
+    rate-constant: {A: 3.011e+10, b: 0.0, Ea: 0.0}
+  - equation: C2H3 + O <=> CH2CHO
+    rate-constant: {A: 1.03e+10, b: 0.2, Ea: -1.786568e+06}
+  - equation: C2H3 + O <=> C2H2 + OH
+    rate-constant: {A: 1.03e+09, b: 0.2, Ea: -1.786568e+06}
+  - equation: C2H3 + HCO <=> C2H4 + CO
+    rate-constant: {A: 9.033e+10, b: 0.0, Ea: 0.0}
+  - equation: C2H3OO + H <=> CH2CHO + OH
+    rate-constant: {A: 9.6e+10, b: 0.0, Ea: 0.0}
+  - equation: C2H3OO + O <=> CH2CHO + O2
+    rate-constant: {A: 1.6e+10, b: 0.0, Ea: -6.0668e+05}
+  - equation: C2H3OO + OH <=> CH2CHO + HO2
+    rate-constant: {A: 4.0e+08, b: 0.6, Ea: 0.0}
+  - equation: C2H3OO + CO <=> CH2CHO + CO2
+    rate-constant: {A: 160.0, b: 2.18, Ea: 7.506096e+07}
+  - equation: C2H3OO + CH3 <=> CH2CHO + CH3O
+    rate-constant: {A: 5.1e+09, b: 0.0, Ea: -5.903624e+06}
+  - equation: CHCHO + H <=> CH2CO + H
+    rate-constant: {A: 1.0e+11, b: 0.0, Ea: 0.0}
+  - equation: CHCHO + O2 => CO2 + H + HCO
+    rate-constant: {A: 2.1e+06, b: 0.9929, Ea: -1.125496e+06}
+  - equation: CHCHO + O2 <=> CHOCHO + O
+    rate-constant: {A: 1300.0, b: 2.4202, Ea: 6.711136e+06}
+  - equation: CHOCHO <=> CH2O + CO
+    rate-constant: {A: 2.049736522091609e+56, b: -12.28633968382651,
+    Ea: 3.269544374884475e+08}
+  - equation: CHOCHO <=> CO + HCOH
+    rate-constant: {A: 1.238182002432103e+59, b: -12.98633968382651,
+    Ea: 3.417252269347386e+08}
+  - equation: CHOCHO => 2 CO + H2
+    rate-constant: {A: 7.793680583704903e+58, b: -12.98633968382651,
+    Ea: 3.447365070239156e+08}
+  - equation: CHOCHO <=> 2 HCO
+    rate-constant: {A: 8.200608025942438e+59, b: -13.14316984191325,
+    Ea: 3.666543732160519e+08}
+  - equation: CHOCHO + OH => CO + H2O + HCO
+    rate-constant: {A: 61.3299, b: 2.65, Ea: -1.91894976e+07}
+  - equation: CHOCHO + O => CO + HCO + OH
+    rate-constant: {A: 5.94e+09, b: 0.0, Ea: 7.815712e+06}
+  - equation: CHOCHO + HO2 => CO + H2O2 + HCO
+    rate-constant: {A: 3.01e+09, b: 0.0, Ea: 4.987328e+07}
+  - equation: CHOCHO + O2 => CO + HCO + HO2
+    rate-constant: {A: 3.01e+10, b: 0.0, Ea: 1.638036e+08}
+  - equation: CHOCHO + H <=> CH2O + HCO
+    rate-constant: {A: 5.4e+10, b: 0.0, Ea: 1.79912e+07}
+  - equation: C2H2 + O2 <=> 2 HCO
+    duplicate: true
+    rate-constant: {A: 6.1e+09, b: 0.0, Ea: 2.22798e+08}
+    duplicate: true
+  - equation: C2H2 + O2 <=> 2 HCO
+    duplicate: true
+    rate-constant: {A: 1.7e+04, b: 1.67, Ea: 2.9689664e+08}
+    duplicate: true
+  - equation: C2H2 + HCO <=> C2H3 + CO
+    rate-constant: {A: 1.0e+04, b: 2.0, Ea: 2.5104e+07}
+  - equation: C2H2 + OH <=> CH2CO + H
+    rate-constant: {A: 6179.666666666666, b: 1.605555555555556, Ea: 1.181933511111112e+07}
+  - equation: C2H2 + OH <=> CH3 + CO
+    rate-constant: {A: 8.071111111111108e+05, b: 0.8355555555555557,
+    Ea: 1.347991822222222e+07}
+  - equation: C2H2 + O <=> CH2 + CO
+    rate-constant: {A: 7.395e+05, b: 1.28, Ea: 1.0342848e+07}
+  - equation: C2H2 + O <=> H + HCCO
+    rate-constant: {A: 2.958e+06, b: 1.28, Ea: 1.0342848e+07}
+  - equation: C2H2 + O <=> CHCHO
+    rate-constant: {A: 3.8e+41, b: -9.63, Ea: 1.573184e+08}
+  - equation: C2H2 + HO2 <=> CHCHO + OH
+    duplicate: true
+    rate-constant: {A: 2.441461988304095e+07, b: 0.8322222222222221,
+    Ea: 8.205386760233918e+07}
+  - equation: C2H2 + HO2 <=> CHCHO + OH
+    duplicate: true
+    rate-constant: {A: 1.528128654970761e+05, b: 1.336608187134503,
+    Ea: 6.370984140350877e+07}
+  - equation: C2H2 + HO2 <=> CH2CHO + O
+    duplicate: true
+    rate-constant: {A: 1.157894736842105e+71, b: -10.03549707602339,
+    Ea: 2.990666923976607e+08}
+  - equation: C2H2 + HO2 <=> CH2CHO + O
+    duplicate: true
+    rate-constant: {A: 38.42117387134501, b: 2.485263157894737, Ea: 4.863936701754386e+07}
+  - equation: C2H2 + HO2 <=> CHOCHO + H
+    duplicate: true
+    rate-constant: {A: 4.093567251461987e+46, b: -6.796081871345026,
+    Ea: 2.192986100584795e+08}
+  - equation: C2H2 + HO2 <=> CHOCHO + H
+    duplicate: true
+    rate-constant: {A: 447.3684293982455, b: 2.093450292397661, Ea: 4.285335990643276e+07}
+  - equation: C2H2 + HO2 <=> CH2CO + OH
+    duplicate: true
+    rate-constant: {A: 2.003976608187136e-08, b: 4.494853801169590,
+    Ea: 6.741818666666667e+07}
+  - equation: C2H2 + HO2 <=> CH2CO + OH
+    duplicate: true
+    rate-constant: {A: 5.440678362573098e-24, b: 8.490994152046785,
+    Ea: 3.513052781286550e+07}
+  - equation: C2H2 + HO2 <=> CH2O + HCO
+    duplicate: true
+    rate-constant: {A: 3.039298245614038e+32, b: -4.249532163742692,
+    Ea: 8.399490105263159e+07}
+  - equation: C2H2 + HO2 <=> CH2O + HCO
+    duplicate: true
+    rate-constant: {A: 4085.616105263162, b: 1.950935672514619, Ea: 3.997824233918129e+07}
+  - equation: C2H2 + HO2 => CH2O + CO + H
+    duplicate: true
+    rate-constant: {A: 7.100000000000006e+32, b: -4.249532163742692,
+    Ea: 8.399490105263159e+07}
+  - equation: C2H2 + HO2 => CH2O + CO + H
+    duplicate: true
+    rate-constant: {A: 9549.712432748547, b: 1.950935672514619, Ea: 3.997824233918129e+07}
+  - equation: C2H2 + HO2 <=> CH3O + CO
+    duplicate: true
+    rate-constant: {A: 1.370175438629592e+20, b: -2.578654970760235,
+    Ea: 7.249599672514620e+07}
+  - equation: C2H2 + HO2 <=> CH3O + CO
+    duplicate: true
+    rate-constant: {A: 0.1187488520467837, b: 2.763976608187134, Ea: 3.583216748538012e+07}
+  - equation: C2H2 + HO2 <=> CH3 + CO2
+    duplicate: true
+    rate-constant: {A: 3.554152046783632e+25, b: -3.489181286549710,
+    Ea: 7.839812818713452e+07}
+  - equation: C2H2 + HO2 <=> CH3 + CO2
+    duplicate: true
+    rate-constant: {A: 7.722812450292404, b: 2.277543859649122, Ea: 3.824885567251462e+07}
+  - equation: C2H2 + HO2 <=> C2H3OO
+    duplicate: true
+    rate-constant: {A: 5.311851461988303e+43, b: -11.01777777777778,
+    Ea: 1.125527808187135e+08}
+  - equation: C2H2 + HO2 <=> C2H3OO
+    duplicate: true
+    rate-constant: {A: 1.210415204678362e+19, b: -4.072397660818713,
+    Ea: 5.524788491228070e+07}
+  - equation: CH2CHO <=> CH2CO + H
+    rate-constant: {A: 1.928088888888890e+36, b: -6.764444444444445,
+    Ea: 2.151092026666667e+08}
+  - equation: CH2CHO <=> CH3 + CO
+    rate-constant: {A: 1.483777777777778e+35, b: -6.758888888888889,
+    Ea: 2.029258595555556e+08}
+  - equation: CH2CHO + H <=> CH3 + HCO
+    rate-constant: {A: 1.549523644444446e+22, b: -2.744444444444445,
+    Ea: 4.325456391111112e+07}
+  - equation: C2H5 + HCO <=> CH2CHO + CH3
+    rate-constant: {A: 1.044679013333335e+22, b: -2.850388888888889,
+    Ea: 3.578333457777779e+07}
+  - equation: CH2CHO + OH <=> CH2CO + H2O
+    rate-constant: {A: 2.0e+10, b: 0.0, Ea: 0.0}
+  - equation: CH2CHO + O <=> CH2O + HCO
+    rate-constant: {A: 5.0e+10, b: 0.0, Ea: 0.0}
+  - equation: CH2CHO + O2 <=> CH2CO + HO2
+    rate-constant: {A: 3.927822222222226e+04, b: 1.941111111111111,
+    Ea: 1.030426222222222e+08}
+  - equation: CH2CHO + O2 => CH2O + CO + OH
+    rate-constant: {A: 7.333383072222214e+15, b: -1.32, Ea: 4.275118222222222e+07}
+  - equation: CH2 + CO (+M) <=> CH2CO (+M)
+    type: falloff
+    low-P-rate-constant: {A: 2.69e+27, b: -5.11, Ea: 2.968548e+07}
+    high-P-rate-constant: {A: 8.1e+08, b: 0.5, Ea: 1.886984e+07}
+    Troe: {A: 0.5907, T3: 275.0, T1: 1226.0, T2: 5185.0}
+    efficiencies: {C2H6: 3.0, CH4: 2.0, CO: 1.5, CO2: 2.0, H2: 2.0, H2O: 6.0}
+  - equation: CH2CO + H <=> H2 + HCCO
+    rate-constant: {A: 1.401e+12, b: -0.171, Ea: 3.67489088e+07}
+  - equation: CH2CO + OH <=> H2O + HCCO
+    rate-constant: {A: 1.0e+10, b: 0.0, Ea: 8.368e+06}
+  - equation: CH2CO + H <=> CH3 + CO
+    rate-constant: {A: 7.704e+10, b: -0.171, Ea: 1.75025088e+07}
+  - equation: CH2CO + O <=> CH2 + CO2
+    rate-constant: {A: 1.75e+09, b: 0.0, Ea: 5.6484e+06}
+  - equation: CH2CO + CH3 <=> C2H5 + CO
+    rate-constant: {A: 47.69, b: 2.312, Ea: 3.9614112e+07}
+  - equation: HCCO + O2 => 2 CO + OH
+    rate-constant: {A: 1.91e+08, b: -0.02, Ea: 4.26768e+06}
+  - equation: HCCO + O2 => CO + CO2 + H
+    rate-constant: {A: 4.78e+09, b: -0.142, Ea: 4.8116e+06}
+  - equation: HCCO + O2 => CO + HCO + O
+    rate-constant: {A: 0.218, b: 2.692, Ea: 1.4815544e+07}
+  - equation: HCCO + OH <=> CO + HCOH
+    rate-constant: {A: 1.5e+11, b: -0.0575, Ea: 1.09106168e+06}
+  - equation: HCCO + O => 2 CO + H
+    rate-constant: {A: 8.0e+10, b: 0.0, Ea: 0.0}
+  - equation: CH2 + HCCO <=> C2H3 + CO
+    rate-constant: {A: 1.0e+10, b: 0.0, Ea: 0.0}
+  - equation: 2 HCCO => C2H2 + 2 CO
+    rate-constant: {A: 1.0e+10, b: 0.0, Ea: 0.0}
+  - equation: C2H5O (+M) <=> CH2O + CH3 (+M)
+    type: falloff
+    low-P-rate-constant: {A: 4.7e+22, b: -3.0, Ea: 6.9169888e+07}
+    high-P-rate-constant: {A: 6.3e+10, b: 0.93, Ea: 7.1538032e+07}
+    Troe: {A: 0.426, T3: 0.3, T1: 2278.0, T2: 1.0e+05}
+  - equation: O2C2H4OH <=> O2 + PC2H4OH
+    rate-constant: {A: 3.9e+16, b: -1.0, Ea: 1.2552e+08}
+  - equation: O2C2H4OH => 2 CH2O + OH
+    rate-constant: {A: 2.866666666666669e+16, b: -2.157777777777778,
+    Ea: 7.038975644444445e+07}
+  - equation: C3H8 (+M) <=> C2H5 + CH3 (+M)
+    type: falloff
+    low-P-rate-constant: {A: 4.77e+74, b: -16.67, Ea: 4.188184e+08}
+    high-P-rate-constant: {A: 1.55e+24, b: -2.034, Ea: 3.78183392e+08}
+    Troe: {A: 0.81, T3: 3091.0, T1: 128.0, T2: 8829.0}
+    efficiencies: {CO: 2.0, CO2: 3.0, H2: 2.0, H2O: 5.0}
+  - equation: H + NC3H7 (+M) <=> C3H8 (+M)
+    type: falloff
+    low-P-rate-constant: {A: 3.01e+42, b: -9.32, Ea: 2.44077824e+07}
+    high-P-rate-constant: {A: 3.6e+10, b: 0.0, Ea: 0.0}
+    Troe: {A: 0.498, T3: 1314.0, T1: 1314.0, T2: 5.0e+04}
+    efficiencies: {C2H6: 3.0, CH4: 2.0, CO: 1.5, CO2: 2.0, H2: 2.0, H2O: 6.0}
+  - equation: H + IC3H7 <=> C3H8
+    rate-constant: {A: 1.66e+10, b: 0.22, Ea: 0.0}
+  - equation: C3H8 + IC3H7 <=> C3H8 + NC3H7
+    rate-constant: {A: 8.44e-06, b: 4.2, Ea: 3.6501216e+07}
+  - equation: C3H8 + O2 <=> HO2 + NC3H7
+    rate-constant: {A: 3.97e+10, b: 0.0, Ea: 2.129656e+08}
+  - equation: C3H8 + H <=> H2 + NC3H7
+    duplicate: true
+    rate-constant: {A: 12.9, b: 2.93, Ea: 2.194792512e+07}
+    duplicate: true
+  - equation: C3H8 + H <=> H2 + NC3H7
+    duplicate: true
+    rate-constant: {A: 1.47e+07, b: 1.31, Ea: 4.30952e+07}
+    duplicate: true
+  - equation: C3H8 + H <=> H2 + IC3H7
+    duplicate: true
+    rate-constant: {A: 30.6, b: 2.8, Ea: 1.4532186784e+07}
+    duplicate: true
+  - equation: C3H8 + H <=> H2 + IC3H7
+    duplicate: true
+    rate-constant: {A: 5.73e+10, b: 0.1, Ea: 4.43504e+07}
+    duplicate: true
+  - equation: C3H8 + O <=> NC3H7 + OH
+    rate-constant: {A: 3710.0, b: 2.4, Ea: 2.303292e+07}
+  - equation: C3H8 + OH <=> H2O + NC3H7
+    rate-constant: {A: 1.33e+05, b: 1.59, Ea: 4.535456e+06}
+  - equation: C3H8 + HO2 <=> H2O2 + NC3H7
+    rate-constant: {A: 0.0408, b: 3.59, Ea: 7.179744e+07}
+  - equation: C3H8 + CH3 <=> CH4 + NC3H7
+    rate-constant: {A: 9.04e-04, b: 3.65, Ea: 2.9932336e+07}
+  - equation: C2H3 + C3H8 <=> C2H4 + NC3H7
+    rate-constant: {A: 0.84, b: 3.05, Ea: 2.5104e+07}
+  - equation: C2H5 + C3H8 <=> C2H6 + NC3H7
+    rate-constant: {A: 3.132e-04, b: 3.76, Ea: 4.01069872e+07}
+  - equation: C3H5-A + C3H8 <=> C3H6 + NC3H7
+    rate-constant: {A: 7.94e+08, b: 0.0, Ea: 8.5772e+07}
+  - equation: C2H5O2 + C3H8 <=> C2H5O2H + NC3H7
+    rate-constant: {A: 7.14e-03, b: 3.65, Ea: 7.15464e+07}
+  - equation: C3H8 + O2 <=> HO2 + IC3H7
+    rate-constant: {A: 3.97e+10, b: 0.0, Ea: 1.995768e+08}
+  - equation: C3H8 + O <=> IC3H7 + OH
+    rate-constant: {A: 549.0, b: 2.5, Ea: 1.313776e+07}
+  - equation: C3H8 + OH <=> H2O + IC3H7
+    rate-constant: {A: 2710.0, b: 2.04, Ea: -2.05016e+06}
+  - equation: C3H8 + HO2 <=> H2O2 + IC3H7
+    rate-constant: {A: 0.0632, b: 3.37, Ea: 5.740448e+07}
+  - equation: C3H8 + CH3 <=> CH4 + IC3H7
+    rate-constant: {A: 1.51e-03, b: 3.46, Ea: 2.292832e+07}
+  - equation: C2H3 + C3H8 <=> C2H4 + IC3H7
+    rate-constant: {A: 1.02, b: 2.92, Ea: 1.75728e+07}
+  - equation: C2H5 + C3H8 <=> C2H6 + IC3H7
+    rate-constant: {A: 1.566e-04, b: 3.71, Ea: 2.74277936e+07}
+  - equation: C3H5-A + C3H8 <=> C3H6 + IC3H7
+    rate-constant: {A: 7.94e+08, b: 0.0, Ea: 6.77808e+07}
+  - equation: C2H5O2 + C3H8 <=> C2H5O2H + IC3H7
+    rate-constant: {A: 0.0402, b: 3.41, Ea: 5.89944e+07}
+  - equation: H + IC3H7 <=> C2H5 + CH3
+    rate-constant: {A: 2.0e+10, b: 0.0, Ea: 0.0}
+  - equation: IC3H7 + OH <=> C3H6 + H2O
+    rate-constant: {A: 2.41e+10, b: 0.0, Ea: 0.0}
+  - equation: IC3H7 + O <=> C3H6 + OH
+    rate-constant: {A: 2.74e+10, b: 0.0, Ea: 0.0}
+  - equation: NC3H7 + O2 <=> C3H6 + HO2
+    rate-constant: {A: 5.244444444444440e+15, b: 0.8777777777777810,
+    Ea: 1.934122338666666e+07}
+  - equation: IC3H7 + O2 <=> C3H6 + HO2
+    rate-constant: {A: 2.072777777777776e+15, b: -1.842222222222222,
+    Ea: 2.543224874666667e+07}
+  - equation: NC3H7 + O2 <=> C3H6OOH1-2
+    rate-constant: {A: 7.222222222234586e+10, b: -0.2366666666666685,
+    Ea: 1.108706258844445e+07}
+  - equation: NC3H7 + O2 <=> C3H6OOH1-3
+    duplicate: true
+    rate-constant: {A: 5.777777777777773e+19, b: 3.142222222222228,
+    Ea: -4.948193653333355e+06}
+  - equation: NC3H7 + O2 <=> C3H6OOH1-3
+    duplicate: true
+    rate-constant: {A: 5.666667586666673e+17, b: -1.433333333333334,
+    Ea: 7.131507128888892e+07}
+  - equation: C3H6OOH1-2 <=> C3H6OOH1-3
+    rate-constant: {A: 4.444444444444440e-16, b: 21.75555555555556,
+    Ea: 5.441705983555549e+07}
+  - equation: C3H6OOH1-2 <=> C3H6 + HO2
+    rate-constant: {A: 4.799999999999994e+30, b: 2.117777777777784,
+    Ea: 9.400931973333330e+07}
+  - equation: C3H6OOH1-3 <=> C3H6 + HO2
+    rate-constant: {A: 8.755555555555547e+25, b: -2.9, Ea: 7.560497297777778e+07}
+  - equation: C3H6OOH1-3 + O2 <=> AC3H5OOH + HO2
+    rate-constant: {A: 1.231111112822221e+17, b: -1.060555555555554, Ea: 3.813837336e+07}
+  - equation: C3H6OOH1-2 + O2 <=> AC3H5OOH + HO2
+    rate-constant: {A: 6.711949999999994e+16, b: -1.856666666666666,
+    Ea: 3.765963543111111e+07}
+  - equation: H + NC3H7 <=> C3H6 + H2
+    rate-constant: {A: 1.81e+09, b: 0.0, Ea: 0.0}
+  - equation: NC3H7 + OH <=> C3H6 + H2O
+    rate-constant: {A: 2.4e+10, b: 0.0, Ea: 0.0}
+  - equation: CH3 + NC3H7 <=> C3H6 + CH4
+    rate-constant: {A: 1.1e+10, b: 0.0, Ea: 0.0}
+  - equation: H + IC3H7 <=> C3H6 + H2
+    rate-constant: {A: 3.61e+09, b: 0.0, Ea: 0.0}
+  - equation: C3H5-A + IC3H7 <=> C3H4-A + C3H8
+    rate-constant: {A: 4.58e+09, b: -0.35, Ea: -5.48104e+05}
+  - equation: C2H4 + IC3H7 <=> C2H5 + C3H6
+    rate-constant: {A: 2.65e+07, b: 0.0, Ea: 2.7606032e+07}
+  - equation: C2H3 + CH3 <=> C3H5-A + H
+    duplicate: true
+    rate-constant: {A: 9.688888888888895e+26, b: -4.553333333333334,
+    Ea: 7.163937777777779e+07}
+  - equation: C2H3 + CH3 <=> C3H5-A + H
+    duplicate: true
+    rate-constant: {A: 1.991338888888887e+07, b: 1.216666666666667,
+    Ea: 5.100249511111110e+06}
+  - equation: C3H6 <=> C2H3 + CH3
+    duplicate: true
+    rate-constant: {A: 2.578228888888886e+75, b: -16.42222222222222,
+    Ea: 5.653048888888888e+08}
+  - equation: C3H6 <=> C2H3 + CH3
+    duplicate: true
+    rate-constant: {A: 2.977777836666664e+54, b: -10.39444444444444,
+    Ea: 4.708906044444444e+08}
+  - equation: C3H6 <=> C3H5-A + H
+    duplicate: true
+    rate-constant: {A: 4.800035555555551e+70, b: -14.95555555555555,
+    Ea: 5.227396622222222e+08}
+  - equation: C3H6 <=> C3H5-A + H
+    duplicate: true
+    rate-constant: {A: 2.791111373888886e+42, b: -7.26, Ea: 4.045630471111111e+08}
+  - equation: C3H6 + H <=> C3H5-A + H2
+    rate-constant: {A: 364.4, b: 2.455, Ea: 1.82472608e+07}
+  - equation: C3H6 + O2 <=> C3H5-A + HO2
+    rate-constant: {A: 0.0177, b: 3.64, Ea: 1.560632e+08}
+  - equation: C3H6 + O <=> C3H5-A + OH
+    rate-constant: {A: 9.68e-06, b: 4.54, Ea: -1.03277856e+07}
+  - equation: C3H6 + OH <=> C3H5-A + H2O
+    rate-constant: {A: 4460.0, b: 2.072, Ea: 4.3965472e+06}
+  - equation: C3H6 + HO2 <=> C3H5-A + H2O2
+    rate-constant: {A: 7.71e-05, b: 4.4, Ea: 5.6680648e+07}
+  - equation: C3H6 + CH3 <=> C3H5-A + CH4
+    rate-constant: {A: 2.21e-03, b: 3.5, Ea: 2.37442e+07}
+  - equation: C2H5 + C3H6 <=> C2H6 + C3H5-A
+    rate-constant: {A: 1.0e+08, b: 0.0, Ea: 4.10032e+07}
+  - equation: C2H5O2 + C3H6 <=> C2H5O2H + C3H5-A
+    rate-constant: {A: 7.68e-05, b: 4.403, Ea: 5.66814848e+07}
+  - equation: C2H3 + C3H6 <=> C2H4 + C3H5-A
+    rate-constant: {A: 0.054, b: 3.34, Ea: 1.2552e+07}
+  - equation: C3H6 + O <=> CH3CHCHO + H
+    rate-constant: {A: 1.17e-06, b: 4.94, Ea: -1.01369952e+07}
+  - equation: C3H6 + O <=> CH2CHO + CH3
+    rate-constant: {A: 9.24e+05, b: 1.2, Ea: -9.970472e+05}
+  - equation: C3H6 + O <=> C2H5 + HCO
+    rate-constant: {A: 6.23e+06, b: 0.79, Ea: -6.15048e+05}
+  - equation: C3H6 + O <=> C2H4 + CH2O
+    rate-constant: {A: 146.0, b: 2.365, Ea: -3.4815064e+06}
+  - equation: C3H6 + H <=> NC3H7
+    duplicate: true
+    rate-constant: {A: 4.622222566666662e+45, b: -10.05111111111111,
+    Ea: 6.258380711111112e+07}
+  - equation: C3H6 + H <=> NC3H7
+    duplicate: true
+    rate-constant: {A: 1.680811111111109e+25, b: -4.853333333333333,
+    Ea: 2.265840551111111e+07}
+  - equation: C3H6 + H <=> C2H4 + CH3
+    duplicate: true
+    rate-constant: {A: 5.138888889007561e+19, b: -1.235555555555557,
+    Ea: 4.008011662222224e+07}
+  - equation: C3H6 + H <=> C2H4 + CH3
+    duplicate: true
+    rate-constant: {A: 68.88888888888901, b: 1.4, Ea: 8.551863555555565e+06}
+  - equation: C3H6 + H <=> IC3H7
+    duplicate: true
+    rate-constant: {A: 1.448918333333332e+58, b: -13.92888888888889,
+    Ea: 8.552979288888891e+07}
+  - equation: C3H6 + H <=> IC3H7
+    duplicate: true
+    rate-constant: {A: 4.714505555555551e+26, b: -4.968888888888888, Ea: 2.24843976e+07}
+  - equation: C2H4 + CH3 <=> NC3H7
+    duplicate: true
+    rate-constant: {A: 3.418944444444442e+44, b: -10.53666666666667,
+    Ea: 9.684053955555555e+07}
+  - equation: C2H4 + CH3 <=> NC3H7
+    duplicate: true
+    rate-constant: {A: 1.155557694444443e+30, b: -6.304444444444443,
+    Ea: 4.971475288888889e+07}
+  - equation: C3H5-A + H <=> C3H4-A + H2
+    rate-constant: {A: 1.232, b: 3.035, Ea: 1.0803088e+07}
+  - equation: C3H5-A + OH <=> C3H4-A + H2O
+    rate-constant: {A: 6.0e+09, b: 0.0, Ea: 0.0}
+  - equation: C3H5-A + CH3 <=> C3H4-A + CH4
+    rate-constant: {A: 3.0e+09, b: -0.32, Ea: -5.48104e+05}
+  - equation: C2H5 + C3H5-A <=> C2H6 + C3H4-A
+    rate-constant: {A: 4.0e+08, b: 0.0, Ea: 0.0}
+  - equation: C2H3 + C3H5-A <=> C2H4 + C3H4-A
+    rate-constant: {A: 1.0e+09, b: 0.0, Ea: 0.0}
+  - equation: 2 C3H4-A <=> C3H3 + C3H5-A
+    rate-constant: {A: 5.0e+11, b: 0.0, Ea: 2.709001928e+08}
+  - equation: 2 C3H5-A <=> C3H4-A + C3H6
+    rate-constant: {A: 2.646715333333332e+29, b: -6.366666666666666, Ea: 3.594056e+07}
+  - equation: C2H5 + C3H5-A <=> C2H4 + C3H6
+    rate-constant: {A: 4.0e+08, b: 0.0, Ea: 0.0}
+  - equation: C3H5-A + HCO <=> C3H6 + CO
+    rate-constant: {A: 6.0e+10, b: 0.0, Ea: 0.0}
+  - equation: C3H5-A + O <=> C2H3CHO + H
+    rate-constant: {A: 6.0e+10, b: 0.0, Ea: 0.0}
+  - equation: C3H5-A + OH => C2H3CHO + 2 H
+    rate-constant: {A: 1.866666666667554e+29, b: -3.16, Ea: 1.172235928888889e+08}
+  - equation: C3H5-A + O2 <=> C3H4-A + HO2
+    rate-constant: {A: 1.211113328888890e+18, b: -2.205555555555556,
+    Ea: 1.131944008888889e+08}
+  - equation: C3H5-A + O2 <=> C2H3CHO + OH
+    rate-constant: {A: 2.181111111111112e+10, b: -0.4322222222222222,
+    Ea: 9.600931822222222e+07}
+  - equation: C3H5-A + HO2 <=> C3H5O + OH
+    rate-constant: {A: 3.469611111111108e+14, b: -1.055555555555555,
+    Ea: 1.282781857777778e+07}
+  - equation: C3H5-A + HO2 <=> AC3H5OOH
+    rate-constant: {A: 4.577777932777774e+41, b: -9.111111111111109, Ea: 2.9704308e+07}
+  - equation: C3H5-A + HO2 <=> C2H3CHO + H2O
+    rate-constant: {A: 441.1111111111110, b: 1.501111111111111, Ea: 7.330553955555560e+06}
+  - equation: AC3H5OOH <=> C2H3CHO + H2O
+    rate-constant: {A: 6.666666666680771e+39, b: -6.706666666666664, Ea: 2.149245488e+08}
+  - equation: AC3H5OOH <=> C3H5O + OH
+    rate-constant: {A: 1.493333333466109e+46, b: -7.993333333333332,
+    Ea: 2.124630551111111e+08}
+  - equation: C3H5O <=> C2H3 + CH2O
+    rate-constant: {A: 3.611586666666670e+29, b: -5.01, Ea: 1.077224727111111e+08}
+  - equation: C3H5O <=> C2H3CHO + H
+    rate-constant: {A: 9.782888888888896e+27, b: -4.601111111111111,
+    Ea: 9.068624746666667e+07}
+  - equation: C3H5O <=> C2H4 + HCO
+    rate-constant: {A: 4.725333333333338e+25, b: -4.293333333333334,
+    Ea: 8.733077244444445e+07}
+  - equation: C2H3 + CH2O <=> C2H3CHO + H
+    rate-constant: {A: 7.577777777777786e+05, b: 1.162777777777777,
+    Ea: 1.839890755555556e+07}
+  - equation: C2H3 + CH2O <=> C2H4 + HCO
+    rate-constant: {A: 1.917297777777780e+10, b: -0.3104444444444449,
+    Ea: 2.345750302222223e+07}
+  - equation: C3H4-P + HO2 => C2H4 + CO + OH
+    rate-constant: {A: 3.0e+09, b: 0.0, Ea: 7.9496e+07}
+  - equation: C3H4-A + HO2 => C2H4 + CO + OH
+    rate-constant: {A: 1.0e+08, b: 0.0, Ea: 5.8576e+07}
+  - equation: C3H4-A + HO2 => CH2 + CH2CO + OH
+    rate-constant: {A: 4.0e+09, b: 0.0, Ea: 7.9496e+07}
+  - equation: C3H4-A <=> C3H4-P
+    rate-constant: {A: 2.658888892338669e+48, b: -9.022222222222224,
+    Ea: 3.520180506666667e+08}
+  - equation: C3H3 + H <=> C3H4-P
+    rate-constant: {A: 3.530228177777774e+26, b: -3.998888888888888,
+    Ea: 1.661931288888889e+07}
+  - equation: C3H3 + H <=> C3H4-A
+    rate-constant: {A: 1.405338172222221e+26, b: -4.0, Ea: 1.632643288888889e+07}
+  - equation: C3H4-P + O2 <=> C3H3 + HO2
+    rate-constant: {A: 3.0e+10, b: 0.0, Ea: 1.7836392e+08}
+  - equation: C3H4-P + H <=> C3H3 + H2
+    rate-constant: {A: 35.7, b: 2.825, Ea: 2.0171064e+07}
+  - equation: C3H4-P + HO2 <=> C3H3 + H2O2
+    rate-constant: {A: 7.7e-05, b: 4.403, Ea: 5.66814848e+07}
+  - equation: C3H4-P + CH3 <=> C3H3 + CH4
+    rate-constant: {A: 0.033, b: 3.24, Ea: 3.2472024e+07}
+  - equation: C2H3 + C3H4-P <=> C2H4 + C3H3
+    rate-constant: {A: 0.48, b: 3.09, Ea: 1.50624e+07}
+  - equation: C3H4-P + C3H5-A <=> C3H3 + C3H6
+    rate-constant: {A: 0.632, b: 3.224, Ea: 7.2809968e+07}
+  - equation: C3H4-A + H <=> C3H3 + H2
+    rate-constant: {A: 6.625, b: 3.095, Ea: 2.3104048e+07}
+  - equation: C3H4-A + O2 <=> C3H3 + HO2
+    rate-constant: {A: 4.0e+10, b: 0.0, Ea: 1.7288288e+08}
+  - equation: C3H4-A + OH <=> C3H3 + H2O
+    duplicate: true
+    rate-constant: {A: 505.0, b: 2.36, Ea: 1.2045736e+07}
+    duplicate: true
+  - equation: C3H4-A + OH <=> C3H3 + H2O
+    duplicate: true
+    rate-constant: {A: 59.5, b: 2.5, Ea: 2.7660424e+06}
+    duplicate: true
+  - equation: C3H4-P + OH <=> C3H3 + H2O
+    duplicate: true
+    rate-constant: {A: 387.0, b: 2.34, Ea: 9.091832e+06}
+    duplicate: true
+  - equation: C3H4-P + OH <=> C3H3 + H2O
+    duplicate: true
+    rate-constant: {A: 49.3, b: 2.48, Ea: -2.59408e+05}
+    duplicate: true
+  - equation: C3H4-A + CH3 <=> C3H3 + CH4
+    rate-constant: {A: 1.71, b: 2.974, Ea: 3.3145648e+07}
+  - equation: C3H4-A + HO2 <=> C3H3 + H2O2
+    rate-constant: {A: 7.7e-05, b: 4.403, Ea: 5.66814848e+07}
+  - equation: C3H4-A + C3H5-A <=> C3H3 + C3H6
+    rate-constant: {A: 0.84, b: 3.224, Ea: 7.2809968e+07}
+  - equation: C3H4-A + H <=> C3H4-P + H
+    rate-constant: {A: 1.305555555665779e+22, b: -1.941111111111113,
+    Ea: 4.256941066666668e+07}
+  - equation: C3H4-A + H <=> C3H5-A
+    rate-constant: {A: 2.083333333333336e+45, b: -8.274444444444446,
+    Ea: 6.518067644444448e+07}
+  - equation: C3H4-A + H <=> C2H2 + CH3
+    rate-constant: {A: 9.333333333338809e+12, b: 0.8577777777777762,
+    Ea: 4.607513777777780e+07}
+  - equation: C3H4-P + H <=> C2H2 + CH3
+    rate-constant: {A: 9.709333333333344e+10, b: 0.1908888888888887,
+    Ea: 2.672646222222223e+07}
+  - equation: C3H4-P + H <=> C3H5-A
+    rate-constant: {A: 7.656e+56, b: -13.834, Ea: 1.428518016e+08}
+  - equation: C2H2 + CH3 <=> C3H5-A
+    rate-constant: {A: 8.407999999999993e+47, b: -11.792, Ea: 1.528030272e+08}
+  - equation: C3H4-P + O <=> C3H3 + OH
+    rate-constant: {A: 1.670222222222224e+09, b: -0.01533333333333339,
+    Ea: 1.827013333333334e+07}
+  - equation: C3H4-P + O <=> C2H3 + HCO
+    rate-constant: {A: 1.733333333333333e+09, b: 0.06633333333333341,
+    Ea: 1.020431111111111e+07}
+  - equation: C3H4-P + O <=> C2H4 + CO
+    rate-constant: {A: 1.841111111111111e+11, b: -0.4981111111111110,
+    Ea: 9.637146666666668e+06}
+  - equation: C3H4-P + O <=> C2H2 + CO + H2
+    rate-constant: {A: 4.053888888888885e+19, b: -3.312222222222222,
+    Ea: 2.263079111111112e+07}
+  - equation: C3H4-P + O <=> CH3 + HCCO
+    rate-constant: {A: 1.063333333333333e+07, b: 0.9204444444444445,
+    Ea: 9.032791111111112e+06}
+  - equation: C3H4-P + O <=> C2H3CHO
+    rate-constant: {A: 2.124444444449392e+41, b: -8.65, Ea: 3.939933333333334e+07}
+  - equation: C3H4-P + O <=> C2H3 + CO + H
+    rate-constant: {A: 2.522222222222223e+07, b: 0.7863333333333333,
+    Ea: 1.304013333333334e+07}
+  - equation: C3H4-P + O <=> C2H3CO + H
+    rate-constant: {A: 733.7777777777784, b: 2.026666666666666, Ea: 1.204527111111112e+07}
+  - equation: C3H4-A + O <=> C3H3 + OH
+    rate-constant: {A: 5.24e+08, b: 0.7, Ea: 2.460192e+07}
+  - equation: C3H4-A + O <=> C2H4 + CO
+    rate-constant: {A: 6240.0, b: 2.05, Ea: 7.5312e+05}
+  - equation: CH3CHCHO <=> C2H3CHO + H
+    rate-constant: {A: 2.336635930692064e+47, b: -7.786871685749989,
+    Ea: 2.259423988759415e+08}
+  - equation: C3H3 <=> C3H2 + H
+    rate-constant: {A: 1.995014285714283e+38, b: -6.321428571428571,
+    Ea: 4.523501714285715e+08}
+  - equation: C3H3 + HCO <=> C3H4-A + CO
+    rate-constant: {A: 2.5e+10, b: 0.0, Ea: 0.0}
+  - equation: C3H3 + HCO <=> C3H4-P + CO
+    rate-constant: {A: 2.5e+10, b: 0.0, Ea: 0.0}
+  - equation: C3H3 + O2 <=> CH2CO + HCO
+    rate-constant: {A: 170.0, b: 1.7, Ea: 6.276e+06}
+  - equation: C3H3 + H <=> C3H2 + H2
+    rate-constant: {A: 214.0, b: 2.52, Ea: 3.1183352e+07}
+  - equation: C3H3 + OH <=> C2H3 + HCO
+    rate-constant: {A: 2.537861598142225e+22, b: -2.627777777777779,
+    Ea: 3.670855644444446e+07}
+  - equation: C3H3 + OH <=> C2H2 + CO + H2
+    rate-constant: {A: 9.888888895600012e+25, b: -3.538888888888891,
+    Ea: 3.980518133333336e+07}
+  - equation: C3H3 + OH <=> C2H4 + CO
+    rate-constant: {A: 1.470817777777777e+26, b: -2.89, Ea: -2.352151822222226e+07}
+  - equation: 2 C3H3 => C6H6
+    rate-constant: {A: 1.404466055555554e+52, b: -11.71111111111111,
+    Ea: 8.865431111111110e+07}
+  - equation: C3H3 + C3H4-A <=> C6H6 + H
+    rate-constant: {A: 1.4e+09, b: 0.0, Ea: 4.17998336e+07}
+  - equation: C3H2 + OH => C2H2 + HCO
+    rate-constant: {A: 5.0e+10, b: 0.0, Ea: 0.0}
+  - equation: C3H2 + OH => C2H2 + CO + H
+    rate-constant: {A: 1.181511111111112e+20, b: -2.511111111111111,
+    Ea: 6.395815813333333e+07}
+  - equation: C3H2 + O2 <=> C2H2 + CO2
+    rate-constant: {A: 1150.0, b: 2.245, Ea: 1.5380384e+06}
+  - equation: C3H2 + O2 <=> CO + H + HCCO
+    rate-constant: {A: 250.0, b: 2.245, Ea: 1.5380384e+06}
+  - equation: C2H3 + HCO <=> C2H3CHO
+    rate-constant: {A: 1.81e+10, b: 0.0, Ea: 0.0}
+  - equation: C2H3CHO + H <=> C2H3CO + H2
+    rate-constant: {A: 1.34e+10, b: 0.0, Ea: 1.38072e+07}
+  - equation: C2H3CHO + O <=> C2H3CO + OH
+    rate-constant: {A: 5.94e+09, b: 0.0, Ea: 7.815712e+06}
+  - equation: C2H3CHO + OH <=> C2H3CO + H2O
+    rate-constant: {A: 9240.0, b: 1.5, Ea: -4.025008e+06}
+  - equation: C2H3CHO + O2 <=> C2H3CO + HO2
+    rate-constant: {A: 1.005e+10, b: 0.0, Ea: 1.702888e+08}
+  - equation: C2H3CHO + HO2 <=> C2H3CO + H2O2
+    rate-constant: {A: 3.01e+09, b: 0.0, Ea: 4.987328e+07}
+  - equation: C2H3CHO + CH3 <=> C2H3CO + CH4
+    rate-constant: {A: 2608.0, b: 1.78, Ea: 2.4731624e+07}
+  - equation: C2H3 + C2H3CHO <=> C2H3CO + C2H4
+    rate-constant: {A: 1.74e+09, b: 0.0, Ea: 3.531296e+07}
+  - equation: C2H3 + CO <=> C2H3CO
+    rate-constant: {A: 1.51e+08, b: 0.0, Ea: 2.012504e+07}

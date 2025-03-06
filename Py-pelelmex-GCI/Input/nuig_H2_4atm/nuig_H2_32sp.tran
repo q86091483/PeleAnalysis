@@ -1,0 +1,39 @@
+! generator: yaml2ck
+! cantera-version: 3.0.0
+! date: Mon, 29 Jan 2024 07:59:06 -0500
+! input-files: ['NUIGMech1_H2_NH3_NO_noHe_noAr.yaml']
+!
+! H2-NH3-NO submechanism extracted from NUIG1.1
+
+N2                 1    97.839     3.610     0.000     1.756     4.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: theoret trans
+H2                 1   304.690     2.190     0.000     0.775   280.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: theoret trans
+H                  0   541.672     1.530     0.000     0.666     0.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: theoret trans
+O2                 1   676.424     3.069     0.000     1.487     3.800 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: theoret trans
+O                  0   235.686     2.485     0.000     0.744     0.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: theoret trans
+H2O                2   637.056     2.943     1.851     1.407     4.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: theoret trans
+OH                 1   514.598     2.582     1.635     1.077     0.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: theoret trans
+OHV                1    80.000     2.750     0.000     0.000     0.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT:
+H2O2               2  1361.148     3.179     1.702     2.239     3.800 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: theoret trans
+HO2                2   963.003     3.129     2.146     1.959     3.800 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: theoret trans
+NO                 1   139.320     3.339     0.200     1.760     4.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: CJP
+NH3                2   481.000     2.920     1.470     0.000    10.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT:
+NH2                2    80.000     2.650     0.000     2.260     4.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT:
+NH                 1    80.000     2.650     0.000     0.000     4.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT:
+N                  0    71.400     3.298     0.000     0.000     0.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: *
+NNH                2    71.400     3.798     0.000     0.000     1.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: *
+N2H4               2   205.000     4.230     0.000     4.260     1.500 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT:
+N2H3               2   200.000     3.900     0.000     0.000     1.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: *
+N2H2               2    71.400     3.798     0.000     0.000     1.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: *
+H2NN               2    71.400     3.798     0.000     0.000     1.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: = N2H2
+NH2OH              2   116.700     3.492     0.000     0.000     1.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: = NHOH
+H2NO               2   116.700     3.492     0.000     0.000     1.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: JAM
+HNOH               2   116.700     3.492     0.000     0.000     1.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: JAM
+HNO                2   170.000     3.430     1.620     0.000     1.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: CJP
+HON                2   116.700     3.492     0.000     0.000     1.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: = HNO
+NO2                2   333.590     3.852     0.400     0.000     1.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: CJP
+HONO               2   350.000     3.950     1.639     0.000     1.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: CJP
+HNO2               2   350.000     3.950     1.639     0.000     1.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: = HONO
+NO3                2   400.000     4.200     0.200     0.000     1.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: CJP
+HONO2              2   400.000     4.200     0.200     0.000     1.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: = NO3
+N2O                1   232.400     3.828     0.000     0.000     1.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: *
+HNO3               2   300.000     3.500     0.000     0.000     1.000 ! \AUTHOR: WARNING !\REF: WARNING !\COMMENT: =hono2
