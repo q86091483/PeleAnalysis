@@ -21,12 +21,12 @@ plt_folder = "/scratch/b/bsavard/zisen347/scopingRuns/conv2D"
 case_name = "conv2D"
 lref = 1.0
 # Patterns of plotfiles to be processed
-plt_pattern = "plt_00950*"
+plt_pattern = "plt_02000*"
 plane_x = np.array([])
 plane_y = np.array([]) * lref
 plane_z = np.array([0.0]) * lref
 # Patterns of npz files to be plotted
-plot_pattern = "plt_00950*"
+plot_pattern = "plt_02000*"
 plot_plane_x = np.array([])
 plot_plane_y = np.array([]) * lref
 plot_plane_z = np.array([0.0]) * lref
@@ -37,12 +37,13 @@ str_prefix = "HRR_T"
 # Fields to be extracted
 field_names = ["density", "temp", "mixture_fraction", "mag_vort",
                "x_velocity", "y_velocity", "z_velocity",
-               "mixture_fraction_userdef_0", "age_0"]
+               "mixture_fraction_userdef_0", "age_0",
+               "mixture_fraction_userdef_1", "age_1"]
 for isp, spn in enumerate(gas_mix.species_names):
   field_names.append("Y("+spn+")")
 # Fields to be plotted
 plot_names = [["x_velocity", "mixture_fraction"],
-              ["mixture_fraction_userdef_0", "age_0"]]
+              ["mixture_fraction_userdef_1", "age_1"]]
 # Output data folder
 output_dir = "/scratch/b/bsavard/zisen347/PeleAnalysis/Data_age"
 fig_dir = "/scratch/b/bsavard/zisen347/PeleAnalysis/Figure_age"
@@ -218,7 +219,7 @@ for iz, pos in enumerate(plane_z):
           ax.set_title(r"$\mathrm{log}(|\omega|)$", fontsize=labelsize-2, pad=3)
 
         if (field_name == "x_velocity"):
-          vmin = 8.0; vmax = 12
+          vmin = 0.0; vmax = 30
           im = ax.imshow(f[field_name], origin="lower",
                    vmin = vmin, vmax = vmax, cmap="seismic",
                     extent=extent, aspect='equal')
@@ -334,6 +335,17 @@ for iz, pos in enumerate(plane_z):
           #ax.contour(f["mixture_fraction"], levels=[0.0623],
           #          origin='lower', colors=['white'], extent=extent)
           ax.set_title(r"$Age0$", fontsize=labelsize-2, pad=3)
+
+        if (field_name == "age_1"):
+          vmin = -0.0; vmax = 3.0E-5
+          #im = ax.imshow(f[field_name]/f["mixture_fraction_userdef_0"], origin="lower",
+          im = ax.imshow(f[field_name]/f["density"], origin="lower",
+                   vmin = vmin, vmax = vmax, cmap="jet",
+                   extent=extent, aspect='equal')
+          #ax.contour(f["mixture_fraction"], levels=[0.0623],
+          #          origin='lower', colors=['white'], extent=extent)
+          ax.set_title(r"$Age1$", fontsize=labelsize-2, pad=3)
+
 
 
     if print_mode == 1:

@@ -7,7 +7,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib        as mpl
 
-path_PeleAnalysis = os.path.abspath("../..")
+path_PeleAnalysis = "/scratch/b/bsavard/zisen347/PeleAnalysis"
 sys.path.append(path_PeleAnalysis)
 from amr_kitchen.mandoline import Mandoline
 from amr_kitchen import HeaderData

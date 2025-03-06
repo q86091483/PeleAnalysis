@@ -46,7 +46,7 @@ for isp, spn in enumerate(gas_mix.species_names):
   field_names.append("Y("+spn+")")
 # Fields to be plotted
 plot_names = [["mixture_fraction_userdef_0", "x_velocity", ],
-              ["age_0", "mixAge_0"]]
+              ["age_1", "mixAge_1"]]
 # Output data folder
 output_dir = "/scratch/b/bsavard/zisen347/PeleAnalysis/Data_age"
 fig_dir = "/scratch/b/bsavard/zisen347/PeleAnalysis/Figure_age"
@@ -425,7 +425,7 @@ U = f["x_velocity"]
 V = f["y_velocity"]
 vmin = 0.0; vmax = 1.0
 im = ax.imshow(f["x_velocity"], origin="lower",
-                   vmin = 0.0, vmax = 30.0, cmap="Purples",
+                   vmin = 0.0, vmax = 35.0, cmap="Purples",
                    extent=extent, aspect='equal')
 ax.set_xlabel(r"$x~\mathrm{[mm]}$", fontsize=20)
 ax.set_ylabel(r"$y~\mathrm{[mm]}$", fontsize=20)

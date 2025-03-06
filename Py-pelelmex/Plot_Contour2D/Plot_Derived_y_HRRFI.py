@@ -7,7 +7,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib        as mpl
 
-path_PeleAnalysis = os.path.abspath("../..")
+path_PeleAnalysis = "/scratch/b/bsavard/zisen347/PeleAnalysis/Py-pelelmex"
 sys.path.append(path_PeleAnalysis)
 from amr_kitchen.mandoline import Mandoline
 from amr_kitchen import HeaderData
@@ -15,15 +15,15 @@ import imageio
 
 # Input
 # Where original plot files are stored
-str_plane = "HRR_T_y=-1.125E-03"
+str_plane = "HRR_T_y=9.000E-04"
 data_folder = ("/scratch/b/bsavard/zisen347/PeleAnalysis/"
-              "Py-pelelmex/Data/Slice2D_plt_lev2/Micromix/" + str_plane)
-str_plane = "HRR_T_y=-1.125E-03"
+              "Data/Slice2D_plt_lev1/MicroMix_age/" + str_plane)
+str_plane = "HRR_T_y=9.000E-04"
 der_folder = ("/scratch/b/bsavard/zisen347/PeleAnalysis/"
-              "Py-pelelmex/Data/Slice2D_der_lev2/Micromix/" + str_plane)
-tfine = 5.960E-4
+              "Data/Slice2D_der_lev1/MicroMix_age/" + str_plane)
+tfine = 9.395E-04
 # Case name
-case_name = "Micromix"
+case_name = "MicroMix_age"
 plane_info = r"$\mathrm{Centre\; plane}$"
 # Patterns of plotfiles to be processed
 data_pattern = "plt_*"
@@ -31,8 +31,8 @@ data_pattern = "plt_*"
 field_names = [["HeatReleaseFI"],]
 # Output data folder
 fig_dir = os.path.abspath("../Figure")
-fig_slice_dir = os.path.join(fig_dir, "Slice2D_HRRFI_lev2")
-# if print on screen or write to file 
+fig_slice_dir = os.path.join(fig_dir, "Slice2D_HRRFI_lev1")
+# if print on screen or write to file
 print_mode = 1
 # Micromix case parameter
 zst = 0.0252
@@ -44,7 +44,7 @@ def get_key(s):
   sss = ss.split(".npz")[0]
   return float(sss)
 fns_sorted = sorted(fns_unsorted, key=get_key)
-nfns = len(fns_sorted) 
+nfns = len(fns_sorted)
 # Get derived file names
 fns_der_unsorted = glob.glob(os.path.join(der_folder, data_pattern))
 def get_key(s):
@@ -67,16 +67,16 @@ matplotlib.rcParams['font.family'] = 'STIXGeneral'
 # Colormap
 ncmp = 128; ncmp_black = 16
 arr_summer = mpl.cm.summer(np.arange(128))
-arr_summer_black = np.ones((ncmp_black, 4)) 
+arr_summer_black = np.ones((ncmp_black, 4))
 arr_autumn = mpl.cm.autumn(np.arange(128))
-arr_autumn_black = np.ones((ncmp_black, 4)) 
+arr_autumn_black = np.ones((ncmp_black, 4))
 color_black = np.array([0.0416    , 0.        , 0.        , 1.])
 for i in range(0, ncmp_black):
   r = float(i/ncmp_black)
   arr_summer_black[i,:] = r*arr_summer[ncmp_black,:] + (1-r)*color_black
   arr_autumn_black[i,:] = r*arr_autumn[ncmp_black,:] + (1-r)*color_black
 arr_l = np.flipud(np.vstack((arr_autumn_black, arr_autumn)))
-arr_Harbin = np.vstack((arr_l, arr_summer_black, arr_summer)) 
+arr_Harbin = np.vstack((arr_l, arr_summer_black, arr_summer))
 Harbin = mpl.colors.ListedColormap(arr_Harbin, name="Harbin", N = 2*(ncmp+ncmp_black))
 #%%
 if not os.path.exists(fig_dir):
@@ -108,7 +108,7 @@ for i, ifn in enumerate(range(0, nfns)):
 
   figsize = ((Lx/Ly)*fig_unit_y*npx*0.85, fig_unit_y*npy)
   fig, axs = plt.subplots(ncols=npx, nrows=npy, figsize=figsize)
-  
+
   for ipy in range(0, npy):
     for ipx in range(0, npx):
       #ax = axs[ipy, ipx]
@@ -121,8 +121,8 @@ for i, ifn in enumerate(range(0, nfns)):
       field_name = field_names[ipy][ipx]
       if (field_name == "HeatRelease"):
         vmin = 0.0; vmax = 1E11
-        im=ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="hot", 
+        im=ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="hot",
                   extent=extent, aspect='equal')
         ax.contour(f["mixture_fraction"], levels=[zst],
                    origin='lower', colors=['white'], extent=extent)
@@ -131,11 +131,11 @@ for i, ifn in enumerate(range(0, nfns)):
           ax.text(x=-11, y=15.5, s=plane_info, fontsize = labelsize-4)
         if time >= tfine:
           finest_level = 3
-        else: 
+        else:
           finest_level = 2
         if True:
           ax.text(x=-11, y=18, s=r"$\mathrm{Finest \; level}="+str(finest_level)+"$", fontsize = labelsize-4)
-        
+
         ax.set_title(r"$\mathrm{HRR}\;\mathrm{[J/m^3s]}$", fontsize=labelsize-2, pad=3)
 
         cax = ax.inset_axes(loc_cb, transform=ax.transData)
@@ -148,8 +148,8 @@ for i, ifn in enumerate(range(0, nfns)):
 
       if (field_name == "HeatReleaseFI"):
         vmin = -1E11; vmax = 1E11
-        im=ax.imshow(fder[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap=Harbin, 
+        im=ax.imshow(fder[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap=Harbin,
                   extent=extent, aspect='equal')
         ax.contour(fder["mixture_fraction"], levels=[zst],
                    origin='lower', colors=['white'], extent=extent, linestyles=["-"])
@@ -171,8 +171,8 @@ for i, ifn in enumerate(range(0, nfns)):
 
       if (field_name == "temp"):
         vmin = 700; vmax = 2800
-        im = ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="jet", 
+        im = ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
                   extent=extent, aspect='equal')
         ax.contour(f["mixture_fraction"], levels=[zst],
                    origin='lower', colors=['white'], extent=extent)
@@ -188,8 +188,8 @@ for i, ifn in enumerate(range(0, nfns)):
 
       if (field_name == "mixture_fraction"):
         vmin = 0; vmax = 1
-        im = ax.imshow(fder[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="jet", 
+        im = ax.imshow(fder[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
                   extent=extent, aspect='equal')
         ax.contour(f["mixture_fraction"], levels=[zst],
                    origin='lower', colors=['white'], extent=extent)
@@ -205,8 +205,8 @@ for i, ifn in enumerate(range(0, nfns)):
 
       if (field_name == "mag_vort"):
         vmin = 3.5; vmax = 6
-        im = ax.imshow(np.log10(f[field_name]), origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="binary", 
+        im = ax.imshow(np.log10(f[field_name]), origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="binary",
                   extent=extent, aspect='equal')
         ax.contour(fder["mixture_fraction"], levels=[zst],
                    origin='lower', colors=['white'], extent=extent)
@@ -224,10 +224,10 @@ for i, ifn in enumerate(range(0, nfns)):
         cb.ax.set_xticklabels([str(vmin), str(vmax)], color="red", fontsize=labelsize-6)  # horizontal colorbar
       if (field_name == "x_velocity"):
         vmin = -250; vmax = 250
-        im = ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="seismic", 
+        im = ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="seismic",
                   extent=extent, aspect='equal')
-        #ax.contour(f["mixture_fraction"], levels=[zst], 
+        #ax.contour(f["mixture_fraction"], levels=[zst],
         #           origin='lower', colors=['white'], extent=extent)
         ax.set_title(r"$u_x \; \mathrm{[m/s]}$", fontsize=labelsize-2, pad=3)
 
@@ -240,10 +240,10 @@ for i, ifn in enumerate(range(0, nfns)):
         cb.ax.set_xticklabels([str(vmin), str(vmax)], color="black", fontsize=labelsize-6)  # horizontal colorbar
       if (field_name == "y_velocity"):
         vmin = -100; vmax = 100
-        im = ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="seismic", 
+        im = ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="seismic",
                   extent=extent, aspect='equal')
-        #ax.contour(f["mixture_fraction"], levels=[zst], 
+        #ax.contour(f["mixture_fraction"], levels=[zst],
         #           origin='lower', colors=['white'], extent=extent)
         ax.set_title(r"$u_y \; \mathrm{[m/s]}$", fontsize=labelsize-2, pad=3)
 
@@ -257,10 +257,10 @@ for i, ifn in enumerate(range(0, nfns)):
 
       if (field_name == "z_velocity"):
         vmin = -250; vmax = 250
-        im = ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="seismic", 
+        im = ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="seismic",
                   extent=extent, aspect='equal')
-        #ax.contour(f["mixture_fraction"], levels=[zst], 
+        #ax.contour(f["mixture_fraction"], levels=[zst],
         #           origin='lower', colors=['white'], extent=extent)
         ax.set_title(r"$u_z \; \mathrm{[m/s]}$", fontsize=labelsize-2, pad=3)
 
@@ -274,8 +274,8 @@ for i, ifn in enumerate(range(0, nfns)):
 
       if (field_name == "Y(NO)"):
         vmin = 0.0; vmax = 1E-4
-        im = ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="jet", 
+        im = ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
                   extent=extent, aspect='equal')
         ax.contour(f["mixture_fraction"], levels=[zst],
                    origin='lower', colors=['white'], extent=extent)
@@ -291,8 +291,8 @@ for i, ifn in enumerate(range(0, nfns)):
 
       if (field_name == "Y(N2O)"):
         vmin = 0.0; vmax = 1E-5
-        im = ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="jet", 
+        im = ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
                   extent=extent, aspect='equal')
         #ax.contour(f["mixture_fraction"], levels=[zst],
         #           origin='lower', colors=['white'], extent=extent)
@@ -307,10 +307,10 @@ for i, ifn in enumerate(range(0, nfns)):
 
       if (field_name == "Y(NNH)"):
         vmin = 0.0; vmax = 2E-7
-        im = ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="jet", 
+        im = ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
                   extent=extent, aspect='equal')
-        #ax.contour(f["mixture_fraction"], levels=[zst], 
+        #ax.contour(f["mixture_fraction"], levels=[zst],
         #           origin='lower', colors=['white'], extent=extent)
         ax.set_title(r"$Y_\mathrm{NNH}$", fontsize=labelsize-2, pad=3)
 
@@ -323,10 +323,10 @@ for i, ifn in enumerate(range(0, nfns)):
         cb.ax.set_xticklabels([str(vmin), "%.1E"%vmax], color="white", fontsize=labelsize-6)  # horizontal colorbar
       if (field_name == "Y(N)"):
         vmin = 0.0; vmax = 2E-7
-        im = ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="jet", 
+        im = ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
                   extent=extent, aspect='equal')
-        #ax.contour(f["mixture_fraction"], levels=[zst], 
+        #ax.contour(f["mixture_fraction"], levels=[zst],
         #           origin='lower', colors=['white'], extent=extent)
         ax.set_title(r"$Y_\mathrm{N}$", fontsize=labelsize-2, pad=3)
 

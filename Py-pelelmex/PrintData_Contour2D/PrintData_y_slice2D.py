@@ -1,8 +1,6 @@
 #%%
 import sys, os
 import re
-from amr_kitchen.mandoline import Mandoline
-from amr_kitchen import HeaderData
 import glob
 import numpy as np
 
@@ -14,24 +12,28 @@ gas_mix = ct.Solution(
             os.path.join(path_PeleAnalysis,
             "Py-pelelmex/Input/nuig_H2_4atm/chem.yaml"))
 
+from amr_kitchen.mandoline import Mandoline
+from amr_kitchen import HeaderData
+
+
 # Input
 # Where plt files are stored
 #plt_folder = "/scratch/b/bsavard/zisen347/scopingRuns/NUIG_Re4000_2J6_4atm/Level_3"
-plt_folder = "/scratch/b/bsavard/zisen347/productionRuns/MicroMix_age"
+plt_folder = "/scratch/b/bsavard/zisen347/productionRuns/MicroMix_age/Level_3"
 
 # Case name
-case_name = "Micromix_age"
+case_name = "MicroMix_age"
 # Patterns of plotfiles to be processed
-plt_pattern = "plt_15600*"
+plt_pattern = "plt_25400*"
 # Planes to be extracted
 Djet = 4.5E-4
 plane_x = np.array([]) * Djet
-plane_y = np.array([2.0]) * Djet
-plane_z = np.array([]) * Djet
+plane_y = np.array([]) * Djet
+plane_z = np.array([2.0, 4.0, 6.0, 1.0, 3.0, 5.0]) * Djet
 # Prefix
 str_prefix = "HRR_T"
 # Max level
-max_level = 1
+max_level = 3
 # Fields to be extracted
 field_names = ["density", "HeatRelease", "temp", "mixture_fraction", "mag_vort",
                "x_velocity", "y_velocity", "z_velocity",

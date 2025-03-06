@@ -15,19 +15,19 @@ plt_folder = "/scratch/b/bsavard/zisen347/PeleAnalysis/Src/res_RPA/"
 # Case name
 case_name = "MicroMix_age"
 # Patterns of plotfiles to be processed
-plt_pattern = "plt_14600_derived*"
+plt_pattern = "plt_25400_derived*"
 # Planes to be extracted
 Djet = 4.5E-4
 #plane_x = np.array([1.0, 2.0, 5.0, 8.0, 15.0, 24.0]) * Djet
 plane_x = np.array([]) * Djet
-#plane_y = np.array([-3.5, -2.5, -1.5, 1.5, 2.0, 2.5, 3.5]) * Djet
-plane_y = np.array([2.0, ]) * Djet
-plane_z = np.array([]) * Djet
+plane_y = np.array([0.0, 1.0, 2.0, 3.0, -1.0, -2.0, -3.0]) * Djet
+plane_y = np.array([]) * Djet
+plane_z = np.array([2.0, 4.0, 6.0, 1.0, 3.0, 5.0]) * Djet
 # Prefix
 str_prefix = "Derived"
 # Fields to be extracted
 # Max level
-max_level = 1
+max_level = 3
 field_names = ["rho", "HeatRelease", "mixture_fraction", "temp", "Y(H2)", "pv", "FI",
                "HeatReleaseFI", "rhorr(NO)", "rhorr(NNH)", "rhorr(N2O)",
                "R10", "zone"]

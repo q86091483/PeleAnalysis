@@ -1,19 +1,17 @@
 #%%
 import sys, os
 import re
-path_PeleAnalysis = os.path.abspath("..")
+path_PeleAnalysis = "/scratch/b/bsavard/zisen347/PeleAnalysis"
 sys.path.append(path_PeleAnalysis)
 from amr_kitchen.mandoline import Mandoline
 from amr_kitchen import HeaderData
 import glob
 import numpy as np
 
-import cantera as ct
-gas_mix = ct.Solution("/scratch/b/bsavard/zisen347/PeleAnalysis/Py-pelelmex/Input/nuig_H2_4atm/chem.yaml")
-
 # Input
 # Where plt files are stored
 plt_folder = "/scratch/b/bsavard/zisen347/PeleAnalysis/Src/res_MicroMix_derived"
+plt_folder = "/scratch/b/bsavard/zisen347/PeleAnalysis/Src/res_RPA/"
 # Case name
 case_name = "Micromix"
 # Patterns of plotfiles to be processed

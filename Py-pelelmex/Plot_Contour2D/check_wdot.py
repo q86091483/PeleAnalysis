@@ -83,9 +83,10 @@ hrr_state = np.sum(net_production_rates * partial_molar_enthalpies, axis=(2))
 
 #%%
 # Reaction fstate
-ir = 184
+ir = 71
+vmin = -1E-2
+vmax = 1E-2
 fig, ax = plt.subplots()
-vmin = -1E-7; vmax = 1E-7
 im = ax.imshow(R10[:,:]/1000., origin="lower",
                vmin=vmin, vmax=vmax,
                 cmap="seismic", extent=extent)
@@ -98,7 +99,6 @@ cax = divider.append_axes('right', size='5%', pad=0.05)
 fig.colorbar(im, cax=cax, orientation='vertical')
 
 fig, ax = plt.subplots()
-vmin = -1E-7; vmax = 1E-7
 im = ax.imshow(fstate.net_rates_of_progress[:,:,ir], origin="lower",
                vmin=vmin, vmax=vmax,
                 cmap="seismic", extent=extent)
@@ -111,7 +111,6 @@ cax = divider.append_axes('right', size='5%', pad=0.05)
 fig.colorbar(im, cax=cax, orientation='vertical')
 
 fig, ax = plt.subplots()
-vmin = -100; vmax = 100
 im = ax.imshow(R10[:,:]/1000-fstate.net_rates_of_progress[:,:,ir], origin="lower",
                vmin=vmin, vmax=vmax,
                 cmap="seismic", extent=extent)

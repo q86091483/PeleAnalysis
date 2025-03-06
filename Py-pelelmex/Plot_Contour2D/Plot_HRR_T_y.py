@@ -6,34 +6,39 @@ import glob
 import matplotlib
 import matplotlib.pyplot as plt
 
-path_PeleAnalysis = os.path.abspath("../..")
+path_PeleAnalysis = "/scratch/b/bsavard/zisen347/PeleAnalysis"
 sys.path.append(path_PeleAnalysis)
 from amr_kitchen.mandoline import Mandoline
 from amr_kitchen import HeaderData
 import imageio
 
+
 # Input
 # Where original plot files are stored
-data_folder = ("/scratch/b/bsavard/zisen347/PeleAnalysis/"
-              "Py-pelelmex/Data/Slice2D_plt_lev2/Micromix/HRR_T_y=-9.000E-04")
+data_folder = os.path.join(
+      path_PeleAnalysis, "Data",
+      "Slice2D_plt_lev1/MicroMix_age/HRR_T_y=9.000E-04")
 # Case name
-case_name = "Micromix"
-str_plane = "HRR_T_y=-9.000E-04"
+case_name = "MicroMix_age"
+str_plane = "HRR_T_y=9.000E-04"
 str_info = r"$\mathrm{Centreplane}$"
 # Patterns of plotfiles to be processed
-data_pattern = "plt_*"
+data_pattern = "plt_25400*"
 # Field_names
-field_names = [["HeatRelease", "Y(NO)", "x_velocity"], 
-               ["temp", "Y(N)", "y_velocity"],
-               ["mag_vort", "Y(NNH)", "z_velocity"]]
+field_names = [["HeatRelease", "temp", "x_velocity"],
+               ["Y(NO)", "Y(N2O)", "Y(NNH)"],
+               ["mixture_fraction_userdef_0", "age_0", "agepv_0"],
+               ["mixture_fraction_userdef_1", "age_1", "agepv_1"],
+              ]
 # Output data folder
-fig_dir = os.path.abspath("../Figure")
-fig_slice_dir = os.path.join(fig_dir, "Slice2D_plt_lev2")
+fig_dir = os.path.join(path_PeleAnalysis, "Figure")
+fig_slice_dir = os.path.join(fig_dir, "Slice2D_plt_lev1")
 
-#%% 
+#%%
 print_mode = 1
 zst = 0.0252
 Djet = 4.5E-4
+eps_age = 1E-6
 # Get file names
 fns_unsorted = glob.glob(os.path.join(data_folder, data_pattern))
 def get_key(s):
@@ -78,18 +83,18 @@ for ifn, fn in enumerate(fns_sorted[0:]):
 
   figsize = ((Lx/Ly)*fig_unit_y*npx*0.95, fig_unit_y*npy)
   fig, axs = plt.subplots(ncols=npx, nrows=npy, figsize=figsize)
-  
+
   for ipy in range(0, npy):
     for ipx in range(0, npx):
       ax = axs[ipy, ipx]
       field_name = field_names[ipy][ipx]
       if (field_name == "HeatRelease"):
         vmin = 0.0; vmax = 1.2E11
-        im=ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="hot", 
+        im=ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="hot",
                   extent=extent, aspect='equal')
-        #ax.contour(f["mixture_fraction"], levels=[zst],
-        #           origin='lower', colors=['white'], extent=extent)
+        ax.contour(f["mixture_fraction"], levels=[zst],
+                   origin='lower', colors=['white'], extent=extent)
         ax.text(x=12.0, y=11.0, s=r"$t="+("%.3f"%(time*1000))+"\mathrm{[ms]}$", c="yellow")
         if str_info != None:
           ax.text(x=-7, y=14, s=str_info, fontsize = labelsize-6)
@@ -105,11 +110,11 @@ for ifn, fn in enumerate(fns_sorted[0:]):
 
       if (field_name == "temp"):
         vmin = 700; vmax = 2800
-        im = ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="jet", 
+        im = ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
                   extent=extent, aspect='equal')
-        #ax.contour(f["mixture_fraction"], levels=[zst],
-        #           origin='lower', colors=['white'], extent=extent)
+        ax.contour(f["mixture_fraction"], levels=[zst],
+                  origin='lower', colors=['white'], extent=extent)
         ax.set_title(r"$T~\mathrm{[K]}$", fontsize=labelsize-2, pad=3)
 
         cax = ax.inset_axes(loc_cb, transform=ax.transData)
@@ -122,8 +127,8 @@ for ifn, fn in enumerate(fns_sorted[0:]):
 
       if (field_name == "mag_vort"):
         vmin = 3.5; vmax = 6
-        im = ax.imshow(np.log10(f[field_name]), origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="binary", 
+        im = ax.imshow(np.log10(f[field_name]), origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="binary",
                   extent=extent, aspect='equal')
         ax.contour(f["mixture_fraction"], levels=[zst],
                    origin='lower', colors=['white'], extent=extent)
@@ -138,11 +143,11 @@ for ifn, fn in enumerate(fns_sorted[0:]):
         cb.ax.set_xticklabels([str(vmin), str(vmax)], color="red", fontsize=labelsize-6)  # horizontal colorbar
       if (field_name == "x_velocity"):
         vmin = -250; vmax = 250
-        im = ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="seismic", 
+        im = ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="seismic",
                   extent=extent, aspect='equal')
-        #ax.contour(f["mixture_fraction"], levels=[zst], 
-        #           origin='lower', colors=['white'], extent=extent)
+        ax.contour(f["mixture_fraction"], levels=[zst],
+                   origin='lower', colors=['white'], extent=extent)
         ax.set_title(r"$u_x \; \mathrm{[m/s]}$", fontsize=labelsize-2, pad=3)
 
         cax = ax.inset_axes(loc_cb, transform=ax.transData)
@@ -154,10 +159,10 @@ for ifn, fn in enumerate(fns_sorted[0:]):
         cb.ax.set_xticklabels([str(vmin), str(vmax)], color="white", fontsize=labelsize-6)  # horizontal colorbar
       if (field_name == "y_velocity"):
         vmin = -150; vmax = 150
-        im = ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="seismic", 
+        im = ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="seismic",
                   extent=extent, aspect='equal')
-        #ax.contour(f["mixture_fraction"], levels=[zst], 
+        #ax.contour(f["mixture_fraction"], levels=[zst],
         #           origin='lower', colors=['white'], extent=extent)
         ax.set_title(r"$u_y \; \mathrm{[m/s]}$", fontsize=labelsize-2, pad=3)
 
@@ -171,10 +176,10 @@ for ifn, fn in enumerate(fns_sorted[0:]):
 
       if (field_name == "z_velocity"):
         vmin = -250; vmax = 250
-        im = ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="seismic", 
+        im = ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="seismic",
                   extent=extent, aspect='equal')
-        #ax.contour(f["mixture_fraction"], levels=[zst], 
+        #ax.contour(f["mixture_fraction"], levels=[zst],
         #           origin='lower', colors=['white'], extent=extent)
         ax.set_title(r"$u_z \; \mathrm{[m/s]}$", fontsize=labelsize-2, pad=3)
 
@@ -186,13 +191,119 @@ for ifn, fn in enumerate(fns_sorted[0:]):
         cb.outline.set_edgecolor("black")
         cb.ax.set_xticklabels([str(vmin), str(vmax)], color="black", fontsize=labelsize-6)  # horizontal colorbar
 
+      if (field_name == "mixture_fraction_userdef_0"):
+        vmin = 0; vmax = 1.05
+        im = ax.imshow(f[field_name] / f["density"], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
+                  extent=extent, aspect='equal')
+        ax.contour(f["mixture_fraction"], levels=[zst],
+                   origin='lower', colors=['white'], extent=extent)
+        ax.set_title(r"$Z_\mathrm{0}$", fontsize=labelsize-2, pad=3)
+
+        cax = ax.inset_axes(loc_cb, transform=ax.transData)
+        cb = fig.colorbar(im, cax=cax, orientation='horizontal',
+                          ticks=[vmin, vmax])
+        cb.ax.xaxis.set_tick_params(color="white")
+        cb.ax.yaxis.set_tick_params(color="white")
+        cb.outline.set_edgecolor("white")
+        cb.ax.set_xticklabels([str(vmin), str(vmax)], color="white", fontsize=labelsize-6)  # horizontal colorbar
+
+      if (field_name == "mixture_fraction_userdef_1"):
+        vmin = 0; vmax = 1.05
+        im = ax.imshow(f[field_name] / f["density"], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
+                  extent=extent, aspect='equal')
+        ax.contour(f["mixture_fraction"], levels=[zst],
+                   origin='lower', colors=['white'], extent=extent)
+        ax.set_title(r"$Z_\mathrm{1}$", fontsize=labelsize-2, pad=3)
+
+        cax = ax.inset_axes(loc_cb, transform=ax.transData)
+        cb = fig.colorbar(im, cax=cax, orientation='horizontal',
+                          ticks=[vmin, vmax])
+        cb.ax.xaxis.set_tick_params(color="white")
+        cb.ax.yaxis.set_tick_params(color="white")
+        cb.outline.set_edgecolor("white")
+        cb.ax.set_xticklabels([str(vmin), str(vmax)], color="white", fontsize=labelsize-6)  # horizontal colorbar
+
+      if (field_name == "age_0"):
+        vmin = 0; vmax = 1E-4
+        rhoMixf = f["mixture_fraction_userdef_0"] + np.amax(f["mixture_fraction_userdef_0"]) * eps_age
+        im = ax.imshow(f[field_name] / rhoMixf, origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
+                  extent=extent, aspect='equal')
+        ax.contour(f["mixture_fraction"], levels=[zst],
+                   origin='lower', colors=['white'], extent=extent)
+        ax.set_title(r"$\alpha_\mathrm{0} \; \mathrm{[s]}$", fontsize=labelsize-2, pad=3)
+
+        cax = ax.inset_axes(loc_cb, transform=ax.transData)
+        cb = fig.colorbar(im, cax=cax, orientation='horizontal',
+                          ticks=[vmin, vmax])
+        cb.ax.xaxis.set_tick_params(color="black")
+        cb.ax.yaxis.set_tick_params(color="black")
+        cb.outline.set_edgecolor("black")
+        cb.ax.set_xticklabels([str(vmin), str(vmax)], color="black", fontsize=labelsize-6)  # horizontal colorbar
+
+      if (field_name == "age_1"):
+        vmin = 0; vmax = 3E-4
+        rhoMixf = f["mixture_fraction_userdef_1"] + np.amax(f["mixture_fraction_userdef_1"]) * eps_age
+        im = ax.imshow(f[field_name] / rhoMixf, origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
+                  extent=extent, aspect='equal')
+        ax.contour(f["mixture_fraction"], levels=[zst],
+                   origin='lower', colors=['white'], extent=extent)
+        ax.set_title(r"$\alpha_\mathrm{1} \; \mathrm{[s]}$", fontsize=labelsize-2, pad=3)
+
+        cax = ax.inset_axes(loc_cb, transform=ax.transData)
+        cb = fig.colorbar(im, cax=cax, orientation='horizontal',
+                          ticks=[vmin, vmax])
+        cb.ax.xaxis.set_tick_params(color="black")
+        cb.ax.yaxis.set_tick_params(color="black")
+        cb.outline.set_edgecolor("black")
+        cb.ax.set_xticklabels([str(vmin), str(vmax)], color="black", fontsize=labelsize-6)  # horizontal colorbar
+
+      if (field_name == "agepv_0"):
+        vmin = 0; vmax = 1E-4
+        rhoMixf = f["mixture_fraction_userdef_0"] + np.amax(f["mixture_fraction_userdef_0"]) * eps_age
+        im = ax.imshow(f[field_name] / rhoMixf, origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
+                  extent=extent, aspect='equal')
+        ax.contour(f["mixture_fraction"], levels=[zst],
+                   origin='lower', colors=['white'], extent=extent)
+        ax.set_title(r"$\alpha_\mathrm{p,0} \; \mathrm{[s]}$", fontsize=labelsize-2, pad=3)
+
+        cax = ax.inset_axes(loc_cb, transform=ax.transData)
+        cb = fig.colorbar(im, cax=cax, orientation='horizontal',
+                          ticks=[vmin, vmax])
+        cb.ax.xaxis.set_tick_params(color="white")
+        cb.ax.yaxis.set_tick_params(color="white")
+        cb.outline.set_edgecolor("white")
+        cb.ax.set_xticklabels([str(vmin), str(vmax)], color="white", fontsize=labelsize-6)  # horizontal colorbar
+
+      if (field_name == "agepv_1"):
+        vmin = 0; vmax = 1E-4
+        rhoMixf = f["mixture_fraction_userdef_1"] + np.amax(f["mixture_fraction_userdef_1"]) * eps_age
+        im = ax.imshow(f[field_name] / rhoMixf, origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
+                  extent=extent, aspect='equal')
+        ax.contour(f["mixture_fraction"], levels=[zst],
+                   origin='lower', colors=['white'], extent=extent)
+        ax.set_title(r"$\alpha_\mathrm{p,1} \; \mathrm{[s]}$", fontsize=labelsize-2, pad=3)
+
+        cax = ax.inset_axes(loc_cb, transform=ax.transData)
+        cb = fig.colorbar(im, cax=cax, orientation='horizontal',
+                          ticks=[vmin, vmax])
+        cb.ax.xaxis.set_tick_params(color="white")
+        cb.ax.yaxis.set_tick_params(color="white")
+        cb.outline.set_edgecolor("white")
+        cb.ax.set_xticklabels([str(vmin), str(vmax)], color="white", fontsize=labelsize-6)  # horizontal colorbar
+
       if (field_name == "Y(NO)"):
         vmin = 0.0; vmax = 1E-4
-        im = ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="jet", 
+        im = ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
                   extent=extent, aspect='equal')
-        #ax.contour(f["mixture_fraction"], levels=[zst],
-        #           origin='lower', colors=['white'], extent=extent)
+        ax.contour(f["mixture_fraction"], levels=[zst],
+                   origin='lower', colors=['white'], extent=extent)
         ax.set_title(r"$Y_\mathrm{NO}$", fontsize=labelsize-2, pad=3)
 
         cax = ax.inset_axes(loc_cb, transform=ax.transData)
@@ -205,11 +316,11 @@ for ifn, fn in enumerate(fns_sorted[0:]):
 
       if (field_name == "Y(N2O)"):
         vmin = 0.0; vmax = 1E-5
-        im = ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="jet", 
+        im = ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
                   extent=extent, aspect='equal')
-        #ax.contour(f["mixture_fraction"], levels=[zst],
-        #           origin='lower', colors=['white'], extent=extent)
+        ax.contour(f["mixture_fraction"], levels=[zst],
+                   origin='lower', colors=['white'], extent=extent)
         ax.set_title(r"$Y_\mathrm{N2O}$", fontsize=labelsize-2, pad=3)
         cax = ax.inset_axes(loc_cb, transform=ax.transData)
         cb = fig.colorbar(im, cax=cax, orientation='horizontal',
@@ -221,11 +332,11 @@ for ifn, fn in enumerate(fns_sorted[0:]):
 
       if (field_name == "Y(NNH)"):
         vmin = 0.0; vmax = 2E-7
-        im = ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="jet", 
+        im = ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
                   extent=extent, aspect='equal')
-        #ax.contour(f["mixture_fraction"], levels=[zst], 
-        #           origin='lower', colors=['white'], extent=extent)
+        ax.contour(f["mixture_fraction"], levels=[zst],
+                   origin='lower', colors=['white'], extent=extent)
         ax.set_title(r"$Y_\mathrm{NNH}$", fontsize=labelsize-2, pad=3)
 
         cax = ax.inset_axes(loc_cb, transform=ax.transData)
@@ -237,11 +348,11 @@ for ifn, fn in enumerate(fns_sorted[0:]):
         cb.ax.set_xticklabels([str(vmin), "%.1E"%vmax], color="black", fontsize=labelsize-6)  # horizontal colorbar
       if (field_name == "Y(N)"):
         vmin = 0.0; vmax = 2E-7
-        im = ax.imshow(f[field_name], origin="lower", 
-                  vmin = vmin, vmax = vmax, cmap="jet", 
+        im = ax.imshow(f[field_name], origin="lower",
+                  vmin = vmin, vmax = vmax, cmap="jet",
                   extent=extent, aspect='equal')
-        #ax.contour(f["mixture_fraction"], levels=[zst], 
-        #           origin='lower', colors=['white'], extent=extent)
+        ax.contour(f["mixture_fraction"], levels=[zst],
+                   origin='lower', colors=['white'], extent=extent)
         ax.set_title(r"$Y_\mathrm{N}$", fontsize=labelsize-2, pad=3)
 
         cax = ax.inset_axes(loc_cb, transform=ax.transData)

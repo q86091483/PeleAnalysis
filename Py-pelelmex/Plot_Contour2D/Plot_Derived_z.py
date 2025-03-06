@@ -7,7 +7,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib        as mpl
 
-path_PeleAnalysis = os.path.abspath("../..")
+path_PeleAnalysis = "/scratch/b/bsavard/zisen347/PeleAnalysis"
 sys.path.append(path_PeleAnalysis)
 from amr_kitchen.mandoline import Mandoline
 from amr_kitchen import HeaderData
@@ -15,31 +15,33 @@ import imageio
 
 # Input
 # Where original plot files are stored
-str_plane = "HRR_T_z=2.025E-03"
+str_plane = "HRR_T_z=9.000E-04"
 data_folder = ("/scratch/b/bsavard/zisen347/PeleAnalysis/"
-              "Py-pelelmex/Data/Slice2D_plt_lev2/Micromix/" + str_plane)
-str_plane = "HRR_T_z=2.025E-03"
+              "Data/Slice2D_plt_lev1/MicroMix_age/" + str_plane)
+str_plane = "Derived_z=9.000E-04"
 der_folder = ("/scratch/b/bsavard/zisen347/PeleAnalysis/"
-              "Py-pelelmex/Data/Slice2D_der_lev2/Micromix/" + str_plane)
+              "Data/Slice2D_derived_lev1/MicroMix_age/" + str_plane)
 tfine = 5.960E-4
 # Case name
-case_name = "Micromix"
-plane_info = r"$\mathrm{Horizotal\;plane}\;z/D_\mathrm{j}=4.5$"
-str_plane = "HRR_T_z=2.025E-03" # Output folder nmae
+case_name = "MicroMix_age"
+plane_info = r"$\mathrm{Horizotal\;plane}\;z/D_\mathrm{j}=2.0$"
+str_plane = "HRR_T_z=9.000E-04" # Output folder nmae
 # Patterns of plotfiles to be processed
-data_pattern = "plt_*"
+data_pattern = "plt_25400*"
 # Field_names
-field_names = [["HeatRelease", "temp"], 
-               ["HeatReleaseFI", "Y(NO)"],
-               ["mixture_fraction", "y_velocity"]]
+field_names = [["HeatRelease", "temp", "x_velocity"], 
+               ["Y(NO)", "Y(N2O)", "Y(NNH)"],
+               ["mixture_fraction_userdef_0", "age_0", "agepv_0"],
+               ["mixture_fraction_userdef_1", "age_1", "agepv_1"]]
 # Output data folder
-fig_dir = os.path.abspath("../Figure")
-fig_slice_dir = os.path.join(fig_dir, "Slice2D_der_lev2")
+fig_dir = os.path.abspath("/scratch/b/bsavard/zisen347/PeleAnalysis/Figure")
+fig_slice_dir = os.path.join(fig_dir, "Slice2D_derived_lev1")
 # if print on screen or write to file
 print_mode = 1
 # Micromix case parameter
 zst = 0.0252
 Djet = 4.5E-4
+eps_age = 1E-6
 # Get plot file names
 fns_unsorted = glob.glob(os.path.join(data_folder, data_pattern))
 def get_key(s):
@@ -114,7 +116,14 @@ for i, ifn in enumerate(range(0,nfns)):
   
   for ipy in range(0, npy):
     for ipx in range(0, npx):
-      ax = axs[ipy, ipx]
+      if npy == 1 and npx == 1:
+        ax = axs
+      elif npx == 1:
+        ax = axs[ipy]
+      elif npy == 1:
+        ax = axs[ipx]
+      else:
+        ax = axs[ipy, ipx]
       field_name = field_names[ipy][ipx]
       if (field_name == "HeatRelease"):
         vmin = 0.0; vmax = 1.0E11
@@ -198,6 +207,40 @@ for i, ifn in enumerate(range(0,nfns)):
         cb.outline.set_edgecolor("white")
         cb.ax.set_yticklabels([str(vmin), str(vmax)], color="white", fontsize=labelsize-6)  # horizontal colorbar
 
+      if (field_name == "mixture_fraction_userdef_0"):
+        vmin = 0.0; vmax = 1.05
+        im = ax.imshow(f[field_name] / f["density"], origin="lower", 
+                  vmin = vmin, vmax = vmax, cmap="jet", 
+                  extent=extent, aspect='equal')
+        ax.contour(fder["mixture_fraction"], levels=[zst],
+                   origin='lower', colors=['white'], extent=extent)
+        ax.set_title(r"$Z_\mathrm{0}$", fontsize=labelsize-2, pad=3)
+
+        cax = ax.inset_axes(loc_cb, transform=ax.transData)
+        cb = fig.colorbar(im, cax=cax, orientation='vertical',
+                          ticks=[vmin, vmax])
+        cb.ax.xaxis.set_tick_params(color="white")
+        cb.ax.yaxis.set_tick_params(color="white")
+        cb.outline.set_edgecolor("white")
+        cb.ax.set_yticklabels([str(vmin), str(vmax)], color="white", fontsize=labelsize-6)  # horizontal colorbar
+
+      if (field_name == "mixture_fraction_userdef_1"):
+        vmin = 0.0; vmax = 1.05
+        im = ax.imshow(f[field_name] / f["density"], origin="lower", 
+                  vmin = vmin, vmax = vmax, cmap="jet", 
+                  extent=extent, aspect='equal')
+        ax.contour(fder["mixture_fraction"], levels=[zst],
+                   origin='lower', colors=['white'], extent=extent)
+        ax.set_title(r"$Z_\mathrm{0}$", fontsize=labelsize-2, pad=3)
+
+        cax = ax.inset_axes(loc_cb, transform=ax.transData)
+        cb = fig.colorbar(im, cax=cax, orientation='vertical',
+                          ticks=[vmin, vmax])
+        cb.ax.xaxis.set_tick_params(color="white")
+        cb.ax.yaxis.set_tick_params(color="white")
+        cb.outline.set_edgecolor("white")
+        cb.ax.set_yticklabels([str(vmin), str(vmax)], color="white", fontsize=labelsize-6)  # horizontal colorbar
+
 
       if (field_name == "mag_vort"):
         vmin = 3.5; vmax = 6
@@ -266,7 +309,7 @@ for i, ifn in enumerate(range(0,nfns)):
         cb.ax.set_yticklabels([str(vmin), str(vmax)], color="black", fontsize=labelsize-6)  # horizontal colorbar
 
       if (field_name == "Y(NO)"):
-        vmin = 0.0; vmax = 1E-4
+        vmin = 0.0; vmax = 2E-4
         im = ax.imshow(f[field_name], origin="lower", 
                   vmin = vmin, vmax = vmax, cmap="jet", 
                   extent=extent, aspect='equal')
@@ -288,7 +331,7 @@ for i, ifn in enumerate(range(0,nfns)):
         cb.ax.set_yticklabels([str(vmin), "%.1E"%vmax], color="white", fontsize=labelsize-6)  # horizontal colorbar
 
       if (field_name == "Y(N2O)"):
-        vmin = 0.0; vmax = 1E-5
+        vmin = 0.0; vmax = 5E-6
         im = ax.imshow(f[field_name], origin="lower", 
                   vmin = vmin, vmax = vmax, cmap="jet", 
                   extent=extent, aspect='equal')
@@ -319,6 +362,7 @@ for i, ifn in enumerate(range(0,nfns)):
         cb.ax.yaxis.set_tick_params(color="white")
         cb.outline.set_edgecolor("white")
         cb.ax.set_yticklabels([str(vmin), "%.1E"%vmax], color="white", fontsize=labelsize-6)  # horizontal colorbar
+
       if (field_name == "Y(N)"):
         vmin = 0.0; vmax = 2E-7
         im = ax.imshow(f[field_name], origin="lower", 
@@ -327,6 +371,78 @@ for i, ifn in enumerate(range(0,nfns)):
         #ax.contour(f["mixture_fraction"], levels=[zst], 
         #           origin='lower', colors=['white'], extent=extent)
         ax.set_title(r"$Y_\mathrm{N}$", fontsize=labelsize-2, pad=3)
+
+        cax = ax.inset_axes(loc_cb, transform=ax.transData)
+        cb = fig.colorbar(im, cax=cax, orientation='vertical',
+                          ticks=[vmin, vmax])
+        cb.ax.xaxis.set_tick_params(color="white")
+        cb.ax.yaxis.set_tick_params(color="white")
+        cb.outline.set_edgecolor("white")
+        cb.ax.set_yticklabels([str(vmin), "%.1E"%vmax], color="white", fontsize=labelsize-6)  # horizontal colorbar
+
+      if (field_name == "age_0"):
+        vmin = 0.0; vmax = 1E-4
+        rhoMixf = f["mixture_fraction_userdef_0"] + np.amax(f["mixture_fraction_userdef_0"]) * eps_age
+        im = ax.imshow(f[field_name] / rhoMixf, origin="lower", 
+                  vmin = vmin, vmax = vmax, cmap="jet", 
+                  extent=extent, aspect='equal')
+        ax.contour(f["mixture_fraction"], levels=[zst], 
+                   origin='lower', colors=['white'], extent=extent)
+        ax.set_title(r"$\alpha_\mathrm{0} \; \mathrm{[s]}$", fontsize=labelsize-2, pad=3)
+
+        cax = ax.inset_axes(loc_cb, transform=ax.transData)
+        cb = fig.colorbar(im, cax=cax, orientation='vertical',
+                          ticks=[vmin, vmax])
+        cb.ax.xaxis.set_tick_params(color="white")
+        cb.ax.yaxis.set_tick_params(color="white")
+        cb.outline.set_edgecolor("white")
+        cb.ax.set_yticklabels([str(vmin), "%.1E"%vmax], color="white", fontsize=labelsize-6)  # horizontal colorbar
+
+      if (field_name == "age_1"):
+        vmin = 0.0; vmax = 3E-4
+        rhoMixf = f["mixture_fraction_userdef_1"] + np.amax(f["mixture_fraction_userdef_1"]) * eps_age
+        im = ax.imshow(f[field_name] / rhoMixf, origin="lower", 
+                  vmin = vmin, vmax = vmax, cmap="jet", 
+                  extent=extent, aspect='equal')
+        ax.contour(f["mixture_fraction"], levels=[zst], 
+                   origin='lower', colors=['white'], extent=extent)
+        ax.set_title(r"$\alpha_\mathrm{1} \; \mathrm{[s]}$", fontsize=labelsize-2, pad=3)
+
+        cax = ax.inset_axes(loc_cb, transform=ax.transData)
+        cb = fig.colorbar(im, cax=cax, orientation='vertical',
+                          ticks=[vmin, vmax])
+        cb.ax.xaxis.set_tick_params(color="white")
+        cb.ax.yaxis.set_tick_params(color="white")
+        cb.outline.set_edgecolor("white")
+        cb.ax.set_yticklabels([str(vmin), "%.1E"%vmax], color="white", fontsize=labelsize-6)  # horizontal colorbar
+
+      if (field_name == "agepv_0"):
+        vmin = 0.0; vmax = 5E-5
+        rhoMixf = f["mixture_fraction_userdef_0"] + np.amax(f["mixture_fraction_userdef_0"]) * eps_age
+        im = ax.imshow(f[field_name] / rhoMixf, origin="lower", 
+                  vmin = vmin, vmax = vmax, cmap="jet", 
+                  extent=extent, aspect='equal')
+        ax.contour(f["mixture_fraction"], levels=[zst], 
+                   origin='lower', colors=['white'], extent=extent)
+        ax.set_title(r"$\alpha_\mathrm{p,0} \; \mathrm{[s]}$", fontsize=labelsize-2, pad=3)
+
+        cax = ax.inset_axes(loc_cb, transform=ax.transData)
+        cb = fig.colorbar(im, cax=cax, orientation='vertical',
+                          ticks=[vmin, vmax])
+        cb.ax.xaxis.set_tick_params(color="white")
+        cb.ax.yaxis.set_tick_params(color="white")
+        cb.outline.set_edgecolor("white")
+        cb.ax.set_yticklabels([str(vmin), "%.1E"%vmax], color="white", fontsize=labelsize-6)  # horizontal colorbar
+
+      if (field_name == "agepv_1"):
+        vmin = 0.0; vmax = 1E-4
+        rhoMixf = f["mixture_fraction_userdef_1"] + np.amax(f["mixture_fraction_userdef_1"]) * eps_age
+        im = ax.imshow(f[field_name] / rhoMixf, origin="lower", 
+                  vmin = vmin, vmax = vmax, cmap="jet", 
+                  extent=extent, aspect='equal')
+        ax.contour(f["mixture_fraction"], levels=[zst], 
+                   origin='lower', colors=['white'], extent=extent)
+        ax.set_title(r"$\alpha_\mathrm{p,1} \; \mathrm{[s]}$", fontsize=labelsize-2, pad=3)
 
         cax = ax.inset_axes(loc_cb, transform=ax.transData)
         cb = fig.colorbar(im, cax=cax, orientation='vertical',
