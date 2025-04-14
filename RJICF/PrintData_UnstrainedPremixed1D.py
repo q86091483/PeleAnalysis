@@ -19,8 +19,8 @@ import graphviz
 #do_things = ["do_plot", "do_laminar1D"]
 do_things = ["do_laminar1D"]
 # Which mixture to calculate
-#Zs = np.linspace(0, 0.3, 61)
-Zs = np.array([0.0275, 0.025])
+Zs = np.linspace(0, 0.05, 51)
+#Zs = np.array([0.0275, 0.025])
 # Which mixture to plot
 plot_Zs = np.array([2.483E-01])
 # Which mechanism to use
@@ -38,14 +38,14 @@ def get_param_base():
   param_base = {}
   param_base["Re_j"]   = 4000
   param_base["njet"]   = 2
-  param_base["P"]      = 4.0 * ct.one_atm 
+  param_base["P"]      = 4.0 * ct.one_atm
   param_base["D_j"]    = 4.5E-4
   param_base["J"]      = 6.6
   param_base["equiv"]  = 0.6
   param_base["intv"]   = 3.0
   param_base["T_j"]    = 300.
   param_base["T_c"]    = 750.
-  X_j = {}; X_j["H2"] = 1.0; X_j["N2"] = 1 - X_j["H2"] 
+  X_j = {}; X_j["H2"] = 1.0; X_j["N2"] = 1 - X_j["H2"]
   X_c = {}; X_c["O2"] = 0.21; X_c["N2"] = 0.79
   param_base["X_j"]    = X_j
   param_base["X_c"]    = X_c
@@ -65,12 +65,12 @@ gas_j = ct.Solution(param["mech"])
 gas_c = ct.Solution(param["mech"])
 species_names = gas_j.species_names
 Ns     = len(gas_j.species_names)
-i_N2   = gas_j.species_index("N2") 
-i_NO   = gas_j.species_index("NO") 
-i_NO2  = gas_j.species_index("NO2") 
-i_N2O  = gas_j.species_index("N2O") 
-i_NNH  = gas_j.species_index("NNH") 
-X_j    = {}; X_j["H2"] = 1.0; X_j["N2"] = 1 - X_j["H2"] 
+i_N2   = gas_j.species_index("N2")
+i_NO   = gas_j.species_index("NO")
+i_NO2  = gas_j.species_index("NO2")
+i_N2O  = gas_j.species_index("N2O")
+i_NNH  = gas_j.species_index("NNH")
+X_j    = {}; X_j["H2"] = 1.0; X_j["N2"] = 1 - X_j["H2"]
 X_c    = {}; X_c["O2"] = 0.21; X_c["N2"] = 0.79
 gas_j.TPX = param["T_j"], param["P"], param["X_j"]
 gas_c.TPX = param["T_c"], param["P"], param["X_c"]
@@ -92,9 +92,9 @@ if "do_laminar1D" in do_things:
       f.set_max_grid_points(domain=f.domains[1], npmax=10000)
       f.set_refine_criteria(ratio=3.0, slope=0.1, curve=0.1)
       f.transport_model = 'mixture-averaged'
-      f.solve(loglevel)  
+      f.solve(loglevel)
       f.set_refine_criteria(ratio=2.0, slope=0.05, curve=0.05)
-      f.solve(loglevel)  
+      f.solve(loglevel)
       fn = get_flame_name(z)
       f.save(fn, basis="mass", overwrite=True)
       print("FreeFlame.solve() successed at Z = ", z)
@@ -116,7 +116,7 @@ if "do_plot" in do_things:
     for isp, spn in enumerate(gas_mix.species_names):
       Y_f.append(fstate.Y[:,isp])
     grad_T = np.gradient(T_f, x_f)
-    i_Tmax = np.argmax(grad_T) 
+    i_Tmax = np.argmax(grad_T)
 
     # Definition of progress variable
     coeff_pv = {}
@@ -186,16 +186,16 @@ if "do_plot" in do_things:
   #for isp, spn in enumerate(gas_mix.species_names):
   #  print("N2 -> " + spn, ratio[isp]/np.sum(ratio))
 
-  
 
 
-  #spn = "NNH"; isp = gas_mix.species_index(spn) 
+
+  #spn = "NNH"; isp = gas_mix.species_index(spn)
   #axz2.plot(x_f, Y_f[isp]*(10**4), label =r"$Y_\mathrm{"+spn+"} * 10^{4}$")
-  #spn = "NO"; isp = gas_mix.species_index(spn) 
+  #spn = "NO"; isp = gas_mix.species_index(spn)
   #axz2.plot(x_f, Y_f[isp]*(10**2), label =r"$Y_\mathrm{"+spn+"}*10^{2}$")
-  #spn = "N2O"; isp = gas_mix.species_index(spn) 
+  #spn = "N2O"; isp = gas_mix.species_index(spn)
   #axz2.plot(x_f, Y_f[isp]*(2*10**3), label =r"$Y_\mathrm{"+spn+"} * 2 * 10^{3}$")
-  #spn = "OH"; isp = gas_mix.species_index(spn) 
+  #spn = "OH"; isp = gas_mix.species_index(spn)
   #axz2.plot(x_f, Y_f[isp], label =r"$Y_\mathrm{"+spn+"}$")
 
   #vmin = 600; vmax = 2500
@@ -207,12 +207,12 @@ if "do_plot" in do_things:
 #f = graphviz.Digraph()
 # For every "reactant" specie
 #for i in range(0, Ns):
-    # For every "product" specie 
+    # For every "product" specie
 #    for j in range(0,Ns):
-        
+
 #        spo = gas_mix.species_names[i]
 #        origin = f"{spo}"
-        
+
 #        spd = gas_mix.species_names[j]
 #        destin = f"{spd}"
 

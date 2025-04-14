@@ -1,20 +1,21 @@
 # Global settings
 verbose         = 2
-finestLevel     = 3
+finestLevel     = 2
+transport.use_soret = 1
 
 # infile from bash
 #infile          = /scratch/b/bsavard/mavab/Backup_run/DNS_HTC_premixer/chemistry/plt05991/
 #infile_derived  = /scratch/b/bsavard/zisen347/PeleAnalysis/Src/cond_ISRN/plt05991_derived
 
-outputDir       = res_RPA
+outputDir       = res_fluxRPA
 outputLabel     = Y
 
 writeDerivedField = 1  # If write derived field (output field)
 
 # Conditioning variables
 vars            = x		      						y		      				z					mixture_fraction	pv				zone 		FI		agepv_1
-nBins           = 1   	      					1 		    				1  				20               	10   	  	1				2			12
-varBounds       = 0.0 +112.25E-4 	-1.8E-3 1.8E-3	  0 5.6E-3				0.0 0.1 	 		 		300 2800	1 4 		-1 1  0 1.2E-4
+nBins           = 1   	      					1 		    				1  				200              	22   	  	1				2			13
+varBounds       = -9.0E-4 +110.25E-4 	-1.8E-3 1.8E-3	   0.0 5.6E-3	0.0 0.2 			 		0 1.1   	1 4 		-1 1  0 1.3E-4
 incOutOfBounds  = 0                 		1		      				1		    	0                 0					0				1 		1
 binType         = lin               		lin		    				lin		    lin               lin				lin		  lin	  lin
 

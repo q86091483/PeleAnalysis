@@ -454,6 +454,14 @@ int main (int argc, char* argv[])
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
   fn = "R10";
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
+  fn = "D10";
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
+  fn = "W10";
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
+  fn = "T10";
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
+  fn = "C10";
+  outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
   fn = "zone";
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
 #if (NUMAUX > 0)
@@ -579,6 +587,30 @@ int main (int argc, char* argv[])
   for (int ir = 0; ir < NUM_REACTIONS; ir++) {
     std::string s = std::to_string(ir);
     fn = "R(" + std::string(s) + ")"; avgVarNames.emplace_back(fn);
+    mav[fn] = avgVarNames.size() - 1;
+  }
+  // Diffusion component of the transport budget
+  int ID_diffY = ID_PRR + NUM_REACTIONS;
+  for (int isp = 0; isp < NUM_SPECIES; isp++) {
+    fn = "diffY(" + spec_names[isp] + ")"; avgVarNames.emplace_back(fn);
+    mav[fn] = avgVarNames.size() - 1;
+  }
+  // Diffusion molecular weight component of the transport budget
+  int ID_diffWY = ID_diffY + NUM_SPECIES;
+  for (int isp = 0; isp < NUM_SPECIES; isp++) {
+    fn = "diffWY(" + spec_names[isp] + ")"; avgVarNames.emplace_back(fn);
+    mav[fn] = avgVarNames.size() - 1;
+  }
+  // Diffusion soret
+  int ID_diffTY = ID_diffWY + NUM_SPECIES;
+  for (int isp = 0; isp < NUM_SPECIES; isp++) {
+    fn = "diffTY(" + spec_names[isp] + ")"; avgVarNames.emplace_back(fn);
+    mav[fn] = avgVarNames.size() - 1;
+  }
+  // Convection component of the transport budget
+  int ID_convY = ID_diffTY + NUM_SPECIES;
+  for (int isp = 0; isp < NUM_SPECIES; isp++) {
+    fn = "convY(" + spec_names[isp] + ")"; avgVarNames.emplace_back(fn);
     mav[fn] = avgVarNames.size() - 1;
   }
 #if (NUMAUX > 0)
@@ -733,7 +765,7 @@ int main (int argc, char* argv[])
       // Intermediate fields MultiFabs
       MultiFab mf_D(ba, dm, NUM_SPECIES, nGrow);
       MultiFab mf_lam(ba, dm, 1, nGrow);
-      MultiFab mf_chi(ba, dm, 1, nGrow);
+      MultiFab mf_chi(ba, dm, NUM_SPECIES, nGrow);
       MultiFab mf_xi(ba, dm, 1, nGrow);
       MultiFab mf_mu(ba, dm, 1, nGrow);
       MultiFab mf_gradu(ba, dm, BL_SPACEDIM+1, nGrow);
@@ -741,6 +773,11 @@ int main (int argc, char* argv[])
       MultiFab mf_gradw(ba, dm, BL_SPACEDIM+1, nGrow);
       MultiFab mf_gradYfu(ba, dm, BL_SPACEDIM+1, nGrow);
       MultiFab mf_gradYox(ba, dm, BL_SPACEDIM+1, nGrow);
+      MultiFab mf_diffY(ba, dm, NUM_SPECIES, nGrow);
+      MultiFab mf_diffWY(ba, dm, NUM_SPECIES, nGrow);
+      MultiFab mf_diffTY(ba, dm, NUM_SPECIES, nGrow);
+      MultiFab mf_convY(ba, dm, NUM_SPECIES, nGrow);
+
 		  //MultiFab mf_su(ba, dm, 6, nGrow); // symmetric velocity tensor 0.5(du_i/dx_j+du_j/dx_i)
 		  //MultiFab mf_tau(ba, dm, 6, nGrow); // viscous force tensor
       //const int L11=0, L22=1, L33=2, L12=3, L13=4, L23=5;
@@ -789,8 +826,8 @@ int main (int argc, char* argv[])
       const amrex::Real ZONE_INTERACTION = 3.5;
 
       //FArrayBox alias_fab(orig_fab, amrex::make_alias, 1, 2);
-      // Calculate result variables & collect their statistics
 
+      // Calculate result variables & collect their statistics
       for (amrex::MFIter mfi(mf_in, amrex::TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
         const Box& bx = mfi.tilebox();
@@ -809,10 +846,21 @@ int main (int argc, char* argv[])
         FArrayBox& fab_xyz = mf_xyz[mfi];
         FArrayBox& fab_covered = mf_covered[mfi];
         FArrayBox& fab_gradu = mf_gradu[mfi];
+        FArrayBox  fab_gradux(mf_gradu[mfi], amrex::make_alias, 0, 1);
+        FArrayBox  fab_graduy(mf_gradu[mfi], amrex::make_alias, 1, 1);
+        FArrayBox  fab_graduz(mf_gradu[mfi], amrex::make_alias, 2, 1);
         FArrayBox& fab_gradv = mf_gradv[mfi];
+        FArrayBox  fab_gradvx(mf_gradv[mfi], amrex::make_alias, 0, 1);
+        FArrayBox  fab_gradvy(mf_gradv[mfi], amrex::make_alias, 1, 1);
+        FArrayBox  fab_gradvz(mf_gradv[mfi], amrex::make_alias, 2, 1);
         FArrayBox& fab_gradw = mf_gradw[mfi];
+        FArrayBox  fab_gradwx(mf_gradw[mfi], amrex::make_alias, 0, 1);
+        FArrayBox  fab_gradwy(mf_gradw[mfi], amrex::make_alias, 1, 1);
+        FArrayBox  fab_gradwz(mf_gradw[mfi], amrex::make_alias, 2, 1);
         FArrayBox& fab_gradYfu = mf_gradYfu[mfi];
         FArrayBox& fab_gradYox = mf_gradYox[mfi];
+        FArrayBox& fab_diffY = mf_diffY[mfi];
+        FArrayBox& fab_convY = mf_convY[mfi];
 
         //FArrayBox& fab_su    = mf_su[mfi];
         //FArrayBox& fab_tau   = mf_tau[mfi];
@@ -848,10 +896,18 @@ int main (int argc, char* argv[])
         Array4<Real> const& rhorr_NNH_out_a = mfv_out[lev].array(mfi, mo["rhorr(NNH)"]);
         Array4<Real> const& FI_out_a = mfv_out[lev].array(mfi, mo["FI"]);
         Array4<Real> const& R10_out_a = mfv_out[lev].array(mfi, mo["R10"]);
+        Array4<Real> const& D10_out_a = mfv_out[lev].array(mfi, mo["D10"]);
+        Array4<Real> const& W10_out_a = mfv_out[lev].array(mfi, mo["W10"]);
+        Array4<Real> const& T10_out_a = mfv_out[lev].array(mfi, mo["T10"]);
+        Array4<Real> const& C10_out_a = mfv_out[lev].array(mfi, mo["C10"]);
         Array4<Real> const& zone_out_a = mfv_out[lev].array(mfi, mo["zone"]);
 #if (NUMAUX > 0)
         Array4<Real> const& agepv_1_out_a = mfv_out[lev].array(mfi, mo["agepv_1"]);
 #endif
+        Array4<Real> const& diffY_a = mf_diffY.array(mfi, 0);
+        Array4<Real> const& diffWY_a = mf_diffWY.array(mfi, 0);
+        Array4<Real> const& diffTY_a = mf_diffTY.array(mfi, 0);
+        Array4<Real> const& convY_a = mf_convY.array(mfi, 0);
 
         //Array4<Real> const& mu_out_a = mfv_out[lev].array(mfi, mo["mu"]);
         //Array4<Real> const& ts_a      = mfv_out[lev].array(mfi, mo["ts11"]);
@@ -904,28 +960,218 @@ int main (int argc, char* argv[])
           trans.get_transport_coeffs(
             tbx, Y_a, T_a, rho_a, D_a, chi_a, mu_a, xi_a, lam_a, ltransparm);
         });
+        amrex::Real mwtinv[NUM_SPECIES] = {0.0};
+        eos.inv_molecular_weight(mwtinv);
 
         // Calculate gradients of velocity
-        gradient(BL_TO_FORTRAN_BOX(bx),
-                BL_TO_FORTRAN_N_ANYD(fab_in,    mi["x_velocity"]),
-                BL_TO_FORTRAN_N_ANYD(fab_gradu, 0),
-                &(dx[0]));
-        gradient(BL_TO_FORTRAN_BOX(bx),
-                BL_TO_FORTRAN_N_ANYD(fab_in,    mi["y_velocity"]),
-                BL_TO_FORTRAN_N_ANYD(fab_gradv, 0),
-                &(dx[0]));
-        gradient(BL_TO_FORTRAN_BOX(bx),
-                BL_TO_FORTRAN_N_ANYD(fab_in,    mi["z_velocity"]),
-                BL_TO_FORTRAN_N_ANYD(fab_gradw, 0),
-                &(dx[0]));
-        gradient(BL_TO_FORTRAN_BOX(bx),
-                BL_TO_FORTRAN_N_ANYD(fab_in,    mi["Y(H2)"]),
-                BL_TO_FORTRAN_N_ANYD(fab_gradYfu, 0),
-                &(dx[0]));
-        gradient(BL_TO_FORTRAN_BOX(bx),
-                BL_TO_FORTRAN_N_ANYD(fab_in,    mi["Y(O2)"]),
-                BL_TO_FORTRAN_N_ANYD(fab_gradYox, 0),
-                &(dx[0]));
+        //gradient(BL_TO_FORTRAN_BOX(bx),
+        //        BL_TO_FORTRAN_N_ANYD(fab_in,    mi["x_velocity"]),
+        //        BL_TO_FORTRAN_N_ANYD(fab_gradu, 0),
+        //        &(dx[0]));
+        //gradient(BL_TO_FORTRAN_BOX(bx),
+        //        BL_TO_FORTRAN_N_ANYD(fab_in,    mi["y_velocity"]),
+        //        BL_TO_FORTRAN_N_ANYD(fab_gradv, 0),
+        //        &(dx[0]));
+        //gradient(BL_TO_FORTRAN_BOX(bx),
+        //        BL_TO_FORTRAN_N_ANYD(fab_in,    mi["z_velocity"]),
+        //        BL_TO_FORTRAN_N_ANYD(fab_gradw, 0),
+        //        &(dx[0]));
+        //gradient(BL_TO_FORTRAN_BOX(bx),
+        //        BL_TO_FORTRAN_N_ANYD(fab_in,    mi["Y(H2)"]),
+        //        BL_TO_FORTRAN_N_ANYD(fab_gradYfu, 0),
+        //        &(dx[0]));
+        //gradient(BL_TO_FORTRAN_BOX(bx),
+        //        BL_TO_FORTRAN_N_ANYD(fab_in,    mi["Y(O2)"]),
+        //        BL_TO_FORTRAN_N_ANYD(fab_gradYox, 0),
+        //        &(dx[0]));
+
+        for (int isp = 0; isp < NUM_SPECIES; isp++) {
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            diffY_a(i,j,k,isp) = 0.0;
+            diffWY_a(i,j,k,isp) = 0.0;
+            diffTY_a(i,j,k,isp) = 0.0;
+          });
+          // gradY
+          gradient(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_N_ANYD(fab_in, mi["Y(" + spec_names[isp] + ")"]),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradu, 0),
+                   &(dx[0]));
+          // rhoD * gradY
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            amrex::Real Wbar = 0.0_rt;
+            amrex::Real Y_loc[NUM_SPECIES] = {0.0_rt};
+            amrex::Real chi_loc[NUM_SPECIES] = {0.0_rt};
+            for (int ispm = 0; ispm < NUM_SPECIES; ispm++) {
+              Y_loc[ispm] = Y_a(i,j,k,ispm);
+              chi_loc[ispm] = chi_a(i,j,k,ispm);
+            }
+            eos.Y2WBAR(Y_loc, Wbar);
+            gradu_a(i,j,k,0) = gradu_a(i,j,k,0) * D_a(i,j,k,isp) * Wbar * mwtinv[isp] * 1.0e-1_rt; // CGS->MKS (kg/m.s);
+            gradu_a(i,j,k,1) = gradu_a(i,j,k,1) * D_a(i,j,k,isp) * Wbar * mwtinv[isp] * 1.0e-1_rt;
+            gradu_a(i,j,k,2) = gradu_a(i,j,k,2) * D_a(i,j,k,isp) * Wbar * mwtinv[isp] * 1.0e-1_rt;
+          });
+          int nCompGrad = BL_SPACEDIM + 1;
+          pushvtog(BL_TO_FORTRAN_BOX(bx),
+                 BL_TO_FORTRAN_BOX(dbox),
+                BL_TO_FORTRAN_ANYD(fab_gradu),
+                &nCompGrad);
+          // laplacian x-x
+          gradient(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradu, 0),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradv, 0),
+                   &(dx[0]));
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            diffY_a(i,j,k,isp) = gradv_a(i,j,k,0);
+          });
+          // laplacian z-z
+          gradient(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradu, 2),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradv, 0),
+                   &(dx[0]));
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            diffY_a(i,j,k,isp) += gradv_a(i,j,k,2);
+            if (isp == H_ID) D10_out_a(i,j,k,0) = diffY_a(i,j,k,isp);
+          });
+          // laplacian y-y
+          gradient(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradu, 1),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradv, 0),
+                   &(dx[0]));
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            diffY_a(i,j,k,isp) += gradv_a(i,j,k,1);
+          });
+
+          // gradW
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            amrex::Real Wbar = 0.0_rt;
+            amrex::Real Y_loc[NUM_SPECIES] = {0.0_rt};
+            for (int ispm = 0; ispm < NUM_SPECIES; ispm++) {
+              Y_loc[ispm] = Y_a(i,j,k,ispm);
+            }
+            eos.Y2WBAR(Y_loc, Wbar);
+            gradu_a(i,j,k,0) = Wbar;
+          });
+          pushvtog(BL_TO_FORTRAN_BOX(bx),
+                 BL_TO_FORTRAN_BOX(dbox),
+                BL_TO_FORTRAN_ANYD(fab_gradu),
+                &nCompGrad);
+          gradient(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradu, 0),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradv, 0),
+                   &(dx[0]));
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            gradw_a(i,j,k,0) = gradv_a(i,j,k,0) * Y_a(i,j,k,isp) * D_a(i,j,k,isp) * mwtinv[isp] * 1.0e-1_rt;
+            gradw_a(i,j,k,1) = gradv_a(i,j,k,1) * Y_a(i,j,k,isp) * D_a(i,j,k,isp) * mwtinv[isp] * 1.0e-1_rt;
+            gradw_a(i,j,k,2) = gradv_a(i,j,k,2) * Y_a(i,j,k,isp) * D_a(i,j,k,isp) * mwtinv[isp] * 1.0e-1_rt;
+          });
+          pushvtog(BL_TO_FORTRAN_BOX(bx),
+                 BL_TO_FORTRAN_BOX(dbox),
+                BL_TO_FORTRAN_ANYD(fab_gradw),
+                &nCompGrad);
+          // gradW laplacian x-x
+          gradient(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradw, 0),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradu, 0),
+                   &(dx[0]));
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            diffWY_a(i,j,k,isp) = gradu_a(i,j,k,0);
+          });
+          // gradW laplacian z-z
+          gradient(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradw, 2),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradu, 0),
+                   &(dx[0]));
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            diffWY_a(i,j,k,isp) += gradu_a(i,j,k,2);
+            if (isp == H_ID) W10_out_a(i,j,k,0) = diffWY_a(i,j,k,isp);
+          });
+          // gradW laplacian y-y
+          gradient(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradw, 1),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradu, 0),
+                   &(dx[0]));
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            diffWY_a(i,j,k,isp) += gradu_a(i,j,k,1);
+          });
+
+          // Soret diffusion
+          gradient(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_N_ANYD(fab_in, mi["temp"]),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradu, 0),
+                   &(dx[0]));
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            gradu_a(i,j,k,0) = -gradu_a(i,j,k,0) * D_a(i,j,k,isp) * 1.0e-1_rt * chi_a(i,j,k,isp) / T_a(i,j,k,0);
+            gradu_a(i,j,k,1) = -gradu_a(i,j,k,1) * D_a(i,j,k,isp) * 1.0e-1_rt * chi_a(i,j,k,isp) / T_a(i,j,k,0);
+            gradu_a(i,j,k,2) = -gradu_a(i,j,k,2) * D_a(i,j,k,isp) * 1.0e-1_rt * chi_a(i,j,k,isp) / T_a(i,j,k,0);
+          });
+          pushvtog(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_BOX(dbox),
+                   BL_TO_FORTRAN_ANYD(fab_gradu),
+                   &nCompGrad);
+          // Soret laplacian x-x
+          gradient(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradu, 0),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradv, 0),
+                   &(dx[0]));
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            diffTY_a(i,j,k,isp) = gradv_a(i,j,k,0);
+          });
+          // Soret laplacian z-z
+          gradient(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradu, 2),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradv, 0),
+                   &(dx[0]));
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            diffTY_a(i,j,k,isp) += gradv_a(i,j,k,2);
+            if (isp == H_ID) T10_out_a(i,j,k,0) = diffTY_a(i,j,k,isp);
+          });
+          // Soret laplacian y-y
+          gradient(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradu, 1),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradv, 0),
+                   &(dx[0]));
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            diffTY_a(i,j,k,isp) += gradv_a(i,j,k,1);
+          });
+        } // isp - diffY, diffWY
+
+        for (int isp = 0; isp < NUM_SPECIES; isp++) {
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            gradu_a(i,j,k,0) = rho_a(i,j,k) * Y_a(i,j,k,isp) * U_a(i,j,k);
+            gradu_a(i,j,k,1) = rho_a(i,j,k) * Y_a(i,j,k,isp) * V_a(i,j,k);
+            gradu_a(i,j,k,2) = rho_a(i,j,k) * Y_a(i,j,k,isp) * W_a(i,j,k);
+          });
+          int nCompGrad = BL_SPACEDIM + 1;
+          pushvtog(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_BOX(dbox),
+                   BL_TO_FORTRAN_ANYD(fab_gradu),
+                 &nCompGrad);
+          // conv u-x
+          gradient(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradu, 0),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradv, 0),
+                   &(dx[0]));
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            convY_a(i,j,k,isp) = gradv_a(i,j,k,0);
+          });
+          // conv w-z
+          gradient(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradu, 2),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradv, 0),
+                   &(dx[0]));
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            convY_a(i,j,k,isp) += gradv_a(i,j,k,2);
+            if (isp == H_ID) C10_out_a(i,j,k,0) = convY_a(i,j,k,isp);
+          });
+          // conv v-y
+          gradient(BL_TO_FORTRAN_BOX(bx),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradu, 1),
+                   BL_TO_FORTRAN_N_ANYD(fab_gradv, 0),
+                   &(dx[0]));
+          amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
+            convY_a(i,j,k,isp) += gradv_a(i,j,k,1);
+          });
+        } // isp - convY
 
         amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept {
           // var_loc(i,j,k)
@@ -1038,9 +1284,38 @@ int main (int argc, char* argv[])
           //R10_out_a(i,j,k) = Qf[186] - Qr[186]; // Qf[186] in Mechanism.H is 184-th reaction in CHEMKIN
 					R10_out_a(i,j,k) = Qf[85] - Qr[85]; // Qf[186] in Mechanism.H is 184-th reaction in CHEMKIN
 
+          amrex::Real mwtinv[NUM_SPECIES] = {0.0};
+          eos.inv_molecular_weight(mwtinv);
+          amrex::Real Wbar = 0.0_rt;
+          eos.Y2WBAR(Y_loc, Wbar);
+          amrex::Real rhoDi_cgs[NUM_SPECIES] = {0.0};
+          amrex::Real dummy_chi[NUM_SPECIES] = {0.0};
+          amrex::Real lambda_cgs = 0.0_rt;
+          amrex::Real mu_cgs = 0.0_rt;
+          amrex::Real dummy_xi = 0.0_rt;
+          amrex::Real Tloc = T_a(i, j, k);
+          bool get_xi = true;
+          bool get_mu = true;
+          bool get_lam = true;
+          bool get_Ddiag = true;
+          bool get_chi = true;
+          // Below pointwise works, but I use the version working for box
+          //auto trans = pele::physics::PhysicsType::transport();
+          //trans.transport(
+          //  get_xi, get_mu, get_lam, get_Ddiag, get_chi, Tloc, rho_cgs, Y_loc, rhoDi_cgs,
+          //  dummy_chi, mu_cgs, dummy_xi, lambda_cgs, ltransparm);
+          //for (int n = 0; n < NUM_SPECIES; n++) {
+           //rhoDi(i, j, k, n) = rhoDi_cgs[n] * Wbar * mwtinv[n] * 1.0e-1_rt;
+            //amrex::AllPrint() << dummy_chi[H_ID] << " ....." << std::endl;
+          //}
+          //D10_out_a(i,j,k) = rhoDi_cgs[H2_ID] * Wbar * mwtinv[H2_ID] * 1.0e-1_rt
+          // The D_a term on the rhs of the below equation is actually rhoD (i.e., density weighted)
+          //T10_out_a(i,j,k) = D_a(i,j,k,NNH_ID) * Wbar * mwtinv[NNH_ID] * 1.0e-1_rt; // CGS->MKS (kg/m.s)
+
           // mf_mid
           mixfrac_mid_a(i,j,k) = mixfrac_out_a(i,j,k);
-          pv_mid_a(i,j,k) = T_a(i,j,k); //pv_out_a(i,j,k);
+          //pv_mid_a(i,j,k) = T_a(i,j,k); //pv_out_a(i,j,k);
+          pv_mid_a(i,j,k) = pv_out_a(i,j,k);
           zone_mid_a(i,j,k) = zone_out_a(i,j,k);
           FI_mid_a(i,j,k) = FI_out_a(i,j,k);
 #if (NUMAUX > 0)
@@ -1134,8 +1409,10 @@ int main (int argc, char* argv[])
           for (int isp = 0; isp < NUM_SPECIES; isp++) {
             dataY[ID_rhoY + isp] = rho_a(i,j,k) * Y_a(i,j,k,isp);
             dataY[ID_rhoY2 + isp] = rho_a(i,j,k) * Y_a(i,j,k,isp) * Y_a(i,j,k,isp);
-            dataY[ID_wdot + isp] = rho_a(i,j,k) * wdot_loc[isp];
-            dataY[ID_wdot2 + isp] = rho_a(i,j,k) * wdot_loc[isp] * wdot_loc[isp];
+            //dataY[ID_wdot + isp] = rho_a(i,j,k) * wdot_loc[isp];
+            //dataY[ID_wdot2 + isp] = rho_a(i,j,k) * wdot_loc[isp] * wdot_loc[isp];
+            dataY[ID_wdot + isp] = wdot_loc[isp];
+            dataY[ID_wdot2 + isp] =  wdot_loc[isp] * wdot_loc[isp] / rho_a(i,j,k);
           }
           for (int ir = 0; ir < NUM_REACTIONS; ir++) {
             dataY[ID_PRR + reaction_map[ir]] = Qf[ir] - Qr[ir];
@@ -1148,6 +1425,13 @@ int main (int argc, char* argv[])
 #if (NUMAUX > 0)
           dataY[mav["agepv_1"]] = agepv_1_out_a(i,j,k);
 #endif
+          for (int isp = 0; isp < NUM_SPECIES; isp++) {
+            dataY[ID_diffY + isp] = diffY_a(i,j,k,isp);
+            dataY[ID_diffWY + isp] = diffWY_a(i,j,k,isp);
+            dataY[ID_diffTY + isp] = diffTY_a(i,j,k,isp);
+            dataY[ID_convY + isp] = convY_a(i,j,k,isp);
+          }
+
 
           // Compute the bin in X space (<Y|X>)
           for (int ivar=0; ivar<nVars; ivar++) {

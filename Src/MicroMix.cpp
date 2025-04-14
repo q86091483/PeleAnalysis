@@ -461,7 +461,6 @@ int main (int argc, char* argv[])
   outNames.emplace_back(fn); nCompOut = outNames.size(); mo[fn] = nCompOut - 1;
 #endif
 
-
   // List of fields to be conditioned upon (X of <Y|X>)
   const int nVars(pp.countval("vars"));
   if (nVars < 1) {
@@ -975,16 +974,6 @@ int main (int argc, char* argv[])
           rhorr_NO_out_a(i,j,k) = wdot_loc[NO_ID] * 1000.0_rt; // kg/m3
           rhorr_N2O_out_a(i,j,k) = wdot_loc[N2O_ID] * 1000.0_rt;
           rhorr_NNH_out_a(i,j,k) = wdot_loc[NNH_ID] * 1000.0_rt;
-          // net rate of reaction progress
-          eos.Y2X(Y_loc, X_loc);
-          CKPX(rho_cgs, T_a(i,j,k), X_loc, Pcgs);
-          CKYTCR(rho_cgs, T_a(i,j,k), Y_loc, Ci_CGS);
-          for (int isp = 0; isp < NUM_SPECIES; isp++) {
-            Ci_MKS[isp] = Ci_CGS[isp]*1.0e6_rt;                             // CGS -> MKS conversion
-          }
-          //CKKFKR(Pcgs, T_a(i,j,k), X_loc, Qf, Qr);
-          progressRateFR(Qf, Qr, Ci_MKS, T_a(i,j,k));
-          R10_out_a(i,j,k) = Qf[0]; //(Qf[reaction_map[10]] - Qr[reaction_map[10]]) * 1.0E6; // - Qr[9];
           // mfv_out - FI
           FI_out_a(i,j,k) = 0.0;
           FI_out_a(i,j,k) = gradYfu_a(i,j,k,0) * gradYox_a(i,j,k,0) +
@@ -1028,6 +1017,17 @@ int main (int argc, char* argv[])
             zone_out_a(i,j,k) = -1.0; // Disregard inlet regions
           }
 
+          // net rate of reaction progress
+          eos.Y2X(Y_loc, X_loc);
+          CKPX(rho_cgs, T_a(i,j,k), X_loc, Pcgs);
+          CKYTCR(rho_cgs, T_a(i,j,k), Y_loc, Ci_CGS);
+          for (int isp = 0; isp < NUM_SPECIES; isp++) {
+            Ci_MKS[isp] = Ci_CGS[isp]*1.0e6_rt;                             // CGS -> MKS conversion
+          }
+          //CKKFKR(Pcgs, T_a(i,j,k), X_loc, Qf, Qr);
+          progressRateFR(Qf, Qr, Ci_MKS, T_a(i,j,k));
+          R10_out_a(i,j,k) = Qf[0]; //(Qf[reaction_map[10]] - Qr[reaction_map[10]]) * 1.0E6; // - Qr[9];
+ 
           // set mf_mid
           mixfrac_mid_a(i,j,k) = mixfrac_out_a(i,j,k);
           pv_mid_a(i,j,k) = pv_out_a(i,j,k); //pv_out_a(i,j,k);
@@ -1117,6 +1117,7 @@ int main (int argc, char* argv[])
 #if (NUMAUX > 0)
           dataY[mav["agepv_1"]] = agepv_1_out_a(i,j,k);
 #endif
+
           // Compute the bin in X space (<Y|X>)
           for (int ivar=0; ivar<nVars; ivar++) {
             bins[ivar] = computeBin(dataX[ivar], varBounds[ivar][0], varBounds[ivar][1], nBins[ivar], binType[ivar]);

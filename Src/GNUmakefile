@@ -1,5 +1,7 @@
+TOP = /home/b/bsavard/zisen347/codes/exascale
+PELELMEX_HOME      ?= ${TOP}/PeleLMeX
 AMREX_HOME          ?= /home/b/bsavard/zisen347/codes/exascale/amrex
-PELE_PHYSICS_HOME   ?= /home/b/bsavard/zisen347/codes/exascale/PelePhysics
+PELE_PHYSICS_HOME   ?= /home/b/bsavard/zisen347/codes/exascale/Old_PelePhysics
 PELE_ANALYSIS_HOME  ?= /scratch/b/bsavard/zisen347/PeleAnalysis
 
 # AMReX
@@ -50,9 +52,9 @@ Reactions_dir := Fuego
 #EBASE         = KolmogorovScale
 #EBASE          = FlameStructure_basic
 #EBASE          = MicroMix
-EBASE          = RPA
-
-
+EBASE          = fluxRPA
+#EBASE          = RPA
+#EBASE          = Touch
 
 #NEEDS_f90_SRC = FALSE
 NEEDS_f90_SRC = TRUE
@@ -71,6 +73,7 @@ ifeq ($(EBASE),partStream)
 endif
 
 include $(AMREX_HOME)/Tools/GNUMake/Make.defs
+#include $(PELELMEX_HOME)/Exec/Make.PeleLMeX
 
 CEXE_sources += $(EBASE).cpp
 ifeq ($(NEEDS_f90_SRC),TRUE)
@@ -95,6 +98,16 @@ ifeq ($(EBASE), MicroMix)
 endif
 
 ifeq ($(EBASE), RPA)
+  #INCLUDE_LOCATIONS += $(HDF5_HOME)/include
+  LIBRARIES         += -lhdf5_cpp -lhdf5
+endif
+
+ifeq ($(EBASE), fluxRPA)
+  #INCLUDE_LOCATIONS += $(HDF5_HOME)/include
+  LIBRARIES         += -lhdf5_cpp -lhdf5
+endif
+
+ifeq ($(EBASE), Touch)
   #INCLUDE_LOCATIONS += $(HDF5_HOME)/include
   LIBRARIES         += -lhdf5_cpp -lhdf5
 endif

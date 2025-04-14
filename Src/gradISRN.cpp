@@ -24,7 +24,7 @@ extern "C" {
 }
 
 static
-void 
+void
 print_usage (int,
              char* argv[])
 {
@@ -90,7 +90,7 @@ int main (int argc, char* argv[])
   pele::physics::eos::speciesNames<pele::physics::PhysicsType::eos_type>(spec_names);
   auto eos = pele::physics::PhysicsType::eos();
 
-  int idYin = -1; 
+  int idYin = -1;
   int idTin = -1;
   int idRin = -1;
   int idZin = -1;
@@ -326,7 +326,7 @@ int main (int argc, char* argv[])
           }
 
           // Copy mixture fraction.
-          Zout_a(i,j,k) = Z_a(i,j,k); 
+          Zout_a(i,j,k) = Z_a(i,j,k);
 
           // Debug print
           amrex::Print(ioproc) << Z_a(i,j,k) << std::endl;
@@ -340,7 +340,7 @@ int main (int argc, char* argv[])
   } // lev
 
   std::string outDir = "cond_ISRN"; pp.query("outputDir", outDir);
-  std::string outfilename(outDir + "/" + basename(infile) + "_derived"); 
+  std::string outfilename(outDir + "/" + basename(infile) + "_derived");
   Print() << "Writing ISRN derived data to " << outfilename << std::endl;
   bool verb = false;
   WritePlotFile(outdata,amrData,outfilename,verb,outNames);

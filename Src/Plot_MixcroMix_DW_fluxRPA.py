@@ -25,10 +25,10 @@ labelsize = 24; lw = 1.5
 
 # Input
 # Where to output the result
-case_folder = "/scratch/b/bsavard/zisen347/PeleAnalysis/Src/res_RPA/"
+case_folder = "/scratch/b/bsavard/zisen347/PeleAnalysis/Src/res_fluxRPA/"
 
 # Where to read h5 files that contain condition smean
-fns = glob.glob(case_folder + "plt_15000*.h5")
+fns = glob.glob(case_folder + "plt_17*.h5")
 
 # Data folder - where 1D flame data is stored
 data_folder = "/scratch/b/bsavard/zisen347/PeleAnalysis/RJICF/Data/UnstrainedPremixed1D"
@@ -244,10 +244,10 @@ rhoY2_wtsum = np.zeros(dim_cond_sp)
 wdot_wtsum  = np.zeros(dim_cond_sp)
 wdot2_wtsum = np.zeros(dim_cond_sp)
 prr_wtsum   = np.zeros(dim_cond_r)
+diffY_wtsum = np.zeros(dim_cond_sp)
 
 for ifn, fn in enumerate(fns):
   f = h5py.File(fn, 'r+')
-  print(fn)
   wt_sum  = wt_sum        + f["DATA"]["volume_mean"]
   rho_wtsum = rho_wtsum   + f["DATA"]["rho_mean"]
   rhoT_wtsum = rhoT_wtsum + f["DATA"]["rhoT_mean"]
@@ -258,18 +258,22 @@ for ifn, fn in enumerate(fns):
   hrr2_wtsum = hrr2_wtsum   + f["DATA"]["HeatRelease2_mean"]
   agepv_wtsum = agepv_wtsum + f["DATA"]["agepv_1_mean"]
   for isp in range(0, Nsp):
-    fn = "rhoY(" + str(species_names[isp]) + ")_mean"
-    rhoY_wtsum[:,:,:,:,:,:,:,:,isp] = rhoY_wtsum[:,:,:,:,:,:,:,:,isp] + f["DATA"][fn]
-    fn = "rhoY2(" + str(species_names[isp]) + ")_mean"
-    rhoY2_wtsum[:,:,:,:,:,:,:,:,isp] = rhoY2_wtsum[:,:,:,:,:,:,:,:,isp] + f["DATA"][fn]
-    fn = "wdot(" + str(species_names[isp]) + ")_mean"
-    wdot_wtsum[:,:,:,:,:,:,:,:,isp] = wdot_wtsum[:,:,:,:,:,:,:,:,isp] + f["DATA"][fn]
-    fn = "wdot2(" + str(species_names[isp]) + ")_mean"
-    wdot2_wtsum[:,:,:,:,:,:,:,:,isp] = wdot2_wtsum[:,:,:,:,:,:,:,:,isp] + f["DATA"][fn]
-  for ir in range(0, Nr):
-    fn = "R(" + str(ir) + ")_mean"
-    prr_wtsum[:,:,:,:,:,:,:,:,ir] = prr_wtsum[:,:,:,:,:,:,:,:,ir] + f["DATA"][fn]
+    fdn = "rhoY(" + str(species_names[isp]) + ")_mean"
+    rhoY_wtsum[:,:,:,:,:,:,:,:,isp] = rhoY_wtsum[:,:,:,:,:,:,:,:,isp] + f["DATA"][fdn]
+    fdn = "rhoY2(" + str(species_names[isp]) + ")_mean"
+    rhoY2_wtsum[:,:,:,:,:,:,:,:,isp] = rhoY2_wtsum[:,:,:,:,:,:,:,:,isp] + f["DATA"][fdn]
+    fdn = "wdot(" + str(species_names[isp]) + ")_mean"
+    wdot_wtsum[:,:,:,:,:,:,:,:,isp] = wdot_wtsum[:,:,:,:,:,:,:,:,isp] + f["DATA"][fdn]
+    fdn = "wdot2(" + str(species_names[isp]) + ")_mean"
+    wdot2_wtsum[:,:,:,:,:,:,:,:,isp] = wdot2_wtsum[:,:,:,:,:,:,:,:,isp] + f["DATA"][fdn]
 
+    fdn = "diffY(" + str(species_names[isp]) + ")_mean"
+    diffY_wtsum[:,:,:,:,:,:,:,:,isp] = diffY_wtsum[:,:,:,:,:,:,:,:,isp] + f["DATA"][fdn]
+  for ir in range(0, Nr):
+    fdn = "R(" + str(ir) + ")_mean"
+    prr_wtsum[:,:,:,:,:,:,:,:,ir] = prr_wtsum[:,:,:,:,:,:,:,:,ir] + f["DATA"][fdn]
+  print("Finished: ", fn)
+#%%
 def get_graph(prr_bin):
   # prr_bin[1:Nr] - volume ingegral of progress rate of reaction
   # Nr - Number of reactions
@@ -542,7 +546,7 @@ prr_premix = np.zeros((Nr))
 for ir in range(0, Nr):
   prr_nonpre[ir] = np.sum(prr_wtsum[:,:,:,:,:,:,0,:,ir],
                             axis = axis_0123456)
-  prr_premix[ir] = np.sum(prr_wtsum[:,:,:,:,:,:,1,:,ir],
+  prr_premix[ir] = np.sum(prr_wtsum[:,:,:,4:,:,:,1,:,ir],
                             axis = axis_0123456)
 graph_nonpre = get_graph(prr_nonpre)
 graph_pre = get_graph(prr_premix)
@@ -560,7 +564,6 @@ for ir in range(0, Nr):
 prr_ZCFA = np.zeros((nmf, npv, nfi, ntres, Nr))
 for ir in range(0, Nr):
   prr_ZCFA[:,:,:,:,ir] = np.sum(prr_wtsum[:,:,:,:,:,:,:,:,ir], axis = (0, 1, 2, 5))
-
 
 z_A = []
 path_N = []
@@ -633,41 +636,27 @@ plot_graph(fig, ax,
            graph_1D, gas1D)
 
 import graphviz
-#%% All species
-fg = graphviz.Digraph(filename="1D_24.gv", format="pdf",)
-gt = graph_1D
-flux_ref = np.sum(gt[N2_ID,:])
-for isp0 in range(0, Nsp):
-  for isp1 in range(0, Nsp):
-    spo = species_names[isp0]
-    origin = f"{spo}"
-
-    spd = species_names[isp1]
-    destin = f"{spd}"
-
-    color='black'
-    width = 10*gt[isp0, isp1]/flux_ref
-    width = max(1, width)
-
-    label = f"  {100*gt[isp0, isp1]/flux_ref:.2f} %\n\n"
-    add_edge = (gt[isp0, isp1] / flux_ref) > 0.01 # Only plot when the flux is >1%
-    if add_edge:
-      fg.edge(origin, destin, label=label, penwidth=str(width), color=color)
-fg
-fg.render()
 
 #%%
-fg_part = graphviz.Digraph(filename="part_all.gv",
+fg_part = graphviz.Digraph(filename="part_premix_rich",
                            format="png",
-                          graph_attr={"nodesep" : "0.05"},
+                          graph_attr={"nodesep" : "0.0",
+                                      "pad" : "0.1",
+                                      "fontname" : "times bold"},
 )
-gt = graph_all
+gt = graph_pre
+nodesize = 50
+labelsize = 40
 flux_ref = np.sum(gt[N2_ID,:])
 spg_part = ["N2", "NO", "N", "NNH", "N2O"]
 xref = np.array([0, 1, 2, 3]);
 yref = np.array([0, 1, 2, 3])
 pos = {}
 fg_part.attr(size=f"{len(spg_part)}")
+for i in range(0, len(spg_part)):
+  nnode = f"{spg_part[i]}"
+  fg_part.node(nnode, label = nnode, fontsize=f"{nodesize}")
+
 for i in range(0, len(spg_part)):
   for j in range(0, len(spg_part)):
     spo = spg_part[i]
@@ -693,175 +682,143 @@ for i in range(0, len(spg_part)):
       color = 'blue'
 
 
-    width = 20*gt[isp0, isp1]/flux_ref
+    width = 40*gt[isp0, isp1]/flux_ref
     width = max(1, width)
 
     label = f"  {100*gt[isp0, isp1]/flux_ref:.2f} %\n\n"
-    add_edge = (gt[isp0, isp1] / flux_ref) > 0.01 # Only plot when the flux is >1%
+    add_edge = (gt[isp0, isp1] / flux_ref) > 0.01
     if add_edge:
       fg_part.edge(origin, destin,
                    label=label,
                    penwidth=str(width),
                    color=color,
                    fontcolor=color,
-                   nodefonasdfasftsize = "600pt",
-                   fontsize = "15, 20")
-fg_part
+                   arrowhead="vee",
+                   fontsize = f"{labelsize}")
 fg_part.render()
-
-#%%
-dot = graphviz.Digraph("G",
-                       engine="neato",
-                       filename="rpa.gv", format="pdf",
-                       graph_attr={'splines': 'compound', 'fontsize' : 20},
-                       )
-gt = graph_1D
-flux_ref = np.sum(gt[N2_ID,:])
-spg = ["N2", "NO", "N", "NNH", "N2O", "NH"]
-xref = np.array([0, 2, 4, 6]);
-yref = np.array([0, 2, 4, 6])
-pos = {}
-dot.attr(size=f"{len(spg)}")
-pos["N2"]   = (xref[1], yref[3])
-pos["NO"]   = (xref[1], yref[2])
-pos["N"]    = (xref[0], yref[2])
-pos["NNH"]  = (xref[2], yref[2])
-pos["N2O"]  = (xref[2], yref[3])
-pos["NH"]   = (xref[3], yref[2])
-
-
-for i in range(0, len(spg)):
-  nnode = f"{spg[i]}"
-  pos_str = str(pos[spg[i]][0]) + ',' + str(pos[spg[i]][1]) + '!'
-  dot.node(nnode, label = nnode, pos = pos_str,)
-
-
-for i in range(0, len(spg)):
-  for j in range(0, len(spg)):
-    isp0 = gas1D.species_index(spg[i])
-    isp1 = gas1D.species_index(spg[j])
-
-    spo = species_names[isp0]
-    origin = f"{spo}"
-
-    spd = species_names[isp1]
-    destin = f"{spd}"
-
-    color='black'
-    width = 3*gt[isp0, isp1]/flux_ref
-    width = max(1, width)
-
-    label = f"{100*gt[isp0, isp1]/flux_ref:.1f}%\n"
-    add_edge = (gt[isp0, isp1] / flux_ref) > 0.01
-    if add_edge:
-      dot.edge(origin, destin,
-               label=label,
-               penwidth=str(width),
-               color=color,
-               labeldistance = "10",
-               )
-
-dot
-
-#%%
-
-fig, ax = plt.subplots()
-ax.plot(x_1D, T_1D, color = "r", linewidth = lw, label = "T")
-ax2 = ax.twinx()
-#ax2.plot(fstate.grid, C_1D[:,tID], color = "b", linestyle = "-.", linewidth = lw, label = "Y(NO)")
-ax2.plot(fstate.grid, u_1D, color = "b", linestyle = "-.", linewidth = lw, label = "Y(NO)")
-
-ax.set_xlabel(r"$x$", fontsize = 20)
-ax.set_ylabel(r"$T~[K]$", fontsize = 20)
-ax2.set_ylabel(r"$Y(\mathrm{NO})$", fontsize = 20)
-ax.tick_params(axis='both', which='major', labelsize=20)
-ax.tick_params(axis='both', which='minor', labelsize=20)
-ax2.tick_params(axis='both', which='major', labelsize=20)
-ax2.tick_params(axis='both', which='minor', labelsize=20)
-ax.legend(fontsize = 20)
-#%%
-
-
-
-#%%
-X_1D    = fstate.X[:,tID]
-X_NO    = fstate.X[:,tID]
-C_NO    = C_1D[:, tID]
-prr_NO  = prr_1D[:,tID]
-wdot_NO = wdot_1D[:,tID]
-
-u_out   = u_1D[-1]
-u_in    = u_1D[0]
-C_NO_out = C_1D[-2, tID]
-C_NO_in = C_1D[1, tID]
-
-dx_c   = x_1D[1:] - x_1D[0:-1]
-prr_NO_c = (prr_NO[0:-1] + prr_NO[1:]) / 2.
-wdot_NO_c = (wdot_NO[0:-1] + wdot_NO[1:]) / 2.
-u_c = (u_1D[0:-1] + u_1D[1:]) / 2.
-C_NO_c = (C_NO[0:-1] + C_NO[1:]) / 2.
-prr_c = np.zeros((x_1D[1:].shape[0], Nr))
+fg_part
+#%% Dependence of RPA on post-flame residence time
+prr_A = np.zeros((ntres, Nr))
 for ir in range(0, Nr):
-  prr_c[:,ir] = (prr_1D[0:-1,ir] + prr_1D[1:,ir]) / 2.
-wdot_c = np.zeros((x_1D[1:].shape[0], Nsp))
-for isp in range(0, Nsp):
-  wdot_c[:,isp] = (wdot_1D[0:-1,isp] + wdot_1D[1:,isp]) / 2.
+  prr_A[:,ir] = np.sum(prr_wtsum[:,:,:,:,:,:,0,:,ir], axis = (0,1,2,3,4,5))
 
-prr_wtsum_1D  = np.zeros((Nr))
+prr_ZFA = np.zeros((nmf, nfi, ntres, Nr))
 for ir in range(0, Nr):
-  prr_wtsum_1D[ir] = np.sum(dx_c * prr_c[:,ir])
-wdot_wtsum_1D = np.zeros((Nsp))
-for isp in range(0, Nsp):
-  wdot_wtsum_1D[isp] = np.sum(dx_c * wdot_c[:,isp])
+  prr_ZFA[:,:,:,ir] = np.sum(prr_wtsum[:,:,:,:,:,:,:,:,ir], axis = (0, 1, 2, 4, 5))
 
-graph_1D = get_graph(prr_wtsum_1D)
+prr_ZCFA = np.zeros((nmf, npv, nfi, ntres, Nr))
+for ir in range(0, Nr):
+  prr_ZCFA[:,:,:,:,ir] = np.sum(prr_wtsum[:,:,:,:,:,:,:,:,ir], axis = (0, 1, 2, 5))
+
+
+lw = 2.5; markersize = 12; markeredgewidth = 3;
+fontsize = 20
+z_A = []
+path_N = []
+path_N= []
+path_NNH = []
+path_N2O = []
+# (10, 19)
+imf = 10; smf = slice(10, 19)
+ifi = 0
+zmin = np.linspace(0, 0.1, 20)[smf.start]
+zmax = np.linspace(0, 0.1, 20)[smf.stop]
+zst = 0.0252
+strt = r"$Z /Z_\mathrm{st}\in [" + "%.1f"%(zmin/zst) + ",~"
+strt = strt + "%.1f"%(zmax/zst) + "] $"
+
+res_A = np.linspace(0.05E-4, 1.2E-4, ntres)
+res_nonpre = np.zeros((ntres, 3))
+res_pre = np.zeros((ntres, 3))
+for iA in range(0, ntres):
+  prr_local = np.sum(prr_ZFA[smf, 0, iA, :], axis = (0))
+  gt = get_graph(prr_local)
+  ref = np.sum(gt[N2_ID,:])
+  r0 = (gt[N2_ID, NO_ID]+gt[N2_ID, N_ID])/ref
+  res_nonpre[iA, 0] = r0
+  r1 = gt[N2_ID, NNH_ID]/ref
+  res_nonpre[iA, 1] = r1
+  r2 = gt[N2_ID, N2O_ID]/ref
+  res_nonpre[iA, 2] = r2
+
+  prr_local = np.sum(prr_ZFA[smf, 1, iA, :], axis = (0))
+  gt = get_graph(prr_local)
+  ref = np.sum(gt[N2_ID,:])
+  r0 = (gt[N2_ID, NO_ID]+gt[N2_ID, N_ID])/ref
+  res_pre[iA, 0] = r0
+  r1 = gt[N2_ID, NNH_ID]/ref
+  res_pre[iA, 1] = r1
+  r2 = gt[N2_ID, N2O_ID]/ref
+  res_pre[iA, 2] = r2
+
+
+res_nonpre = pd.DataFrame({ 'A' : res_A[:],
+                      'thermal': res_nonpre[:,0],
+                      'NNH': res_nonpre[:,1],
+                      'N2O': res_nonpre[:,2]})
+res_pre = pd.DataFrame({ 'A' : res_A[:],
+                      'thermal': res_pre[:,0],
+                      'NNH': res_pre[:,1],
+                      'N2O': res_pre[:,2]})
+
+res_nonpre.dropna(subset=['thermal'])
+res_pre.dropna(subset=['thermal'])
+
+A_nonpre = res_nonpre['A'].values * 10000.
+nonpre0 = res_nonpre['thermal'].values
+nonpre1 = res_nonpre['NNH'].values
+nonpre2 = res_nonpre['N2O'].values
+non_pre = res_nonpre['A'].values
+A_pre = res_pre['A'].values * 10000.
+pre0 = res_pre['thermal'].values
+pre1 = res_pre['NNH'].values
+pre2 = res_pre['N2O'].values
+
+figunit_x = 3.0; figunit_y = 3.0
+fig, axs = plt.subplots(figsize = (figunit_x, figunit_y*2), ncols = 1, nrows = 2)
+for iplot in range(0, 2):
+  ax = axs[iplot]
+  if (iplot == 0):
+    ax.plot(A_nonpre, nonpre0, color = "r", linewidth = 2.5,
+        marker = "o", markersize = markersize,
+        markerfacecolor = "w",
+        markeredgecolor = "r", markeredgewidth = markeredgewidth)
+    ax.set_title(strt, fontsize = 24)
+    ax.plot(A_nonpre, nonpre1, color = "purple", linewidth = 2.5,
+        marker = "o", markersize = markersize,
+        markerfacecolor = "w",
+        markeredgecolor = "purple", markeredgewidth = markeredgewidth)
+    ax.plot(A_nonpre, nonpre2, color = "blue", linewidth = 2.5,
+        marker = "o", markersize = markersize,
+        markerfacecolor = "w",
+        markeredgecolor = "blue", markeredgewidth = markeredgewidth)
+  elif (iplot == 1):
+    ax.plot(A_pre, pre0, color = "r", linewidth = 2.5,
+        marker = "s", markersize = markersize,
+        markerfacecolor = "w",
+        markeredgecolor = "r", markeredgewidth = markeredgewidth)
+    ax.plot(A_pre, pre1, color = "purple", linewidth = 2.5,
+        marker = "s", markersize = markersize, alpha = 1.0,
+        markerfacecolor = "w",
+        markeredgecolor = "purple", markeredgewidth = markeredgewidth)
+    ax.plot(A_pre, pre2, color = "blue", linewidth = 2.5,
+        marker = "s", markersize = markersize,
+        markerfacecolor = "w",
+        markeredgecolor = "blue", markeredgewidth = markeredgewidth)
+  if iplot == 1:
+    ax.set_xlabel(r'$\alpha_\mathrm{p} \times \mathrm{10^{-4}~[s]}$', fontsize = 20)
+  #ax.set_ylabel("", fontsize = 24)
+  if iplot == 1:
+    ax.set_xticks([0.6, 1.2])
+  else:
+    ax.set_xticks([0.6, 1.2])
+    ax.set_xticklabels([])
+  ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
+  ax.set_yticklabels([r"$0.0$", " ", r"$0.5$", " ", r"$1.0$"])
+  ax.tick_params(axis='both', which='major', labelsize=24)
+  ax.tick_params(axis='both', which='minor', labelsize=24)
+  ax.grid()
+pltn = "./RPAA_Z=" + str(smf.start) + "-" + str(smf.stop) + ".png"
+plt.savefig(pltn, dpi = 400, bbox_inches = "tight")
 
 #%%
-for ir, rn in enumerate(gas1D.reactions()):
-  print(ir, rn)
-fig, ax = plt.subplots()
-ax.plot(x_1D, T_1D, color = "r", linewidth = lw, label = "T")
-ax2 = ax.twinx()
-ax2.plot(fstate.grid, X_NO, color = "b", linestyle = "-.", linewidth = lw, label = "Y(NO)")
-ax.set_xlabel(r"$x$", fontsize = 20)
-ax.set_ylabel(r"$T~[K]$", fontsize = 20)
-ax2.set_ylabel(r"$Y(\mathrm{NO})$", fontsize = 20)
-ax.tick_params(axis='both', which='major', labelsize=20)
-ax.tick_params(axis='both', which='minor', labelsize=20)
-ax2.tick_params(axis='both', which='major', labelsize=20)
-ax2.tick_params(axis='both', which='minor', labelsize=20)
-ax.legend(fontsize = 20)
-ax.set_title(r"Z=4.0 Zst", fontsize = 30)
-
-
-v1 = C_NO_c[-1] * u_c[-1]
-print("1. Outflow flux:", v1, "kmol/m2/s")
-v2 = wdot_wtsum_1D[tID]
-print("2. Production of NO:", wdot_wtsum_1D[tID], "kmol/m2/s")
-v3 = -np.sum(graph_1D[tID,:])
-print("3. Production of NO from transfer matrix:", -np.sum(graph_1D[tID,:]), "kmol/m2/s")
-err = (np.abs(v1) - np.abs(v2)) / np.abs(v1)
-err = err * 100
-print("|value1 - value2] / value1: ", "%.2f"%err, "%")
-
-fig, ax = plt.subplots()
-plot_graph(fig, ax,
-           graph_1D, gas1D)
-
-#target_ID = N2O_ID
-#target_name = species_names[target_ID]
-#for isp in range(0, Nsp):
-#  print(target_name + " to ".rjust(5)+gas1D.species_names[isp].ljust(5), ": "
-#         "%5.2E" % (graph_1D[target_ID, isp]) )
-
-
-zs = np.array([5E-3])
-r_N = np.array([4E-4])
-r_NO = np.array([4E-4])
-r_NNH = np.array([])
-r_N2O = np.array([])
-
-
-
-
-# %%

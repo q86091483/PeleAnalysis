@@ -28,7 +28,7 @@ fns = glob.glob(case_folder + "plt_1*.h5")
 # Data folder - where 1D flame data is stored
 data_folder = "/scratch/b/bsavard/zisen347/PeleAnalysis/RJICF/Data/UnstrainedPremixed1D"
 # Field names
-field_names = [["T", "wdot(O2)", "wdot(H2)", "wdot(H2O)"], 
+field_names = [["T", "wdot(O2)", "wdot(H2)", "wdot(H2O)"],
                 ["wdot(NH)", "wdot(NNH)", "wdot(OH)", "wdot(H2O2)"],
                ["wdot(NO)", "wdot(N2O)", "wdot(NO2)", "wdot(N)"],
               ]
@@ -41,7 +41,7 @@ ny = tet.shape[1]
 nz = tet.shape[2]
 nmf = tet.shape[3]
 npv = tet.shape[4]
-nzo = tet.shape[5] 
+nzo = tet.shape[5]
 zout = np.linspace(0, 1, nmf)
 pvout = np.linspace(0, 1, npv)
 labelsize = 16
@@ -49,8 +49,8 @@ labelsize = 16
 xmin = -15.75E-4; xmax = 112.25E-4
 ymin = -1.8E-3; ymax = 1.8E-3
 zmin = -0.0E-3; zmax = 5.6E-3
-Lx = xmax - xmin 
-Ly = ymax - ymin 
+Lx = xmax - xmin
+Ly = ymax - ymin
 Lz = zmax - zmin
 nmix = 30;
 # Mechanism
@@ -78,10 +78,10 @@ def get_states(zs, equilibrate = True):
   gas_f = ct.Solution(mech)
   gas_o = ct.Solution(mech)
   gas_m = ct.Solution(mech)
-  states = ct.SolutionArray(gas_m) 
+  states = ct.SolutionArray(gas_m)
   for iz, z in enumerate(zs):
     # Fuel and oxidizer stream
-    X_f    = {}; X_f["H2"] = 1.0; X_f["N2"] = 1 - X_f["H2"] 
+    X_f    = {}; X_f["H2"] = 1.0; X_f["N2"] = 1 - X_f["H2"]
     X_o    = {}; X_o["O2"] = 0.21; X_o["N2"] = 0.79
     gas_f.TPX = 300, 405300, X_f
     gas_o.TPX = 750, 405300, X_o
@@ -113,7 +113,7 @@ mf_CD = []
 for ix, x in enumerate(fstate_CD.grid):
   gas_CD.TPY = fstate_CD.T[ix], fstate_CD.P[ix], fstate_CD.Y[ix,:]
   mf_CD.append(zer.spec2mf(gas_CD.Y))
-mf_CD = np.array(mf_CD) 
+mf_CD = np.array(mf_CD)
 
 # Progress variable definition
 coeff_pv = {}
@@ -143,7 +143,7 @@ def get_pveq(zs, equilibrate):
   print("Input zs for get_pveq: ", zs)
   for iz, z in enumerate(zs):
     # Fuel and oxidizer stream
-    X_f    = {}; X_f["H2"] = 1.0; X_f["N2"] = 1 - X_f["H2"] 
+    X_f    = {}; X_f["H2"] = 1.0; X_f["N2"] = 1 - X_f["H2"]
     X_o    = {}; X_o["O2"] = 0.21; X_o["N2"] = 0.79
     gas_f.TPX = 300, 405300, X_f
     gas_o.TPX = 750, 405300, X_o
@@ -214,12 +214,12 @@ wdot_ZC_wtsum   = np.sum(wdot_wtsum, axis=axis_sum)
 wdot2_ZC_wtsum   = np.sum(wdot2_wtsum, axis=axis_sum)
 
 #%%
-rho_ZC    = rho_ZC_wtsum / wt_ZC_wtsum 
-mf_ZC     = mf_ZC_wtsum / wt_ZC_wtsum 
-pv_ZC     = pv_ZC_wtsum / wt_ZC_wtsum 
-rhoT_ZC   = rhoT_ZC_wtsum / wt_ZC_wtsum 
-rhoT2_ZC  = rhoT2_ZC_wtsum / wt_ZC_wtsum 
-hrr_ZC    = hrr_ZC_wtsum / wt_ZC_wtsum 
+rho_ZC    = rho_ZC_wtsum / wt_ZC_wtsum
+mf_ZC     = mf_ZC_wtsum / wt_ZC_wtsum
+pv_ZC     = pv_ZC_wtsum / wt_ZC_wtsum
+rhoT_ZC   = rhoT_ZC_wtsum / wt_ZC_wtsum
+rhoT2_ZC  = rhoT2_ZC_wtsum / wt_ZC_wtsum
+hrr_ZC    = hrr_ZC_wtsum / wt_ZC_wtsum
 rhoY_ZC   = np.zeros_like(rhoY_ZC_wtsum)
 rhoY2_ZC  = np.zeros_like(rhoY2_ZC_wtsum)
 wdot_ZC   = np.zeros_like(wdot_ZC_wtsum)
@@ -232,8 +232,8 @@ for isp in range(0, Nsp):
 
 fig, ax = plt.subplots(figsize=(5,4))
 phi = pv_ZC
-ax.imshow(phi.transpose(), origin="lower", 
-          vmin=0, vmax=1, 
+ax.imshow(phi.transpose(), origin="lower",
+          vmin=0, vmax=1,
           cmap = "jet",
           extent = [0.0, 1.0, 0.0, 1.2])
 ax.set_xlabel(r"$Z$", fontsize=labelsize)
@@ -244,8 +244,8 @@ ax.tick_params(axis='both', which='major', labelsize=labelsize-2)
 ax.tick_params(axis='both', which='minor', labelsize=labelsize-2)
 #%%
 Zt = 0.0126
-iz1D = np.argmax((Zs1D > Zt)) 
-iz3D = np.argmax((zout > Zt)) - 1 
+iz1D = np.argmax((Zs1D > Zt))
+iz3D = np.argmax((zout > Zt)) - 1
 fn1D = fns1D_sorted[iz1D]
 df = pd.read_csv(fn1D)
 fstate = ct.SolutionArray(gas1D)
@@ -253,7 +253,7 @@ fstate.from_pandas(df)
 net_production_rates = fstate.net_production_rates
 pv1D = np.zeros_like(fstate.T)
 for isp, spn in enumerate(gas1D.species_names):
-  pv1D = pv1D + coeff_pv[spn] * fstate.Y[:, isp] 
+  pv1D = pv1D + coeff_pv[spn] * fstate.Y[:, isp]
 pv1D = (pv1D - pveqs0[iz1D]) / (pveqs[iz1D] - pveqs0[iz1D])
 
 # Plot parameter
@@ -272,7 +272,7 @@ for ipy in range(0, npy):
       ax.plot(pv1D, fstate.T, color="r", linestyle="--", label = r"$\mathrm{1D}$")
       # 3D
       T_favm = rhoT_ZC[iz3D,:] / rho_ZC[iz3D,:]
-      ax.plot(pv3D, T_favm, color="k", linestyle="-", label=r"$\langle T | C \rangle$") 
+      ax.plot(pv3D, T_favm, color="k", linestyle="-", label=r"$\langle T | C \rangle$")
       # 3D - std
       rhoT_fms = rhoT2_ZC[iz3D,:] - rho_ZC[iz3D,:]*T_favm*T_favm
       T_fms = np.sqrt(rhoT_fms / rho_ZC[iz3D,:])
@@ -296,7 +296,7 @@ for ipy in range(0, npy):
       y1 = Y_favm - Y_fms
       y2 = Y_favm + Y_fms
       ax.fill_between(pv3D, y1, y2, color="gray", alpha=0.5)
-      indx = (Y_favm<1) & (Y_favm>0) 
+      indx = (Y_favm<1) & (Y_favm>0)
       ax.set_ylim([0, np.amax(Y_favm[indx])*1.05])
       ax.set_title(r"$Y_\mathrm{"+spn+"}$", fontsize=14)
     elif (field_name[0:4] == "wdot"):
@@ -326,5 +326,5 @@ for ipy in range(0, npy):
     #if (ipx == 0):
       #ax.set_ylabel(r"$z / D_{j}$", fontsize = labelsize)
       #ax.set_yticks(np.array([0, 5, 10]))
-      
+
 #%%
